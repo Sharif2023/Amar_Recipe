@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from "../assets/Amar_Recipe_Header_Logo.svg";
 
 const AdminFooter = () => {
     return (
@@ -6,7 +7,7 @@ const AdminFooter = () => {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="max-w-3xl mx-auto">
                     <a href="/Home" className="flex justify-center ">
-                        <div className="text-black font-bold text-2xl mb-4 lg:mb-0 hover:text-orange-600 hover:cursor-pointer inline-flex items-center gap-2"><img src="src/assets/Amar_Recipe_Header_Logo.svg" className="w-8 h-8" alt="Amar Recipe Header Logo" />আমার রেসিপি</div>
+                        <div className="text-black font-bold text-2xl mb-4 lg:mb-0 hover:text-orange-600 hover:cursor-pointer inline-flex items-center gap-2"><img src={logo} className="w-8 h-8" alt="Amar Recipe Header Logo" />আমার রেসিপি</div>
                     </a>
                     <ul className="text-sm flex items-center justify-center flex-col gap-7 md:flex-row md:gap-12 transition-all duration-500 py-5 mb-5 border-b border-gray-200">
                         <li><a href="#" className=" text-gray-800 hover:text-[#ff3300]">রেসিপিগুলো দেখুন</a></li>

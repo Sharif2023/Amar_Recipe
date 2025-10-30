@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link, NavLink } from "react-router-dom";
+import logo from "../assets/Amar_Recipe_Header_Logo.svg";
 
 function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -58,7 +59,7 @@ function Header() {
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
 
                     <Link to={'/'}>
-                        <div className="text-white font-bold text-2xl mb-4 lg:mb-0 hover:text-orange-600 hover:cursor-pointer inline-flex items-center gap-2"><img src="src/assets/Amar_Recipe_Header_Logo.svg" className="w-8 h-8" alt="Amar Recipe Header Logo" />আমার রেসিপি</div>
+                        <div className="text-white font-bold text-2xl mb-4 lg:mb-0 hover:text-orange-600 hover:cursor-pointer inline-flex items-center gap-2"><img src={logo} className="w-8 h-8" alt="Amar Recipe Header Logo" />আমার রেসিপি</div>
                     </Link>
 
                     {/* Hamburger menu for small screens */}

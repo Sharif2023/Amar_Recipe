@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import ChatModal from "../Admin/ChatModal";
+import logo from "../assets/Amar_Recipe_Header_Logo.svg";
 
 const AdminHeader = () => {
   const [reportCount, setReportCount] = useState(0);
@@ -134,7 +135,7 @@ const AdminHeader = () => {
           {/* Logo */}
           <div className="flex items-center text-white font-bold text-2xl mb-4 lg:mb-0 cursor-pointer gap-2">
             <img
-              src="src/assets/Amar_Recipe_Header_Logo.svg"
+              src={logo}
               className="w-8 h-8"
               alt="Amar Recipe Header Logo"
             />
