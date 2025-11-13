@@ -1,9 +1,8 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-header('Content-Type: application/json');
-header("Access-Control-Allow-Origin: *"); // Allow CORS for testing
 
+require_once 'cors.php';
 require_once 'config.php';
 
 // Helper function to sanitize input
