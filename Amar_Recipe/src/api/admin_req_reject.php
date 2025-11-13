@@ -2,10 +2,7 @@
 
 date_default_timezone_set("Asia/Dhaka");
 
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Content-Type: application/json");
+require_once 'cors.php';
 ini_set("display_errors", 0);
 error_reporting(0);
 
