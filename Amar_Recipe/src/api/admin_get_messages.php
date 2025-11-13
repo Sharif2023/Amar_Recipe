@@ -1,13 +1,6 @@
 <?php
 // Handle preflight OPTIONS request for CORS
 require_once 'cors.php';
-
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {// Now handle the actual GET request
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Content-Type: application/json");
-
 require_once 'config.php';
 
 $sender_id = isset($_GET['sender_id']) ? intval($_GET['sender_id']) : 0;
