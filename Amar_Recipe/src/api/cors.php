@@ -11,22 +11,28 @@ $allowed_origins = [
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-if (in_array($origin, $allowed_origins)) {
+if ($origin && in_array($origin, $allowed_origins)) {
     header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
 } else {
+    // Fallback to wildcard if origin absent or not in the allow list
     header('Access-Control-Allow-Origin: *');
 }
 
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+
+// If the browser sent specific request headers during preflight, mirror them.
+$requestedHeaders = $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'] ?? 'Content-Type, Authorization, X-Requested-With';
+header('Access-Control-Allow-Headers: ' . $requestedHeaders);
+
 header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Max-Age: 86400');
 
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+// Handle preflight requests quickly and exit without producing JSON body
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
-    exit();
+    exit;
 }
 
 header('Content-Type: application/json');
-?>
+
