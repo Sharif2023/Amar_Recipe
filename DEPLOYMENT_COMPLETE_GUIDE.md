@@ -121,7 +121,7 @@ Your project already has `vercel.json` configured. Here's what it does:
   "buildCommand": "npm run build",        // Run Vite build
   "outputDirectory": "dist",              // Output folder
   "env": {
-    "VITE_API_URL": "@vite_api_url"     // API URL from Vercel env vars
+    "VITE_API_URL": "https://amar-recipes.infinityfreeapp.com/api"
   },
   "routes": [
     {
@@ -134,14 +134,12 @@ Your project already has `vercel.json` configured. Here's what it does:
 
 ### Step 3: Set Environment Variables in Vercel Dashboard
 
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Select your **Amar_Recipe** project
-3. Go to **Settings** → **Environment Variables**
-4. Add the following:
+✅ **No manual action needed!** The environment variable is now configured directly in `vercel.json`.
 
-| Variable Name | Value | Environment |
-|---|---|---|
-| `VITE_API_URL` | `https://amar-recipes.infinityfreeapp.com/api` | Production |
+The API URL is hardcoded in the build configuration:
+- `VITE_API_URL`: `https://amar-recipes.infinityfreeapp.com/api`
+
+This ensures the frontend always calls the correct backend API regardless of environment.
 
 ### Step 4: Deploy
 
