@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-const backendBaseUrl = 'http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/';
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const categoryBanglaMap = {
   Meat: 'মাংস',
@@ -94,7 +93,7 @@ const AdminViewRecipeModal = ({ isOpen, onClose, recipe, onSave }) => {
             <label className="block mb-2 font-bold">ছবিটির পথঃ</label>
             <div className="flex items-center gap-2">
               <img
-                src={editedRecipe.image_url ? backendBaseUrl + editedRecipe.image_url : 'https://dummyimage.com/400x300/000/fff&text=No+Image'}
+                src={editedRecipe.image_url ? API_CONFIG.BASE_URL + '/' + editedRecipe.image_url : 'https://dummyimage.com/400x300/000/fff&text=No+Image'}
                 alt={editedRecipe.title}
                 className="w-[100px] h-[75px] object-cover rounded-md mb-4"
               />

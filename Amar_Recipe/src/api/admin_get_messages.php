@@ -14,12 +14,7 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
 
-$conn = new mysqli("localhost", "root", "", "Amar_Recipe");
-
-if ($conn->connect_errno) {
-    echo json_encode(['success' => false, 'message' => 'DB Connection failed']);
-    exit;
-}
+require_once 'config.php';
 
 $sender_id = isset($_GET['sender_id']) ? intval($_GET['sender_id']) : 0;
 $receiver_id = isset($_GET['receiver_id']) ? intval($_GET['receiver_id']) : 0;

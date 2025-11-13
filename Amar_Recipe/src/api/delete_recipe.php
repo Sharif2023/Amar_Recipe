@@ -26,18 +26,13 @@ if (!isset($data['id']) || intval($data['id']) <= 0) {
 
 $recipeId = intval($data['id']);
 
-$mysqli = new mysqli("localhost", "root", "", "Amar_Recipe");
-
-if ($mysqli->connect_errno) {
-    echo json_encode(['success' => false, 'message' => 'DB connection failed: ' . $mysqli->connect_error]);
-    exit;
-}
+require_once 'config.php';
 
 // First delete any related reports (optional, for consistency)
-$mysqli->query("DELETE FROM reports WHERE recipe_id = $recipeId");
+$conn->query("DELETE FROM reports WHERE recipe_id = $recipeId");
 
 // Then delete the recipe
-$stmt = $mysqli->prepare("DELETE FROM recipes WHERE id = ?");
+$stmt = $conn->prepare("DELETE FROM recipes WHERE id = ?");
 $stmt->bind_param("i", $recipeId);
 
 if ($stmt->execute()) {

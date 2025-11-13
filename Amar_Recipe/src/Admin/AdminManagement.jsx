@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const AdminManagement = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const AdminManagement = () => {
   }, [navigate]);
 
   const fetchRequests = async () => {
-    const res = await fetch("http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/admin_requests.php", {
+    const res = await fetch(getApiUrl(API_CONFIG.ADMIN_MANAGEMENT.GET_REQUESTS), {
       cache: "no-store",
     });
     const data = await res.json();
@@ -51,7 +52,7 @@ const AdminManagement = () => {
     const admin = JSON.parse(localStorage.getItem("admin"));
 
     try {
-      const res = await fetch("http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/update_admin_status.php", {
+      const res = await fetch(getApiUrl(API_CONFIG.ADMIN.UPDATE_STATUS), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status, admin_name: admin.name }),  // Include admin's name
@@ -77,7 +78,7 @@ const AdminManagement = () => {
       const loggedInAdmin = JSON.parse(localStorage.getItem("admin"));
 
       try {
-        const res = await fetch("http://localhost/Amar_Recipies_jsx/Amar_Recipe/admin_api/admin_delete.php", {
+        const res = await fetch(getApiUrl('/admin_delete.php'), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -4,16 +4,7 @@ ini_set('display_errors', 1);
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "Amar_Recipe";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => "DB Connection failed"]);
-    exit;
-}
+require_once 'config.php';
 
 function sanitize($conn, $data)
 {

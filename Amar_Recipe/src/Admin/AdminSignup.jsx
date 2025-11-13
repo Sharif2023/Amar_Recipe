@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const AdminSignup = () => {
     const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ const AdminSignup = () => {
         }
 
         try {
-            const res = await fetch("http://localhost/Amar_Recipies_jsx/Amar_Recipe/admin_api/admin_signup.php", {
+            const res = await fetch(getApiUrl('/admin_signup.php'), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),

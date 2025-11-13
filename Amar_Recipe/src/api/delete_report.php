@@ -34,15 +34,10 @@ if ($id <= 0) {
     exit;
 }
 
-$mysqli = new mysqli("localhost", "root", "", "Amar_Recipe");
-
-if ($mysqli->connect_errno) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . $mysqli->connect_error]);
-    exit;
-}
+require_once 'config.php';
 
 // Check existence
-$stmt = $mysqli->prepare("SELECT id FROM reports WHERE id = ?");
+$stmt = $conn->prepare("SELECT id FROM reports WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $result = $stmt->get_result();

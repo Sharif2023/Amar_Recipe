@@ -2,11 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
-$mysqli = new mysqli("localhost", "root", "", "Amar_Recipe");
-if ($mysqli->connect_errno) {
-    echo json_encode(['success' => false, 'data' => []]);
-    exit;
-}
+require_once 'config.php';
 
 // Join reports with recipes to get full recipe data
 $query = "

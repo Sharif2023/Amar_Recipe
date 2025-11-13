@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 export default function SubmitRecipe() {
     const [formData, setFormData] = useState({
@@ -41,7 +42,7 @@ export default function SubmitRecipe() {
         }
 
         try {
-            const response = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/submit_recipe_request.php', {
+            const response = await fetch(getApiUrl(API_CONFIG.RECIPES.SUBMIT_REQUEST), {
                 method: 'POST',
                 body: data,
             });

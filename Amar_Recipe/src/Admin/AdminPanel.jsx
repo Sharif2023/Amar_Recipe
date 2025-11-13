@@ -3,6 +3,7 @@ import AdminHeader from "../Components/AdminHeader";
 import AdminFooter from '../Components/AdminFooter';
 import { IoStar, IoTrashBinOutline, IoPencilOutline, IoEyeOutline } from 'react-icons/io5';
 import AdminViewRecipeModal from './AdminViewRecipeModal';
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const AdminPanel = () => {
   const [recipes, setRecipes] = useState([]);
@@ -10,7 +11,7 @@ const AdminPanel = () => {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const baseImageUrl = 'http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/';
+  const baseImageUrl = `${API_CONFIG.BASE_URL}/`;
 
   const [currentPage, setCurrentPage] = useState(1);
   const recipesPerPage = 8;
@@ -18,7 +19,7 @@ const AdminPanel = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/get_recipes.php');
+        const res = await fetch(getApiUrl(API_CONFIG.RECIPES.GET_ALL));
         if (!res.ok) throw new Error('Failed to fetch recipes');
         const data = await res.json();
         setRecipes(data.recipes || []);

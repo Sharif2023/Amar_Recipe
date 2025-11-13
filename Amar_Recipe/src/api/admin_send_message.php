@@ -11,13 +11,7 @@ header('Content-Type: application/json');
 // Get the input data from the POST request
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Create a new MySQLi connection
-$mysqli = new mysqli("localhost", "root", "", "Amar_Recipe");
-
-if ($mysqli->connect_errno) {
-    echo json_encode(['success' => false, 'message' => 'DB Connection failed']);
-    exit;
-}
+require_once 'config.php';
 
 // Check if the required fields are present
 if (isset($data['sender_id'], $data['receiver_id'], $data['message'])) {

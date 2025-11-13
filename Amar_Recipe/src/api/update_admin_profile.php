@@ -19,11 +19,7 @@ if (!isset($_POST['id'])) {
     exit();
 }
 
-$conn = new mysqli("localhost", "root", "", "amar_recipe");
-if ($conn->connect_error) {
-    echo json_encode(["success" => false, "message" => "Database connection failed: " . $conn->connect_error]);
-    exit();
-}
+require_once 'config.php';
 
 $id = $_POST['id'];
 $name = $_POST['name'] ?? '';

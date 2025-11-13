@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const SubmissionRequest = () => {
   const [requests, setRequests] = useState([]);
@@ -40,18 +41,18 @@ const SubmissionRequest = () => {
     setViewModalOpen(false);
   };
 
-  // রিকুয়েষ্ট ফেচ করুন
+  // রিকুয়েষ্ট ফেচ করুন
   const fetchRequests = async () => {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/get_submission_requests.php"
+        getApiUrl(API_CONFIG.ADMIN_MANAGEMENT.GET_SUBMISSION_REQUESTS)
       );
       const json = await res.json();
       if (json.success) {
         setRequests(json.data);
       } else {
-        alert("রিকুয়েষ্ট লোড করতে ব্যর্থ হয়েছে।");
+        alert("রিকুয়েষ্ট লোড করতে ব্যর্থ হয়েছে।");
       }
     } catch (err) {
       alert("ত্রুটি: " + err.message);
@@ -68,7 +69,7 @@ const SubmissionRequest = () => {
     if (!window.confirm("আপনি কি নিশ্চিত এই সাবমিশন এপ্রুভ করতে চান?")) return;
     try {
       const res = await fetch(
-        "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/approve_submission.php",
+        getApiUrl(API_CONFIG.ADMIN_MANAGEMENT.APPROVE_SUBMISSION),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -104,7 +105,7 @@ const SubmissionRequest = () => {
     }
     try {
       const res = await fetch(
-        "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/reject_submission.php",
+        getApiUrl(API_CONFIG.ADMIN_MANAGEMENT.REJECT_SUBMISSION),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -147,7 +148,7 @@ const SubmissionRequest = () => {
               <div className="flex-shrink-0 w-24 h-20 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden mr-4">
                 {req.image ? (
                   <img
-                    src={`http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/${req.image}`}
+                    src={`${API_CONFIG.BASE_URL}/${req.image}`}
                     alt={req.title}
                     className="w-full h-full object-cover"
                   />
@@ -239,7 +240,7 @@ const SubmissionRequest = () => {
 
             {selectedSubmission.image ? (
               <img
-                src={`http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/${selectedSubmission.image}`}
+                src={`${API_CONFIG.BASE_URL}/${selectedSubmission.image}`}
                 alt={selectedSubmission.title}
                 className="w-full max-h-64 object-cover rounded mb-4"
               />

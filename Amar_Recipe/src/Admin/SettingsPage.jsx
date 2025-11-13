@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const SettingsPage = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -22,7 +23,7 @@ const SettingsPage = () => {
         const email = admin.email;  // Extract email from the logged-in admin
 
         try {
-            const response = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/change_password.php', {
+            const response = await fetch(getApiUrl(API_CONFIG.ADMIN.CHANGE_PASSWORD), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ currentPassword, newPassword, email }) // Include email here
@@ -50,7 +51,7 @@ const SettingsPage = () => {
             const email = admin.email;  // Extract email from the logged-in admin
 
             try {
-                const response = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/delete_account.php', {
+                const response = await fetch(getApiUrl(API_CONFIG.ADMIN.DELETE_ACCOUNT), {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email }) // Include email here

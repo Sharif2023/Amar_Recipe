@@ -9,7 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-$conn = new mysqli("localhost", "root", "", "amar_recipe");
+require_once 'config.php';
+
 $result = $conn->query("SELECT * FROM admin_requests");
 $rows = [];
 
@@ -18,3 +19,4 @@ while($row = $result->fetch_assoc()) {
 }
 echo json_encode($rows);
 ?>
+

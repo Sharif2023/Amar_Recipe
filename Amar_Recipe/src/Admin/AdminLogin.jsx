@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const AdminLogin = () => {
 
@@ -9,7 +10,7 @@ const AdminLogin = () => {
     const navigate = useNavigate();
     const handleLogIn = async () => {
         try {
-            const res = await fetch("http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/admin_login.php", {
+            const res = await fetch(getApiUrl(API_CONFIG.ADMIN.LOGIN), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -19,7 +20,7 @@ const AdminLogin = () => {
 
             if (data.success) {
                 // Normalize the profile image path before saving to localStorage
-                const BASE_URL = "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/";
+                const BASE_URL = API_CONFIG.BASE_URL;
 
                 const fullProfileImage = data.admin.profile_image?.startsWith("http")
                     ? data.admin.profile_image

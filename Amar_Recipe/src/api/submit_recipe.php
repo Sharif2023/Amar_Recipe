@@ -4,19 +4,7 @@ ini_set('display_errors', 1);
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *"); // Allow CORS for testing
 
-
-// Database config
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "Amar_Recipe";
-
-// Connect to DB
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => "DB Connection failed"]);
-    exit;
-}
+require_once 'config.php';
 
 // Helper function to sanitize input
 function sanitize($conn, $data)

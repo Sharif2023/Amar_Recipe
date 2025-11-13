@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminViewRecipeModal from './AdminViewRecipeModal';
-
-const backendBaseUrl = 'http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/';
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -11,7 +10,7 @@ const Reports = () => {
 
   const fetchReports = async () => {
     try {
-      const res = await fetch(`${backendBaseUrl}get_reports.php`);
+      const res = await fetch(getApiUrl(API_CONFIG.REPORTS.GET_ALL));
       const json = await res.json();
       if (json.success) {
         setReports(json.data);
@@ -32,7 +31,7 @@ const Reports = () => {
     if (!window.confirm('আপনি কি নিশ্চিত এই রিপোর্ট সমাধান হয়েছে?')) return;
 
     try {
-      const res = await fetch(`${backendBaseUrl}delete_report.php`, {
+      const res = await fetch(getApiUrl(API_CONFIG.REPORTS.DELETE), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +74,7 @@ const Reports = () => {
 
   const handleSaveRecipe = async (updatedRecipe) => {
     try {
-      const res = await fetch(`${backendBaseUrl}update_recipe.php`, {
+      const res = await fetch(getApiUrl(API_CONFIG.RECIPES.UPDATE), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedRecipe),

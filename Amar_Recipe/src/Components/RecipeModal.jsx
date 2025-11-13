@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-const backendBaseUrl = 'http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/';
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const categoryBanglaMap = {
     Meat: 'মাংস',
@@ -63,7 +63,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
         };
 
         try {
-            const res = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/report_recipe.php', {
+            const res = await fetch(getApiUrl(API_CONFIG.RECIPES.REPORT), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reportData),
@@ -94,7 +94,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
     }
 
     // Check if the user has already rated the recipe
-    const checkRating = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/check_user_rating.php', {
+    const checkRating = await fetch(getApiUrl(API_CONFIG.RECIPES.CHECK_RATING), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipeId: recipe.id, email: email }),
@@ -115,7 +115,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
     };
 
     try {
-        const res = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/rate_recipe.php', {
+        const res = await fetch(getApiUrl(API_CONFIG.RECIPES.RATE), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(ratingData),

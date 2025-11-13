@@ -24,18 +24,14 @@ if (!isset($data['id'])) {
     exit;
 }
 
-$mysqli = new mysqli("localhost", "root", "", "Amar_Recipe");
-if ($mysqli->connect_errno) {
-    echo json_encode(['success' => false, 'message' => 'DB connection failed']);
-    exit;
-}
+require_once 'config.php';
 
-$stmt = $mysqli->prepare("
+$stmt = $conn->prepare("
     UPDATE recipes SET 
         title = ?, 
         image_url = ?, 
         description = ?, 
-        comment = ?, 
+        comment = ?,
         location = ?, 
         organizerName = ?, 
         organizerEmail = ?

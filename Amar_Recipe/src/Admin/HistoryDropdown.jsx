@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const categoryBanglaMap = {
   Meat: 'মাংস',
@@ -29,8 +30,8 @@ const HistoryDropdown = () => {
     const fetchAllHistories = async () => {
       try {
         const [subRes, adminRes] = await Promise.all([
-          fetch("http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/get_submission_history.php"),
-          fetch("http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/get_admin_activity_history.php")
+          fetch(getApiUrl(API_CONFIG.ADMIN_MANAGEMENT.GET_SUBMISSION_HISTORY)),
+          fetch(getApiUrl(API_CONFIG.ADMIN.GET_ACTIVITY_HISTORY))
         ]);
 
         const subJson = await subRes.json();
@@ -92,7 +93,7 @@ const HistoryDropdown = () => {
                   <div className="w-24 h-20 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden mr-4">
                     {req.image ? (
                       <img
-                        src={`http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/${req.image}`}
+                        src={`${API_CONFIG.BASE_URL}/${req.image}`}
                         alt={req.title}
                         className="w-full h-full object-cover"
                       />

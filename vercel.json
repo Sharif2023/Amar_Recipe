@@ -1,0 +1,20 @@
+{
+  "builds": [
+    {
+      "src": "Amar_Recipe/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "Amar_Recipe/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(?!api)(?!.json)(?!.svg)(?!.png)(?!.jpg)(?!.jpeg)(?!.gif)(?!.css)(?!.js).*",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "@vite_api_url"
+  }
+}

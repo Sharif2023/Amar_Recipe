@@ -2,12 +2,7 @@
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
-$conn = new mysqli("localhost", "root", "", "amar_recipe");
-
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => "DB Connection failed"]);
-    exit;
-}
+require_once 'config.php';
 
 $sql = "SELECT id, name, email, status, comment AS rejection_reason, date AS action_date 
         FROM admin_requests 

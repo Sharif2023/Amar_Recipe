@@ -1,6 +1,9 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
+
+require_once 'config.php';
+
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!isset($data['id']) || !isset($data['status'])) {
@@ -17,13 +20,7 @@ if (!in_array($status, $validStatuses)) {
     exit;
 }
 
-$mysqli = new mysqli("localhost", "root", "", "Amar_Recipe");
-if ($mysqli->connect_errno) {
-    echo json_encode(['success' => false]);
-    exit;
-}
-
-$stmt = $mysqli->prepare("UPDATE reports SET status = ? WHERE id = ?");
+$stmt = $conn->prepare("UPDATE reports SET status = ? WHERE id = ?");
 $stmt->bind_param("si", $status, $id);
 
 if ($stmt->execute()) {

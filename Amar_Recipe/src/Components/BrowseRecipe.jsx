@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { IoStar } from 'react-icons/io5';
 import RecipeModal from './RecipeModal';
+import { API_CONFIG, getApiUrl } from '../config/apiConfig';
 
 const BrowseRecipe = () => {
   const [recipes, setRecipes] = useState([]);
@@ -9,7 +10,7 @@ const BrowseRecipe = () => {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const baseImageUrl = 'http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/';
+  const baseImageUrl = `${API_CONFIG.BASE_URL}/`;
 
   const { search } = useLocation();
   const category = new URLSearchParams(search).get('category') || 'সকল রেসিপি';
@@ -25,7 +26,7 @@ const BrowseRecipe = () => {
       setError(null);
 
       try {
-        const res = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/get_recipes.php');
+        const res = await fetch(getApiUrl(API_CONFIG.RECIPES.GET_ALL));
         if (!res.ok) throw new Error('Failed to fetch recipes');
         const data = await res.json();
 
