@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build --prefix Amar_Recipe",
+  "buildCommand": "cd Amar_Recipe && npm run build",
   "outputDirectory": "Amar_Recipe/dist",
   "env": {
     "VITE_API_URL": "https://amar-recipes.infinityfreeapp.com/api"
