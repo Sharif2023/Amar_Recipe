@@ -1,22 +1,22 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "Amar_Recipe/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
+  "buildCommand": "npm run build --prefix Amar_Recipe",
   "outputDirectory": "Amar_Recipe/dist",
-  "routes": [
-    {
-      "src": "/(?!api)(?!.json)(?!.svg)(?!.png)(?!.jpg)(?!.jpeg)(?!.gif)(?!.css)(?!.js).*",
-      "dest": "/index.html"
-    }
-  ],
   "env": {
     "VITE_API_URL": "https://amar-recipes.infinityfreeapp.com/api"
-  }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/Amar_Recipe/src/api/$1"
+    },
+    {
+      "src": "/(.*\\.(?:js|jsx|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))",
+      "dest": "/$1"
+    },
+    {
+      "src": "^/(?!api).*",
+      "dest": "/index.html"
+    }
+  ]
 }
