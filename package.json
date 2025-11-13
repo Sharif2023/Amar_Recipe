@@ -2,7 +2,8 @@
   "homepage": "https://sharif2023.github.io/Amar_Recipies_ReactJS/",
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "build": "npm --prefix Amar_Recipe run build"
   },
   "devDependencies": {
     "gh-pages": "^6.3.0"

@@ -1,13 +1,15 @@
 {
+  "version": 2,
   "builds": [
     {
       "src": "Amar_Recipe/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "Amar_Recipe/dist"
+        "distDir": "dist"
       }
     }
   ],
+  "outputDirectory": "Amar_Recipe/dist",
   "routes": [
     {
       "src": "/(?!api)(?!.json)(?!.svg)(?!.png)(?!.jpg)(?!.jpeg)(?!.gif)(?!.css)(?!.js).*",
@@ -15,6 +17,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "@vite_api_url"
+    "VITE_API_URL": "https://amar-recipes.infinityfreeapp.com/api"
   }
 }
