@@ -14,7 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-$conn = new mysqli("localhost", "root", "", "amar_recipe");
+require_once 'config.php';
+
 if ($conn->connect_error) {
     echo json_encode(['success' => false, 'message' => 'DB connection failed']);
     exit;

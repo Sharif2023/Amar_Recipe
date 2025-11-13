@@ -13,7 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 $data = json_decode(file_get_contents("php://input"), true);
-$conn = new mysqli("localhost", "root", "", "amar_recipe");
+
+require_once 'config.php';
 
 if ($conn->connect_error) die("Connection failed");
 
