@@ -1,38 +1,67 @@
 <?php
-// CORS Configuration Handler
-// This file handles CORS headers for all API requests
-
+// -----------------------------------------------
+// CORS SETTINGS
+// -----------------------------------------------
 $allowed_origins = [
     'https://amar-recipe.vercel.app',
-    'https://amar-recipes.infinityfreeapp.com',
     'http://localhost:5173',
     'http://localhost:3000'
 ];
 
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$origin = $_SERVER['HTTP_ORIGIN'] ?? "";
 
 if ($origin && in_array($origin, $allowed_origins)) {
-    header('Access-Control-Allow-Origin: ' . $origin);
-    header('Vary: Origin');
+    header("Access-Control-Allow-Origin: $origin");
 } else {
-    // Fallback to wildcard if origin absent or not in the allow list
-    header('Access-Control-Allow-Origin: *');
+    header("Access-Control-Allow-Origin: *");
 }
 
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header("Vary: Origin");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
-// If the browser sent specific request headers during preflight, mirror them.
-$requestedHeaders = $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'] ?? 'Content-Type, Authorization, X-Requested-With';
-header('Access-Control-Allow-Headers: ' . $requestedHeaders);
-
-header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Max-Age: 86400');
-
-// Handle preflight requests quickly and exit without producing JSON body
-if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+if ($_SERVER['REQUEST_METHOD'] === "OPTIONS") {
     http_response_code(200);
     exit;
 }
 
-header('Content-Type: application/json');
+// -----------------------------------------------
+// UNIVERSAL PROXY
+// -----------------------------------------------
+if (!isset($_GET["file"])) {
+    echo json_encode(["success" => false, "error" => "Missing ?file= parameter"]);
+    exit;
+}
 
+$file = $_GET["file"]; // example: get_recipes.php
+
+$api_url = "https://amar-recipes.infinityfreeapp.com/api/" . $file;
+
+$method = $_SERVER['REQUEST_METHOD'];
+
+// GET request
+if ($method === "GET") {
+    $response = file_get_contents($api_url);
+}
+
+// POST request
+else if ($method === "POST") {
+    $postData = http_build_query($_POST);
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+            'content' => $postData
+        ]
+    ]);
+    $response = file_get_contents($api_url, false, $context);
+}
+
+else {
+    echo json_encode(["success" => false, "error" => "Unsupported method"]);
+    exit;
+}
+
+// Return InfinityFree response with proper CORS
+header("Content-Type: application/json");
+echo $response;
