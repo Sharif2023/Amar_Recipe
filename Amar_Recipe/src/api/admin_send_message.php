@@ -3,7 +3,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require_once 'cors.php';
+
 
 // Get the input data from the POST request
 $data = json_decode(file_get_contents('php://input'), true);

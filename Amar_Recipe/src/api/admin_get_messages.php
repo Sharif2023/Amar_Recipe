@@ -1,6 +1,6 @@
 <?php
 // Handle preflight OPTIONS request for CORS
-require_once 'cors.php';
+
 require_once 'config.php';
 
 $sender_id = isset($_GET['sender_id']) ? intval($_GET['sender_id']) : 0;

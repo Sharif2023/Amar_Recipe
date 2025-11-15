@@ -1,5 +1,5 @@
 <?php
-require_once 'cors.php';
+
 
 // Handle OPTIONS request for preflight check
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
