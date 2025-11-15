@@ -55,7 +55,7 @@ const AdminPanel = () => {
 
   const handleSaveRecipe = async (updatedRecipe) => {
     try {
-      const res = await fetch(`${baseImageUrl}update_recipe.php`, {
+      const res = await fetch(getApiUrl(API_CONFIG.RECIPES.UPDATE), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedRecipe),
@@ -83,7 +83,7 @@ const AdminPanel = () => {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${baseImageUrl}delete_recipe.php`, {
+      const res = await fetch(getApiUrl(API_CONFIG.RECIPES.DELETE), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

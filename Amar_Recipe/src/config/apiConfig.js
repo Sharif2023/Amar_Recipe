@@ -57,7 +57,5 @@ export const API_CONFIG = {
  * @param {string} endpoint - The InfinityFree API file name
  * @returns {string} - Full URL for the API call
  */
-export const getApiUrl = (endpoint) => {
-  // IMPORTANT: append ?file= to match proxy requirements
-  return `${API_CONFIG.BASE_URL}?file=${endpoint}`;
-};
+export const getApiUrl = (endpoint) => `${API_CONFIG.BASE_URL}?file=${endpoint}`;
+
