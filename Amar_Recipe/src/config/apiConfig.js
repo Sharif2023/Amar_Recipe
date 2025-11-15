@@ -3,7 +3,7 @@
 
 export const API_CONFIG = {
   // Base URL for all API calls
-  BASE_URL: import.meta.env.VITE_API_URL || 'https://amar-recipe.byethost7.com/api/proxy.php',
+  BASE_URL: 'https://amar-recipe.byethost7.com/api/proxy.php',
   
   // Recipe endpoints
   RECIPES: {
