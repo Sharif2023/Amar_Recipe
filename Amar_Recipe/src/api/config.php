@@ -24,13 +24,17 @@ define('API_BASE_URL', BASE_URL . 'src/api/');
 // CORS Configuration
 function setCorsHeaders() {
     // Allow requests from any origin (you can restrict this to your Vercel domain for security)
-    header('Access-Control-Allow-Origin: *');
+    if (isset($_SERVER['HTTP_ORIGIN'])) {
+        header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    } else {
+        header('Access-Control-Allow-Origin: *');
+    }
     
     // Allow specific HTTP methods
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     
     // Allow specific headers
-    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
     
     // Allow credentials
     header('Access-Control-Allow-Credentials: true');
@@ -39,7 +43,10 @@ function setCorsHeaders() {
     header('Access-Control-Max-Age: 3600');
     
     // Set content type
-    header('Content-Type: application/json');
+    header('Content-Type: application/json; charset=utf-8');
+    
+    // Additional headers for compatibility
+    header('Access-Control-Expose-Headers: Content-Length, X-JSON');
     
     // Handle preflight OPTIONS request
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

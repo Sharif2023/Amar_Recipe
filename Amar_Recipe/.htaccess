@@ -1,4 +1,4 @@
-# Amar Recipe - InfinityFree Hosting Configuration
+# Amar Recipe - Byethost Configuration
 
 # Enable RewriteEngine
 <IfModule mod_rewrite.c>
@@ -6,25 +6,21 @@
     RewriteBase /
 </IfModule>
 
-# CORS Headers for API Access
+# CORS Headers - Critical for API Access
 <IfModule mod_headers.c>
-    # Allow cross-origin requests from any domain
     Header always set Access-Control-Allow-Origin "*"
-    
-    # Allow specific HTTP methods
     Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    
-    # Allow specific headers
     Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-    
-    # Allow credentials
     Header always set Access-Control-Allow-Credentials "true"
-    
-    # Cache preflight requests for 1 hour
     Header always set Access-Control-Max-Age "3600"
-    
-    # Remove X-Powered-By header for security
-    Header unset X-Powered-By
+</IfModule>
+
+# If mod_headers isn't available, try with Header set instead of Header always set
+<IfModule !mod_headers.c>
+    # Byethost might need this alternative
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
 </IfModule>
 
 # Handle OPTIONS preflight requests
