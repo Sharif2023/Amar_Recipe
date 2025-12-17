@@ -1,35 +1,18 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
+require_once __DIR__ . '/config.php';
+
 $data = json_decode(file_get_contents("php://input"), true);
+$conn = getDbConnection();
 
-if (!isset($data['id']) || !isset($data['status'])) {
-    echo json_encode(['success' => false]);
-    exit;
-}
-
-$id = intval($data['id']);
+$reportId = $data['id'];
 $status = $data['status'];
 
-$validStatuses = ['pending', 'reviewed', 'resolved'];
-if (!in_array($status, $validStatuses)) {
-    echo json_encode(['success' => false]);
-    exit;
-}
-
-$mysqli = new mysqli("localhost", "root", "", "Amar_Recipe");
-if ($mysqli->connect_errno) {
-    echo json_encode(['success' => false]);
-    exit;
-}
-
-$stmt = $mysqli->prepare("UPDATE reports SET status = ? WHERE id = ?");
-$stmt->bind_param("si", $status, $id);
+$stmt = $conn->prepare("UPDATE reports SET status = ?, updated_at = NOW() WHERE id = ?");
+$stmt->bind_param("si", $status, $reportId);
 
 if ($stmt->execute()) {
-    echo json_encode(['success' => true]);
+    echo json_encode(["success" => true]);
 } else {
-    echo json_encode(['success' => false]);
+    echo json_encode(["success" => false, "message" => "Failed to update report status"]);
 }
-$stmt->close();
-$mysqli->close();
+?>

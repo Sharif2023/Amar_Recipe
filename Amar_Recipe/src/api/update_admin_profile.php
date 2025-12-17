@@ -1,13 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Content-Type: application/json");
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+require_once __DIR__ . '/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["success" => false, "message" => "Invalid request method"]);
@@ -19,11 +11,7 @@ if (!isset($_POST['id'])) {
     exit();
 }
 
-$conn = new mysqli("localhost", "root", "", "amar_recipe");
-if ($conn->connect_error) {
-    echo json_encode(["success" => false, "message" => "Database connection failed: " . $conn->connect_error]);
-    exit();
-}
+$conn = getDbConnection();
 
 $id = $_POST['id'];
 $name = $_POST['name'] ?? '';
@@ -75,7 +63,7 @@ if (isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] === UPLOA
         $updateImgStmt->bind_param("si", $newImagePath, $id);
         if ($updateImgStmt->execute()) {
             // Respond with the full URL (returning it for the frontend to handle)
-            $response["profileImage"] = "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/" . $newImagePath;
+            $response["profileImage"] = API_BASE_URL . $newImagePath;
         } else {
             $response["success"] = false;
             $response["message"] = "Error saving image path: " . $updateImgStmt->error;

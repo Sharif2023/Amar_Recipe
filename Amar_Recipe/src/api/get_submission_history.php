@@ -1,27 +1,14 @@
 <?php
-header('Content-Type: application/json');
-header("Access-Control-Allow-Origin: *");
+require_once __DIR__ . '/config.php';
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "Amar_Recipe";
+$conn = getDbConnection();
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => "DB Connection failed"]);
-    exit;
-}
+$result = $conn->query("SELECT * FROM recipe_submission_requests WHERE status != 'pending' ORDER BY updated_at DESC");
+$history = [];
 
-$sql = "SELECT * FROM submission_requests ORDER BY submission_date DESC";
-
-$result = $conn->query($sql);
-
-$requests = [];
 while ($row = $result->fetch_assoc()) {
-    $requests[] = $row;
+    $history[] = $row;
 }
 
-echo json_encode(['success' => true, 'data' => $requests]);
-
-$conn->close();
+echo json_encode(["success" => true, "history" => $history]);
+?>

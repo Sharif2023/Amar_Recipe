@@ -1,46 +1,17 @@
 <?php
+require_once __DIR__ . '/config.php';
 
-date_default_timezone_set("Asia/Dhaka");
+$data = json_decode(file_get_contents("php://input"), true);
+$conn = getDbConnection();
 
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Content-Type: application/json");
+$requestId = $data['id'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+$stmt = $conn->prepare("UPDATE recipe_submission_requests SET status = 'rejected', updated_at = NOW() WHERE id = ?");
+$stmt->bind_param("i", $requestId);
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "Amar_Recipe";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => "DB Connection failed"]);
-    exit;
-}
-
-$data = json_decode(file_get_contents('php://input'), true);
-$id = isset($data['id']) ? intval($data['id']) : 0;
-$reason = isset($data['reason']) ? trim($data['reason']) : '';
-$adminName = isset($data['admin_name']) ? trim($data['admin_name']) : '';
-
-if ($id <= 0 || empty($reason) || empty($adminName)) {
-    echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
-    exit;
-}
-
-$stmt = $conn->prepare("UPDATE submission_requests SET status = 'Rejected', comment = ?, admin_name = ?, action_date = NOW() WHERE id = ?");
-$stmt->bind_param('ssi', $reason, $adminName, $id);
 if ($stmt->execute()) {
-    echo json_encode(['success' => true]);
+    echo json_encode(["success" => true]);
 } else {
-    echo json_encode(['success' => false, 'message' => $stmt->error]);
+    echo json_encode(["success" => false, "message" => "Failed to reject submission"]);
 }
-$stmt->close();
-$conn->close();
-
 ?>

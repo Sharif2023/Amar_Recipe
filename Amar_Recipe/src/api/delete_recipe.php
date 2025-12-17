@@ -1,51 +1,17 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-    exit;
-}
+require_once __DIR__ . '/config.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
+$conn = getDbConnection();
 
-if (!isset($data['id']) || intval($data['id']) <= 0) {
-    echo json_encode(['success' => false, 'message' => 'Invalid or missing recipe ID']);
-    exit;
-}
+$recipeId = $data['id'];
 
-$recipeId = intval($data['id']);
-
-$mysqli = new mysqli("localhost", "root", "", "Amar_Recipe");
-
-if ($mysqli->connect_errno) {
-    echo json_encode(['success' => false, 'message' => 'DB connection failed: ' . $mysqli->connect_error]);
-    exit;
-}
-
-// First delete any related reports (optional, for consistency)
-$mysqli->query("DELETE FROM reports WHERE recipe_id = $recipeId");
-
-// Then delete the recipe
-$stmt = $mysqli->prepare("DELETE FROM recipes WHERE id = ?");
+$stmt = $conn->prepare("DELETE FROM recipes WHERE id = ?");
 $stmt->bind_param("i", $recipeId);
 
 if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Recipe deleted successfully']);
+    echo json_encode(["success" => true]);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Deletion failed: ' . $stmt->error]);
+    echo json_encode(["success" => false, "message" => "Failed to delete recipe"]);
 }
-
-$stmt->close();
-$mysqli->close();
 ?>

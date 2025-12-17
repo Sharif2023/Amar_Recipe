@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-const backendBaseUrl = 'http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/';
+import { API_BASE_URL } from '../config/api';
+
+const backendBaseUrl = API_BASE_URL;
 
 const categoryBanglaMap = {
     Meat: 'মাংস',
@@ -63,7 +65,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
         };
 
         try {
-            const res = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/report_recipe.php', {
+            const res = await fetch(API_BASE_URL + 'report_recipe.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reportData),
@@ -88,53 +90,53 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
     };
 
     const handleSubmitRating = async () => {
-    if (!email || rating === 0) {
-        alert('Please enter your email and rating');
-        return;
-    }
+        if (!email || rating === 0) {
+            alert('Please enter your email and rating');
+            return;
+        }
 
-    // Check if the user has already rated the recipe
-    const checkRating = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/check_user_rating.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipeId: recipe.id, email: email }),
-    });
-
-    const checkData = await checkRating.json();
-
-    if (checkData.success && checkData.exists) {
-        // Notify user if they have already rated this recipe
-        alert('You have already rated this recipe!');
-        return;
-    }
-
-    const ratingData = {
-        recipeId: recipe.id,
-        email,
-        rating,
-    };
-
-    try {
-        const res = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/rate_recipe.php', {
+        // Check if the user has already rated the recipe
+        const checkRating = await fetch(API_BASE_URL + 'check_user_rating.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(ratingData),
+            body: JSON.stringify({ recipeId: recipe.id, email: email }),
         });
-        const json = await res.json();
 
-        if (json.success) {
-            // Update the average rating
-            const newTotalRatings = ratingCount * averageRating + rating;
-            const newCount = ratingCount + 1;
-            setAverageRating((newTotalRatings / newCount).toFixed(1));
-            setRatingCount(newCount);
-        } else {
-            alert('Failed to submit your rating');
+        const checkData = await checkRating.json();
+
+        if (checkData.success && checkData.exists) {
+            // Notify user if they have already rated this recipe
+            alert('You have already rated this recipe!');
+            return;
         }
-    } catch (error) {
-        alert('Error occurred while submitting your rating');
-    }
-};
+
+        const ratingData = {
+            recipeId: recipe.id,
+            email,
+            rating,
+        };
+
+        try {
+            const res = await fetch(API_BASE_URL + 'rate_recipe.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ratingData),
+            });
+            const json = await res.json();
+
+            if (json.success) {
+                // Update the average rating
+                const newTotalRatings = ratingCount * averageRating + rating;
+                const newCount = ratingCount + 1;
+                setAverageRating((newTotalRatings / newCount).toFixed(1));
+                setRatingCount(newCount);
+            } else {
+                alert('Failed to submit your rating');
+            }
+        } catch (error) {
+            alert('Error occurred while submitting your rating');
+        }
+    };
 
 
     return (
