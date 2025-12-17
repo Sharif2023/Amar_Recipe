@@ -72,7 +72,7 @@ const AdminProfile = () => {
 
   useEffect(() => {
     const adminData = JSON.parse(localStorage.getItem("admin"));
-    const BASE_URL = "API_BASE_URL + ";
+    const BASE_URL = API_BASE_URL;
 
     if (adminData) {
       setAdmin(adminData);
@@ -108,7 +108,7 @@ const AdminProfile = () => {
 
     try {
       const res = await fetch(
-        "API_BASE_URL + update_admin_profile.php",
+        API_BASE_URL + "update_admin_profile.php",
         {
           method: "POST",
           body: formDataToSend,
@@ -123,7 +123,7 @@ const AdminProfile = () => {
 
         const fullProfileImagePath = (result.profileImage || profileImage).startsWith("http")
           ? result.profileImage
-          : "API_BASE_URL + " + result.profileImage;
+          : API_BASE_URL + result.profileImage;
 
         const updatedAdminWithImage = {
           ...updatedAdmin,

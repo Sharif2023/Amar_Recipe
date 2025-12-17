@@ -10,7 +10,7 @@ const AdminLogin = () => {
     const navigate = useNavigate();
     const handleLogIn = async () => {
         try {
-            const res = await fetch("API_BASE_URL + admin_login.php", {
+            const res = await fetch(API_BASE_URL + "admin_login.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -20,7 +20,7 @@ const AdminLogin = () => {
 
             if (data.success) {
                 // Normalize the profile image path before saving to localStorage
-                const BASE_URL = "API_BASE_URL + ";
+                const BASE_URL = API_BASE_URL;
 
                 const fullProfileImage = data.admin.profile_image?.startsWith("http")
                     ? data.admin.profile_image

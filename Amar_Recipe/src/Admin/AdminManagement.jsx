@@ -25,7 +25,7 @@ const AdminManagement = () => {
   }, [navigate]);
 
   const fetchRequests = async () => {
-    const res = await fetch("API_BASE_URL + admin_requests.php", {
+    const res = await fetch(API_BASE_URL + "admin_requests.php", {
       cache: "no-store",
     });
     const data = await res.json();
@@ -52,7 +52,7 @@ const AdminManagement = () => {
     const admin = JSON.parse(localStorage.getItem("admin"));
 
     try {
-      const res = await fetch("API_BASE_URL + update_admin_status.php", {
+      const res = await fetch(API_BASE_URL + "update_admin_status.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status, admin_name: admin.name }),  // Include admin's name
@@ -78,7 +78,7 @@ const AdminManagement = () => {
       const loggedInAdmin = JSON.parse(localStorage.getItem("admin"));
 
       try {
-        const res = await fetch("ADMIN_API_BASE_URL + admin_delete.php", {
+        const res = await fetch(ADMIN_API_BASE_URL + "admin_delete.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -146,7 +146,7 @@ const AdminManagement = () => {
                         const admin = JSON.parse(localStorage.getItem("admin"));
 
                         try {
-                          const res = await fetch("ADMIN_API_BASE_URL + admin_req_reject.php", {
+                          const res = await fetch(ADMIN_API_BASE_URL + "admin_req_reject.php", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ id: adminId, reason, admin_name: admin.name }),

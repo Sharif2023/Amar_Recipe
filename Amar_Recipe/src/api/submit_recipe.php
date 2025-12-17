@@ -43,7 +43,7 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $destPath = $uploadDir . $newFileName;
 
     if (move_uploaded_file($fileTmpPath, $destPath)) {
-        // Assuming your backend URL is http://yourdomain.com/
+        // Store relative path - will be resolved by frontend using API_BASE_URL
         $image_url = "uploads/" . $newFileName;
     } else {
         echo json_encode(['success' => false, 'message' => "Failed to move uploaded image"]);

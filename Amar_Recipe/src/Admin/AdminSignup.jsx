@@ -34,7 +34,7 @@ const AdminSignup = () => {
         }
 
         try {
-            const res = await fetch("ADMIN_API_BASE_URL + admin_signup.php", {
+            const res = await fetch(ADMIN_API_BASE_URL + "admin_signup.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -87,7 +87,7 @@ const AdminSignup = () => {
                         { label: "শহর", name: "city", type: "text" },
                         { label: "বিভাগ", name: "state", type: "text" },
                         { label: "পোস্ট নং", name: "postcode", type: "text" },
-                        { label: "আপনার রান্নাবান্নার অভিজ্ঞতার বয়স", name: "experience", type: "number" , min: "0", max: "50" },
+                        { label: "আপনার রান্নাবান্নার অভিজ্ঞতার বয়স", name: "experience", type: "number", min: "0", max: "50" },
                         { label: "দক্ষতা (e.g., মিষ্টিজাত, শাকসবজি, ...)", name: "specialty", type: "text" },
                         { label: "পোর্টফোলিও লিংক (অপশনাল)", name: "portfolio", type: "url" },
                         { label: "আপনার সার্টিফিকেশন তথ্য", name: "certification", type: "textarea" },
@@ -126,12 +126,12 @@ const AdminSignup = () => {
                         type="submit"
                         className="w-full bg-rose-700 text-white py-3 rounded hover:bg-rose-900 transition font-semibold"
                     >
-                    ফর্ম জমা দিন
+                        ফর্ম জমা দিন
                     </button>
 
                     <div className="flex text-sm text-blue-700 underline space-x-2 items-center justify-center py-2.5">
                         <Link to='/adminlogin'>
-                        ইতিমধ্যেই অ্যাকাউন্ট আছে? সাইনইন করুন
+                            ইতিমধ্যেই অ্যাকাউন্ট আছে? সাইনইন করুন
                         </Link>
                     </div>
                 </form>

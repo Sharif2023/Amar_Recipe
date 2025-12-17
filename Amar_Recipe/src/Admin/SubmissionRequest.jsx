@@ -46,7 +46,7 @@ const SubmissionRequest = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        "API_BASE_URL + get_submission_requests.php"
+        API_BASE_URL + "get_submission_requests.php"
       );
       const json = await res.json();
       if (json.success) {
@@ -69,7 +69,7 @@ const SubmissionRequest = () => {
     if (!window.confirm("আপনি কি নিশ্চিত এই সাবমিশন এপ্রুভ করতে চান?")) return;
     try {
       const res = await fetch(
-        "API_BASE_URL + approve_submission.php",
+        API_BASE_URL + "approve_submission.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -89,8 +89,8 @@ const SubmissionRequest = () => {
     } catch (err) {
       alert("ত্রুটি: " + err.message);
     }
-  };  
-  
+  };
+
   // প্রত্যাখ্যান শুরু করুন
   const startReject = (id) => {
     setRejectingId(id);
@@ -105,7 +105,7 @@ const SubmissionRequest = () => {
     }
     try {
       const res = await fetch(
-        "API_BASE_URL + reject_submission.php",
+        API_BASE_URL + "reject_submission.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -128,7 +128,7 @@ const SubmissionRequest = () => {
     } catch (err) {
       alert("ত্রুটি: " + err.message);
     }
-  };  
+  };
 
   return (
     <div className="container mx-auto p-4">

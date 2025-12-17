@@ -30,8 +30,8 @@ const HistoryDropdown = () => {
     const fetchAllHistories = async () => {
       try {
         const [subRes, adminRes] = await Promise.all([
-          fetch("API_BASE_URL + get_submission_history.php"),
-          fetch("API_BASE_URL + get_admin_activity_history.php")
+          fetch(API_BASE_URL + "get_submission_history.php"),
+          fetch(API_BASE_URL + "get_admin_activity_history.php")
         ]);
 
         const subJson = await subRes.json();
@@ -93,7 +93,7 @@ const HistoryDropdown = () => {
                   <div className="w-24 h-20 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden mr-4">
                     {req.image ? (
                       <img
-                        src={`API_BASE_URL + ${req.image}`}
+                        src={`${API_BASE_URL}${req.image}`}
                         alt={req.title}
                         className="w-full h-full object-cover"
                       />
@@ -134,7 +134,7 @@ const HistoryDropdown = () => {
                   )}
                   <p className="text-xs text-gray-400 mt-1">অ্যাকশনের সময়ঃ {req.action_date}</p>
                   <p className="text-xs font-medium text-indigo-500 mt-1">ধরণঃ {req.type === "recipe" ? "Recipe" : "Admin"}</p>
-                  
+
                   <p className="text-xs text-gray-400 mt-1">
                     {new Date(req.activity_time).toLocaleString()}
                   </p>
