@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 
 const SubmissionRequest = () => {
   const [requests, setRequests] = useState([]);
@@ -45,7 +46,7 @@ const SubmissionRequest = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/get_submission_requests.php"
+        "API_BASE_URL + get_submission_requests.php"
       );
       const json = await res.json();
       if (json.success) {
@@ -68,7 +69,7 @@ const SubmissionRequest = () => {
     if (!window.confirm("আপনি কি নিশ্চিত এই সাবমিশন এপ্রুভ করতে চান?")) return;
     try {
       const res = await fetch(
-        "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/approve_submission.php",
+        "API_BASE_URL + approve_submission.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -104,7 +105,7 @@ const SubmissionRequest = () => {
     }
     try {
       const res = await fetch(
-        "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/reject_submission.php",
+        "API_BASE_URL + reject_submission.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -147,7 +148,7 @@ const SubmissionRequest = () => {
               <div className="flex-shrink-0 w-24 h-20 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden mr-4">
                 {req.image ? (
                   <img
-                    src={`http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/${req.image}`}
+                    src={`API_BASE_URL + ${req.image}`}
                     alt={req.title}
                     className="w-full h-full object-cover"
                   />
@@ -239,7 +240,7 @@ const SubmissionRequest = () => {
 
             {selectedSubmission.image ? (
               <img
-                src={`http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/${selectedSubmission.image}`}
+                src={`API_BASE_URL + ${selectedSubmission.image}`}
                 alt={selectedSubmission.title}
                 className="w-full max-h-64 object-cover rounded mb-4"
               />
@@ -345,3 +346,4 @@ const SubmissionRequest = () => {
 };
 
 export default SubmissionRequest;
+

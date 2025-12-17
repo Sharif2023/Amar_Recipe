@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import { Link } from "react-router-dom";
 
 const AdminSignup = () => {
@@ -33,7 +34,7 @@ const AdminSignup = () => {
         }
 
         try {
-            const res = await fetch("http://localhost/Amar_Recipies_jsx/Amar_Recipe/admin_api/admin_signup.php", {
+            const res = await fetch("ADMIN_API_BASE_URL + admin_signup.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -140,3 +141,4 @@ const AdminSignup = () => {
 };
 
 export default AdminSignup;
+

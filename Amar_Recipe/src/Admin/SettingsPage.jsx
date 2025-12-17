@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import { useNavigate } from 'react-router-dom';
 
 const SettingsPage = () => {
@@ -22,7 +23,7 @@ const SettingsPage = () => {
         const email = admin.email;  // Extract email from the logged-in admin
 
         try {
-            const response = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/change_password.php', {
+            const response = await fetch('API_BASE_URL + change_password.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ currentPassword, newPassword, email }) // Include email here
@@ -50,7 +51,7 @@ const SettingsPage = () => {
             const email = admin.email;  // Extract email from the logged-in admin
 
             try {
-                const response = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/delete_account.php', {
+                const response = await fetch('API_BASE_URL + delete_account.php', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email }) // Include email here
@@ -175,3 +176,4 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+

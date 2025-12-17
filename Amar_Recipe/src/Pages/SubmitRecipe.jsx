@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 
 export default function SubmitRecipe() {
     const [formData, setFormData] = useState({
@@ -41,7 +42,7 @@ export default function SubmitRecipe() {
         }
 
         try {
-            const response = await fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/submit_recipe_request.php', {
+            const response = await fetch('API_BASE_URL + submit_recipe_request.php', {
                 method: 'POST',
                 body: data,
             });
@@ -289,3 +290,4 @@ export default function SubmitRecipe() {
         </div>
     );
 }
+
