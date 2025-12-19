@@ -1,32 +1,5 @@
-# API Directory - CORS Configuration
-
-# Enable CORS for all API endpoints
-<IfModule mod_headers.c>
-    # Allow requests from any origin (Vercel frontend)
-    Header always set Access-Control-Allow-Origin "*"
-    
-    # Allow specific HTTP methods
-    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    
-    # Allow specific headers
-    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-    
-    # Allow credentials
-    Header always set Access-Control-Allow-Credentials "true"
-    
-    # Cache preflight requests
-    Header always set Access-Control-Max-Age "3600"
-    
-    # Set content type
-    Header always set Content-Type "application/json; charset=utf-8"
-</IfModule>
-
-# Handle preflight OPTIONS requests
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_METHOD} OPTIONS
-    RewriteRule ^(.*)$ $1 [R=200,L]
-</IfModule>
+# API Directory Configuration
+# CORS is handled in config.php - DO NOT add CORS headers here (causes duplicates)
 
 # PHP Settings
 <IfModule mod_php.c>
@@ -41,3 +14,4 @@
     # Session settings
     php_value session.gc_maxlifetime 3600
 </IfModule>
+
