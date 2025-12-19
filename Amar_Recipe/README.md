@@ -1,6 +1,6 @@
-# Amar Recipes - Recipe Management System
+# Amar Recipe - Recipe Management System
 
-A full-stack recipe management system with React frontend and PHP backend, designed for deployment on Vercel (frontend) and InfinityFree (backend).
+A full-stack recipe management system with React frontend and PHP backend, designed for deployment on Vercel (frontend) and Bytehost (backend).
 
 ## 🚀 Features
 
@@ -15,7 +15,7 @@ A full-stack recipe management system with React frontend and PHP backend, desig
 ## 📋 Tech Stack
 
 ### Frontend
-- **Framework**: React 19 + Vite
+- **Framework**: React 19 + Vite 6
 - **Styling**: Tailwind CSS 4
 - **Routing**: React Router DOM 7
 - **Icons**: React Icons
@@ -24,7 +24,7 @@ A full-stack recipe management system with React frontend and PHP backend, desig
 ### Backend
 - **Language**: PHP 8+
 - **Database**: MySQL (MariaDB)
-- **Hosting**: InfinityFree
+- **Hosting**: Bytehost
 - **Features**: RESTful API, CORS enabled
 
 ## 🛠️ Installation
@@ -49,16 +49,26 @@ A full-stack recipe management system with React frontend and PHP backend, desig
    ```
 
 3. **Setup local database**
-   - Create a MySQL database named `Amar_Recipe`
+   - Create a MySQL database named `amar_recipe`
    - Import `database/schema.sql`
 
 4. **Configure backend (for local development)**
-   - Copy `src/api/config.php` and update with local credentials
-   - Set database host to `localhost`
+   - Copy `src/api/config.example.php` to `src/api/config.php`
+   - Update with local credentials:
+     ```php
+     define('DB_HOST', 'localhost');
+     define('DB_USER', 'root');
+     define('DB_PASS', '');
+     define('DB_NAME', 'amar_recipe');
+     ```
 
 5. **Configure frontend**
-   - Copy `.env.example` to `.env.local`
-   - Update API URLs to your local PHP server
+   - Copy `.env.local.example` to `.env.local`
+   - Update API URLs to your local PHP server:
+     ```
+     VITE_API_BASE_URL=http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/
+     VITE_ADMIN_API_BASE_URL=http://localhost/Amar_Recipies_Live/Amar_Recipe/admin_api/
+     ```
 
 6. **Run development server**
    ```bash
@@ -67,25 +77,34 @@ A full-stack recipe management system with React frontend and PHP backend, desig
 
 ## 📦 Deployment
 
-See [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md) for comprehensive deployment instructions.
+### Comprehensive Deployment Guides
 
-### Quick Deploy
+- **[Database Setup](../DATABASE_SETUP.md)** - Complete database configuration guide
+- **[Backend Deployment](../DEPLOYMENT_BYTEHOST.md)** - Deploy PHP backend to Bytehost
+- **[Frontend Deployment](../DEPLOYMENT_VERCEL.md)** - Deploy React app to Vercel
+- **[Quick Reference](../DEPLOYMENT_QUICK_REFERENCE.md)** - Checklists and quick commands
 
-**Backend (InfinityFree)**:
-1. Upload `src/api/` and `admin_api/` via FTP
-2. Import `database/schema.sql` in phpMyAdmin
-3. Create upload directories with proper permissions
+### Quick Deploy Overview
+
+**Backend (Bytehost)**:
+1. Create database and import `database/schema.sql`
+2. Update `src/api/config.php` with Bytehost credentials
+3. Upload `src/api/` and `admin_api/` via FTP
+4. Create upload directories with proper permissions
 
 **Frontend (Vercel)**:
 ```bash
+# Build the project
 npm run build
+
+# Deploy via Vercel CLI
 vercel --prod
 ```
 
-Set environment variables in Vercel:
+Set environment variables in Vercel dashboard:
 ```
-VITE_API_BASE_URL=https://uiu-healthcare.infinityfreeapp.com/src/api/
-VITE_ADMIN_API_BASE_URL=https://uiu-healthcare.infinityfreeapp.com/admin_api/
+VITE_API_BASE_URL=https://amar-recipe.byethost7.com/src/api/
+VITE_ADMIN_API_BASE_URL=https://amar-recipe.byethost7.com/admin_api/
 ```
 
 ## 📁 Project Structure
@@ -97,36 +116,68 @@ Amar_Recipe/
 │   ├── Components/         # Reusable UI components
 │   ├── Pages/              # Page components
 │   ├── api/                # PHP backend API
+│   │   ├── *.php          # API endpoints
+│   │   ├── config.php     # Database config
+│   │   ├── uploads/       # Recipe images
+│   │   └── admin_dp_uploads/ # Admin profiles
 │   ├── config/             # Frontend configuration
 │   └── App.jsx             # Main app component
-├── admin_api/              # Admin-specific PHP endpoints
-├── database/               # Database schema and migrations
+├── admin_api/              # Admin-specific endpoints
+├── database/               # Database schema
+│   └── schema.sql         # MySQL schema
 ├── public/                 # Static assets
 ├── .htaccess               # Apache configuration
-├── vercel.json             # Vercel deployment config
-└── package.json            # Node dependencies
+├── .env.example            # Environment template
+├── package.json            # Node dependencies
+└── vite.config.js          # Vite configuration
 ```
 
 ## 🔐 Environment Variables
 
-### Frontend (.env.production)
+### Frontend (.env.local / .env.production)
 ```env
-VITE_API_BASE_URL=https://your-domain.com/src/api/
-VITE_ADMIN_API_BASE_URL=https://your-domain.com/admin_api/
+VITE_API_BASE_URL=https://your-backend-domain.com/src/api/
+VITE_ADMIN_API_BASE_URL=https://your-backend-domain.com/admin_api/
 ```
 
 ### Backend (config.php)
-- Database credentials
-- API base URLs
+- Database credentials (DB_HOST, DB_USER, DB_PASS, DB_NAME)
+- API base URLs (BASE_URL, API_BASE_URL)
 - CORS settings
+
+## 🧪 Build & Test
+
+```bash
+# Development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Lint code
+npm run lint
+```
 
 ## 📞 Support
 
-For issues and questions:
-- Check [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md)
-- Review [DEPLOYMENT_QUICK_REF.md](../DEPLOYMENT_QUICK_REF.md)
+For deployment help and troubleshooting:
+- [Database Setup Guide](../DATABASE_SETUP.md)
+- [Backend Deployment Guide](../DEPLOYMENT_BYTEHOST.md)
+- [Frontend Deployment Guide](../DEPLOYMENT_VERCEL.md)
+- [Quick Reference](../DEPLOYMENT_QUICK_REFERENCE.md)
+
+## 🔒 Security Notes
+
+- Never commit `.env.local` or `.env.production` with credentials
+- Change default admin password after first login
+- Keep `config.php` out of version control
+- Use environment variables for all sensitive data
 
 ---
 
 **Last Updated**: December 2024  
 **Version**: 1.0.0
+

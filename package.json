@@ -1,10 +1,25 @@
 {
-  "homepage": "https://sharif2023.github.io/Amar_Recipies_ReactJS/",
+  "name": "amar-recipe",
+  "version": "1.0.0",
+  "description": "Recipe management system for GitHub and Bytehost deployment",
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "dev": "cd Amar_Recipe && npm run dev",
+    "build": "cd Amar_Recipe && npm run build",
+    "deploy": "cd Amar_Recipe && npm run deploy",
+    "deploy:preview": "cd Amar_Recipe && npm run deploy:preview"
   },
-  "devDependencies": {
-    "gh-pages": "^6.3.0"
-  }
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sharif2023/Amar_Recipe.git"
+  },
+  "keywords": [
+    "recipe",
+    "management",
+    "react",
+    "php",
+    "vercel",
+    "bytehost"
+  ],
+  "author": "Sharif Ahmed",
+  "license": "MIT"
 }
