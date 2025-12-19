@@ -1,26 +1,39 @@
 <?php
 /**
  * Database Configuration for Byethost Hosting
- * CRITICAL: CORS headers must be set BEFORE any output
+ * CORS headers MUST be first - before any output
  */
 
-// CORS MUST BE FIRST - Before any other output
-// Handle OPTIONS request immediately
+// Define allowed origins
+$allowedOrigins = [
+    'https://amar-recipe.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+
+// Get the request origin
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+
+// Check if origin is allowed, otherwise use the Vercel production URL
+if (in_array($origin, $allowedOrigins)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    // Default to Vercel production URL
+    header("Access-Control-Allow-Origin: https://amar-recipe.vercel.app");
+}
+
+// Handle OPTIONS preflight request immediately
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    header('Access-Control-Allow-Credentials: true');
     header('Access-Control-Max-Age: 86400');
     http_response_code(200);
     exit();
 }
 
-// Set CORS headers for all requests
-header('Access-Control-Allow-Origin: *');
+// Set CORS headers for all other requests
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
-header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json; charset=utf-8');
 
 // Error reporting
@@ -55,3 +68,4 @@ function getDbConnection() {
     return $conn;
 }
 ?>
+
