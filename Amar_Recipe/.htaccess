@@ -6,28 +6,39 @@
     RewriteBase /
 </IfModule>
 
-# CORS Headers - Critical for API Access
+# Security Headers (NOT CORS - handled in PHP)
 <IfModule mod_headers.c>
-    Header always set Access-Control-Allow-Origin "*"
-    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-    Header always set Access-Control-Allow-Credentials "true"
-    Header always set Access-Control-Max-Age "3600"
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Prevent MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# If mod_headers isn't available, try with Header set instead of Header always set
-<IfModule !mod_headers.c>
-    # Byethost might need this alternative
-    Header set Access-Control-Allow-Origin "*"
-    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-</IfModule>
+# Protect sensitive files from DIRECT browser access
+# But allow PHP includes (require/include)
+<FilesMatch "^config\.php$">
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+        # Allow access from localhost (for local testing)
+        RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1
+        # Block if accessed directly (not through PHP include)
+        RewriteCond %{REQUEST_URI} config\.php$
+        RewriteRule .* - [F,L]
+    </IfModule>
+</FilesMatch>
 
-# Handle OPTIONS preflight requests
-<IfModule mod_rewrite.c>
-    RewriteCond %{REQUEST_METHOD} OPTIONS
-    RewriteRule ^(.*)$ $1 [R=200,L]
-</IfModule>
+# Protect .env files and .git directory
+<FilesMatch "^\.(env|git)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
 
 # PHP Configuration
 <IfModule mod_php.c>
@@ -44,27 +55,6 @@
     # Session settings
     php_value session.gc_maxlifetime 3600
 </IfModule>
-
-# Security Headers
-<IfModule mod_headers.c>
-    # Prevent clickjacking
-    Header always set X-Frame-Options "SAMEORIGIN"
-    
-    # XSS Protection
-    Header always set X-XSS-Protection "1; mode=block"
-    
-    # Prevent MIME sniffing
-    Header always set X-Content-Type-Options "nosniff"
-    
-    # Referrer Policy
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
-
-# Protect sensitive files
-<FilesMatch "^(config\.php|\.env|\.git)">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
 
 # Enable Gzip Compression
 <IfModule mod_deflate.c>
@@ -86,3 +76,4 @@
 # Custom Error Pages (optional - create these if needed)
 # ErrorDocument 404 /404.html
 # ErrorDocument 500 /500.html
+

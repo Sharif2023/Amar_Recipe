@@ -1,14 +1,31 @@
 <?php
 /**
  * Database Configuration for Byethost Hosting
- * 
- * This file contains database connection settings.
- * For local development, modify these values accordingly.
+ * CRITICAL: CORS headers must be set BEFORE any output
  */
 
-// Error reporting (disable in production)
+// CORS MUST BE FIRST - Before any other output
+// Handle OPTIONS request immediately
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');
+    http_response_code(200);
+    exit();
+}
+
+// Set CORS headers for all requests
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
+header('Access-Control-Allow-Credentials: true');
+header('Content-Type: application/json; charset=utf-8');
+
+// Error reporting
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Set to 0 for production
+ini_set('display_errors', 0);
 
 // Database Configuration
 define('DB_HOST', 'sql212.byethost7.com');
@@ -17,43 +34,9 @@ define('DB_PASS', 'Sharif2025');
 define('DB_NAME', 'b7_40426674_amar_recipe');
 define('DB_PORT', 3306);
 
-// Base URL for the API (used for image paths, etc.)
+// Base URLs
 define('BASE_URL', 'https://amar-recipe.byethost7.com/');
 define('API_BASE_URL', BASE_URL . 'src/api/');
-
-// CORS Configuration
-function setCorsHeaders() {
-    // Allow requests from any origin (you can restrict this to your Vercel domain for security)
-    if (isset($_SERVER['HTTP_ORIGIN'])) {
-        header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-    } else {
-        header('Access-Control-Allow-Origin: *');
-    }
-    
-    // Allow specific HTTP methods
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    
-    // Allow specific headers
-    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    
-    // Allow credentials
-    header('Access-Control-Allow-Credentials: true');
-    
-    // Cache preflight requests for 1 hour
-    header('Access-Control-Max-Age: 3600');
-    
-    // Set content type
-    header('Content-Type: application/json; charset=utf-8');
-    
-    // Additional headers for compatibility
-    header('Access-Control-Expose-Headers: Content-Length, X-JSON');
-    
-    // Handle preflight OPTIONS request
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        http_response_code(200);
-        exit();
-    }
-}
 
 // Database Connection Function
 function getDbConnection() {
@@ -68,12 +51,7 @@ function getDbConnection() {
         exit();
     }
     
-    // Set charset to utf8mb4 for better emoji and character support
     $conn->set_charset('utf8mb4');
-    
     return $conn;
 }
-
-// Initialize CORS headers for all API requests
-setCorsHeaders();
 ?>
