@@ -1,0 +1,21 @@
+# Exclude from Docker build
+node_modules/
+dist/
+src/
+public/
+.git/
+.gitignore
+.env.local
+.env.production
+README.md
+package.json
+package-lock.json
+vite.config.js
+tailwind.config.js
+eslint.config.js
+index.html
+*.md
+database/
+api/
+update-api-urls.ps1
+vercel.json

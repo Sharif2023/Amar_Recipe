@@ -1,25 +1,25 @@
 <?php
 /**
- * Database Configuration for Byethost Hosting
+ * Database Configuration for Production (Railway) and Local Development
  * CORS headers MUST be first - before any output
  */
 
 // Define allowed origins
 $allowedOrigins = [
-    'https://amar-recipe.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:3000'
+    getenv('ALLOWED_ORIGIN') ?: 'https://amar-recipe.vercel.app', // Railway env variable or default
+    'http://localhost:5173', // Local Vite dev server
+    'http://localhost:3000'  // Alternative local port
 ];
 
 // Get the request origin
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 
-// Check if origin is allowed, otherwise use the Vercel production URL
+// Check if origin is allowed
 if (in_array($origin, $allowedOrigins)) {
     header("Access-Control-Allow-Origin: $origin");
 } else {
-    // Default to Vercel production URL
-    header("Access-Control-Allow-Origin: https://amar-recipe.vercel.app");
+    // Default to first allowed origin (production)
+    header("Access-Control-Allow-Origin: " . $allowedOrigins[0]);
 }
 
 // Handle OPTIONS preflight request immediately
@@ -40,15 +40,28 @@ header('Content-Type: application/json; charset=utf-8');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-// Database Configuration
-define('DB_HOST', 'sql212.byethost7.com');
-define('DB_USER', 'b7_40426674');
-define('DB_PASS', 'Sharif2025');
-define('DB_NAME', 'b7_40426674_amar_recipe');
-define('DB_PORT', 3306);
+// ==========================================
+// DATABASE CONFIGURATION
+// ==========================================
+// For Railway (Production): Uses environment variables
+// For Local Development: Falls back to localhost
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_NAME', getenv('DB_NAME') ?: 'amar_recipe');
+define('DB_PORT', getenv('DB_PORT') ?: 3306);
 
-// Base URLs
-define('BASE_URL', 'https://amar-recipe.byethost7.com/');
+// ==========================================
+// BASE URLs
+// ==========================================
+// For Railway: Uses RAILWAY_PUBLIC_DOMAIN environment variable
+// For Local: Falls back to localhost
+$isRailway = getenv('RAILWAY_PUBLIC_DOMAIN');
+if ($isRailway) {
+    define('BASE_URL', 'https://' . getenv('RAILWAY_PUBLIC_DOMAIN') . '/');
+} else {
+    define('BASE_URL', 'http://localhost/Amar_Recipies_Live/Amar_Recipe/');
+}
 define('API_BASE_URL', BASE_URL . 'src/api/');
 
 // Database Connection Function

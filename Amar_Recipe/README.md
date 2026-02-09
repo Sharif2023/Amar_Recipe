@@ -1,6 +1,6 @@
 # Amar Recipe - Recipe Management System
 
-A full-stack recipe management system with React frontend and PHP backend, designed for deployment on Vercel (frontend) and Bytehost (backend).
+A full-stack recipe management system with React frontend and PHP backend, designed for deployment on Vercel (frontend) and Railway (backend).
 
 ## 🚀 Features
 
@@ -22,9 +22,9 @@ A full-stack recipe management system with React frontend and PHP backend, desig
 - **Deployment**: Vercel
 
 ### Backend
-- **Language**: PHP 8+
-- **Database**: MySQL (MariaDB)
-- **Hosting**: Bytehost
+- **Language**: PHP 8.2+
+- **Database**: MySQL (Railway)
+- **Hosting**: Railway (Docker)
 - **Features**: RESTful API, CORS enabled
 
 ## 🛠️ Installation
@@ -79,18 +79,19 @@ A full-stack recipe management system with React frontend and PHP backend, desig
 
 ### Comprehensive Deployment Guides
 
-- **[Database Setup](../DATABASE_SETUP.md)** - Complete database configuration guide
-- **[Backend Deployment](../DEPLOYMENT_BYTEHOST.md)** - Deploy PHP backend to Bytehost
+- **[Backend Deployment](../DEPLOYMENT_RAILWAY.md)** - Deploy PHP backend to Railway
 - **[Frontend Deployment](../DEPLOYMENT_VERCEL.md)** - Deploy React app to Vercel
-- **[Quick Reference](../DEPLOYMENT_QUICK_REFERENCE.md)** - Checklists and quick commands
+- **[Database Setup](../DATABASE_SETUP.md)** - Complete database configuration guide
 
 ### Quick Deploy Overview
 
-**Backend (Bytehost)**:
-1. Create database and import `database/schema.sql`
-2. Update `src/api/config.php` with Bytehost credentials
-3. Upload `src/api/` and `admin_api/` via FTP
-4. Create upload directories with proper permissions
+**Backend (Railway)**:
+1. Push code to GitHub
+2. Create Railway project from GitHub repo
+3. Add MySQL database service
+4. Import `database/schema.sql`
+5. Set environment variables
+6. Railway auto-deploys via Dockerfile
 
 **Frontend (Vercel)**:
 ```bash
@@ -103,8 +104,8 @@ vercel --prod
 
 Set environment variables in Vercel dashboard:
 ```
-VITE_API_BASE_URL=https://amar-recipe.byethost7.com/src/api/
-VITE_ADMIN_API_BASE_URL=https://amar-recipe.byethost7.com/admin_api/
+VITE_API_BASE_URL=https://your-project-production.up.railway.app/src/api/
+VITE_ADMIN_API_BASE_URL=https://your-project-production.up.railway.app/admin_api/
 ```
 
 ## 📁 Project Structure
@@ -164,10 +165,9 @@ npm run lint
 ## 📞 Support
 
 For deployment help and troubleshooting:
+- [Railway Backend Deployment](../DEPLOYMENT_RAILWAY.md)
+- [Vercel Frontend Deployment](../DEPLOYMENT_VERCEL.md)
 - [Database Setup Guide](../DATABASE_SETUP.md)
-- [Backend Deployment Guide](../DEPLOYMENT_BYTEHOST.md)
-- [Frontend Deployment Guide](../DEPLOYMENT_VERCEL.md)
-- [Quick Reference](../DEPLOYMENT_QUICK_REFERENCE.md)
 
 ## 🔒 Security Notes
 

@@ -65,9 +65,9 @@ Amar_Recipies_Live/
 - **Deployment**: Vercel
 
 ### Backend
-- **Language**: PHP 8+
-- **Database**: MySQL (MariaDB)
-- **Hosting**: Bytehost
+- **Language**: PHP 8.2+
+- **Database**: MySQL (Railway)
+- **Hosting**: Railway (Docker)
 - **API**: RESTful JSON API
 - **CORS**: Enabled for cross-origin requests
 
@@ -77,10 +77,10 @@ Amar_Recipies_Live/
 - **PHP** 8.0+
 - **MySQL** 5.7+ or MariaDB
 - **Git**
-- **FTP client** (FileZilla recommended)
-- **Bytehost account** (for backend)
-- **Vercel account** (for frontend)
-- **GitHub account** (for version control)
+- **Railway account** (for backend hosting)
+- **Vercel account** (for frontend hosting)
+- **GitHub account** (required for Railway + version control)
+- **Payment method** (Railway is a paid service)
 
 ## 🛠️ Installation & Setup
 
@@ -111,8 +111,8 @@ VITE_ADMIN_API_BASE_URL=http://localhost/Amar_Recipies_Live/Amar_Recipe/admin_ap
 
 Set in Vercel dashboard:
 ```bash
-VITE_API_BASE_URL=https://amar-recipe.byethost7.com/src/api/
-VITE_ADMIN_API_BASE_URL=https://amar-recipe.byethost7.com/admin_api/
+VITE_API_BASE_URL=https://your-project-production.up.railway.app/src/api/
+VITE_ADMIN_API_BASE_URL=https://your-project-production.up.railway.app/admin_api/
 ```
 
 ### 4. Setup Local Database
@@ -136,17 +136,17 @@ Visit `http://localhost:5173`
 
 ### Quick Start
 
-1. **Deploy Backend to Bytehost** → See [DEPLOYMENT_BYTEHOST.md](DEPLOYMENT_BYTEHOST.md)
+1. **Deploy Backend to Railway** → See [DEPLOYMENT_RAILWAY.md](DEPLOYMENT_RAILWAY.md)
 2. **Deploy Frontend to Vercel** → See [DEPLOYMENT_VERCEL.md](DEPLOYMENT_VERCEL.md)
 3. **Setup Database** → See [DATABASE_SETUP.md](DATABASE_SETUP.md)
 
 ### Quick Reference
 
-See [DEPLOYMENT_QUICK_REFERENCE.md](DEPLOYMENT_QUICK_REFERENCE.md) for:
-- Deployment checklists
-- Quick commands
-- Common issues and fixes
-- Testing procedures
+Key deployment resources:
+- Step-by-step Railway deployment guide
+- Environment variable configuration
+- Database migration steps
+- Troubleshooting common issues
 
 ## 🔐 Default Admin Account
 
@@ -240,7 +240,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 📞 Support
 
 For issues and questions:
-- Check the [deployment guides](DEPLOYMENT_QUICK_REFERENCE.md)
+- Check the [Railway deployment guide](DEPLOYMENT_RAILWAY.md)
 - Open an issue on GitHub
 - Review existing issues for solutions
 
