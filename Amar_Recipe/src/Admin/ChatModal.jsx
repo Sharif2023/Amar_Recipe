@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 
 const ChatModal = ({ isOpen, onClose, senderId }) => {
   const [userInput, setUserInput] = useState('');
@@ -9,7 +10,7 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
 
   useEffect(() => {
     if (isOpen) {
-      fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/admin_requests.php')
+      fetch('API_BASE_URL + admin_requests.php')
         .then(response => response.json())
         .then(data => {
           const approvedAdmins = data.filter(admin => admin.status === 'approved');
@@ -39,7 +40,7 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
 
 
   const fetchMessages = (receiverId) => {
-    fetch(`http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/admin_get_messages.php?sender_id=${senderId}&receiver_id=${receiverId}`)
+    fetch(`API_BASE_URL + admin_get_messages.php?sender_id=${senderId}&receiver_id=${receiverId}`)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -71,7 +72,7 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
         message: userInput,
       };
 
-      fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/admin_send_message.php', {
+      fetch('API_BASE_URL + admin_send_message.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -182,3 +183,4 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
 };
 
 export default ChatModal;
+

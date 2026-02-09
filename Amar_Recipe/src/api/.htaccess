@@ -1,0 +1,17 @@
+# API Directory Configuration
+# CORS is handled in config.php - DO NOT add CORS headers here (causes duplicates)
+
+# PHP Settings
+<IfModule mod_php.c>
+    # Error handling
+    php_flag display_errors Off
+    php_flag log_errors On
+    
+    # File upload settings
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    
+    # Session settings
+    php_value session.gc_maxlifetime 3600
+</IfModule>
+

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import ChatModal from "../Admin/ChatModal";
 import logo from "../assets/Amar_Recipe_Header_Logo.svg";
@@ -16,13 +17,13 @@ const AdminHeader = () => {
 
   const firstDropdownRef = useRef(null);
   const secondDropdownRef = useRef(null);
-  const BASE_URL = "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/";
+  const BASE_URL = API_BASE_URL;
 
   const [admin, setAdmin] = useState(JSON.parse(localStorage.getItem("admin")));
 
   useEffect(() => {
     const adminData = JSON.parse(localStorage.getItem("admin"));
-    const BASE_URL = "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/";
+    const BASE_URL = API_BASE_URL;
 
     if (adminData) {
       setAdmin(adminData);
@@ -41,8 +42,8 @@ const AdminHeader = () => {
     const fetchCounts = async () => {
       try {
         const [reportRes, submissionRes] = await Promise.all([
-          fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/get_report_count.php'),
-          fetch('http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/get_submission_count.php')
+          fetch(API_BASE_URL + 'get_report_count.php'),
+          fetch(API_BASE_URL + 'get_submission_count.php')
         ]);
 
         const reportJson = await reportRes.json();
@@ -368,3 +369,4 @@ const AdminHeader = () => {
 };
 
 export default AdminHeader;
+

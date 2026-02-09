@@ -1,43 +1,31 @@
 <?php
+require_once __DIR__ . '/config.php';
 
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
+$data = json_decode(file_get_contents("php://input"), true);
+$conn = getDbConnection();
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
+$email = $data['email'];
+$password = $data['password'];
+
+// Verify credentials
+$stmt = $conn->prepare("SELECT id FROM admin_requests WHERE email = ? AND status = 'approved'");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+if (!$user || !password_verify($password, $user['password'])) {
+    echo json_encode(["success" => false, "message" => "Invalid credentials"]);
     exit();
 }
 
-$data = json_decode(file_get_contents("php://input"), true);
-$conn = new mysqli("localhost", "root", "", "amar_recipe");
+// Delete the account
+$deleteStmt = $conn->prepare("DELETE FROM admin_requests WHERE id = ?");
+$deleteStmt->bind_param("i", $user['id']);
 
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => 'DB Connection failed']);
-    exit;
-}
-
-$email = $data['email'];  // Logged-in admin's email
-
-// Ensure the admin is allowed to delete their account (i.e., not the root admin)
-$rootAdminEmail = "sharifislam0505@gmail.com";
-
-if ($email === $rootAdminEmail) {
-    echo json_encode(['success' => false, 'message' => 'Root admin cannot delete their account']);
-    $conn->close();
-    exit;
-}
-
-// Delete the admin's account from the database
-$stmt = $conn->prepare("DELETE FROM admin_requests WHERE email = ?");
-$stmt->bind_param("s", $email);
-
-if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Account deleted successfully']);
+if ($deleteStmt->execute()) {
+    echo json_encode(["success" => true, "message" => "Account deleted successfully"]);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Failed to delete account']);
+    echo json_encode(["success" => false, "message" => "Failed to delete account"]);
 }
-
-$stmt->close();
-$conn->close();
 ?>

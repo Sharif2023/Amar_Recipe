@@ -1,92 +1,252 @@
-# Amar Recipe
+# Amar Recipe - Complete Recipe Management System
 
-A modern, responsive recipe management platform built with React. This application allows users to browse and share recipes while providing administrators with powerful tools to moderate content and manage the platform.
+A full-stack recipe management system built with React and PHP, featuring recipe browsing, submissions, ratings, reporting, and a complete admin panel.
 
-## 🚀 Key Features
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com)
 
-### User Features
-- **Browse Recipes**: Explore a variety of recipes with a user-friendly interface.
-- **Recipe Submission**: Users can submit their own recipes for approval.
-- **Responsive Design**: Fully optimized unique interface for desktop and mobile devices.
+## 🌟 Live Demo
 
-### Admin Features
-- **Dashboard**: Centralized hub for platform management.
-- **Secure Authentication**: Dedicated admin login and signup systems.
-- **Content Moderation**:
-  - Review generic "Submission Requests" from users.
-  - Approve or Reject recipes.
-  - View detailed recipe information before publishing.
-- **Management**:
-  - Manage admin profiles.
-  - View platform activity reports.
-  - Track action history.
-  - Configuration settings.
-- **Communication**: Integrated chat functionality for admin coordination.
+- **Frontend**: [Your Vercel URL]
+- **Backend API**: [Your Bytehost URL]
 
-## 🛠️ Technology Stack
+## 📖 Overview
 
-- **Frontend Framework**: [React](https://react.dev/) (v19)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) (v4)
-- **Routing**: [React Router DOM](https://reactrouter.com/) (v7)
-- **Icons**: [React Icons](https://react-icons.github.io/react-icons/)
-- **Linting**: ESLint
+Amar Recipe is a comprehensive recipe management platform that allows users to browse, submit, and rate recipes while providing administrators with powerful tools to manage content, users, and community interactions.
 
-## 📦 Installation & Setup
+### Key Features
 
-Follow these lines to run the project locally.
+- 🍳 **Recipe Browsing** - Search and filter recipes by category
+- ✍️ **Recipe Submission** - Submit new recipes for admin approval
+- ⭐ **Rating System** - Rate and review recipes
+- 🚩 **Reporting** - Report inappropriate content
+- 👥 **Admin Panel** - Complete admin dashboard for content management
+- 💬 **Admin Chat** - Inter-admin communication system
+- 🌙 **Dark Mode** - Eye-friendly dark mode support
+- 📱 **Responsive Design** - Mobile-first responsive interface
 
-### Prerequisites
-- Node.js (Latest LTS recommended)
-- npm (comes with Node.js)
-- A local server environment (like XAMPP/WAMP) for the MySQL database.
-
-### Steps
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd Amar_Recipe
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Database Setup**
-   - Locate the SQL file in the project root (e.g., `../sql`).
-   - Import the SQL file into your MySQL database.
-   - Ensure your backend API is configured to connect to the `Amar_Recipe` database.
-
-4. **Run the Development Server**
-   ```bash
-   npm run dev
-   ```
-   The application will start, typically at `http://localhost:5173`.
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
-Amar_Recipe/
-├── src/
-│   ├── Admin/          # Admin dashboard components and pages
-│   ├── api/            # Backend API integration
-│   ├── assets/         # Static assets
-│   ├── Components/     # Reusable UI components
-│   ├── Pages/          # Public facing pages
-│   ├── App.jsx         # Main application component with Routing
-│   └── main.jsx        # Entry point
-├── public/             # Public assets
-├── index.html          # HTML entry point
-├── package.json        # Dependencies and scripts
-├── vite.config.js      # Vite configuration
-└── tailwind.config.js  # Tailwind configuration
+Amar_Recipies_Live/
+├── Amar_Recipe/                  # Main application directory
+│   ├── src/
+│   │   ├── Admin/                # Admin panel components
+│   │   ├── Components/           # Reusable UI components
+│   │   ├── Pages/                # Page components
+│   │   ├── api/                  # Backend PHP API
+│   │   │   ├── *.php            # API endpoints
+│   │   │   ├── config.php       # Database configuration
+│   │   │   ├── uploads/         # Recipe images
+│   │   │   └── admin_dp_uploads/ # Admin profile pictures
+│   │   ├── config/               # Frontend configuration
+│   │   └── App.jsx               # Main app component
+│   ├── admin_api/                # Admin-specific endpoints
+│   ├── database/                 # Database schema
+│   │   └── schema.sql           # MySQL schema
+│   ├── public/                   # Static assets
+│   ├── .htaccess                 # Apache configuration
+│   ├── .env.example              # Environment template
+│   └── package.json              # Node dependencies
+├── DEPLOYMENT_BYTEHOST.md        # Backend deployment guide
+├── DEPLOYMENT_VERCEL.md          # Frontend deployment guide
+├── DATABASE_SETUP.md             # Database setup guide
+├── DEPLOYMENT_QUICK_REFERENCE.md # Quick deployment checklist
+└── README.md                     # This file
 ```
 
-## 📜 Scripts
+## 🚀 Tech Stack
 
-- `npm run dev`: Start the development server.
-- `npm run build`: Build the app for production.
-- `npm run lint`: Run ESLint to check for code quality issues.
-- `npm run preview`: Preview the production build locally.
+### Frontend
+- **Framework**: React 19
+- **Build Tool**: Vite 6
+- **Styling**: Tailwind CSS 4
+- **Routing**: React Router DOM 7
+- **Icons**: React Icons
+- **Deployment**: Vercel
+
+### Backend
+- **Language**: PHP 8+
+- **Database**: MySQL (MariaDB)
+- **Hosting**: Bytehost
+- **API**: RESTful JSON API
+- **CORS**: Enabled for cross-origin requests
+
+## 📋 Prerequisites
+
+- **Node.js** 18+ and npm
+- **PHP** 8.0+
+- **MySQL** 5.7+ or MariaDB
+- **Git**
+- **FTP client** (FileZilla recommended)
+- **Bytehost account** (for backend)
+- **Vercel account** (for frontend)
+- **GitHub account** (for version control)
+
+## 🛠️ Installation & Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/Amar_Recipe.git
+cd Amar_Recipies_Live/Amar_Recipe
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure Environment
+
+#### For Local Development
+
+Create `.env.local`:
+```bash
+VITE_API_BASE_URL=http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/
+VITE_ADMIN_API_BASE_URL=http://localhost/Amar_Recipies_Live/Amar_Recipe/admin_api/
+```
+
+#### For Production
+
+Set in Vercel dashboard:
+```bash
+VITE_API_BASE_URL=https://amar-recipe.byethost7.com/src/api/
+VITE_ADMIN_API_BASE_URL=https://amar-recipe.byethost7.com/admin_api/
+```
+
+### 4. Setup Local Database
+
+1. Create MySQL database: `amar_recipe`
+2. Import schema:
+   ```bash
+   mysql -u root -p amar_recipe < database/schema.sql
+   ```
+3. Update `src/api/config.php` with local credentials
+
+### 5. Run Development Server
+
+```bash
+npm run dev
+```
+
+Visit `http://localhost:5173`
+
+## 📦 Deployment
+
+### Quick Start
+
+1. **Deploy Backend to Bytehost** → See [DEPLOYMENT_BYTEHOST.md](DEPLOYMENT_BYTEHOST.md)
+2. **Deploy Frontend to Vercel** → See [DEPLOYMENT_VERCEL.md](DEPLOYMENT_VERCEL.md)
+3. **Setup Database** → See [DATABASE_SETUP.md](DATABASE_SETUP.md)
+
+### Quick Reference
+
+See [DEPLOYMENT_QUICK_REFERENCE.md](DEPLOYMENT_QUICK_REFERENCE.md) for:
+- Deployment checklists
+- Quick commands
+- Common issues and fixes
+- Testing procedures
+
+## 🔐 Default Admin Account
+
+After database setup, use these credentials for first login:
+
+- **Email**: `admin@amarrecipe.com`
+- **Password**: `admin123`
+
+**⚠️ CRITICAL**: Change this password immediately after first login!
+
+## 🧪 Testing
+
+### Run Build Test
+```bash
+npm run build
+```
+
+### Preview Production Build
+```bash
+npm run preview
+```
+
+### Lint Code
+```bash
+npm run lint
+```
+
+## 📚 API Documentation
+
+### Public Endpoints
+- `GET /api/get_recipes.php` - Get all recipes
+- `POST /api/submit_recipe.php` - Submit recipe for approval
+- `POST /api/rate_recipe.php` - Rate a recipe
+- `POST /api/report_recipe.php` - Report recipe
+
+### Admin Endpoints
+- `POST /admin_api/admin_login.php` - Admin login
+- `GET /admin_api/admin_requests.php` - Get admin requests
+- `POST /api/approve_submission.php` - Approve recipe
+- `POST /api/delete_recipe.php` - Delete recipe
+
+Full API documentation coming soon.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**CORS Errors**
+- Verify `.htaccess` is uploaded to Bytehost
+- Check CORS headers in `config.php`
+- Clear browser cache
+
+**Database Connection Fails**
+- Verify credentials in `config.php`
+- Check database exists
+- Ensure user has proper permissions
+
+**Build Fails**
+- Check Node.js version (18+)
+- Delete `node_modules` and reinstall
+- Clear Vite cache
+
+See [DEPLOYMENT_QUICK_REFERENCE.md](DEPLOYMENT_QUICK_REFERENCE.md) for more solutions.
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 👨‍💻 Author
+
+**Sharif Ahmed**
+- GitHub: [@Sharif2023](https://github.com/Sharif2023)
+
+## 🙏 Acknowledgments
+
+- React team for the amazing framework
+- Tailwind CSS for the utility-first CSS framework
+- Vercel for seamless deployment
+- Bytehost for reliable PHP hosting
+
+## 📞 Support
+
+For issues and questions:
+- Check the [deployment guides](DEPLOYMENT_QUICK_REFERENCE.md)
+- Open an issue on GitHub
+- Review existing issues for solutions
+
+---
+
+**Built with ❤️ using React and PHP**
+
+**Version**: 1.0.0  
+**Last Updated**: December 2024

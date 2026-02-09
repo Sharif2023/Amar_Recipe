@@ -1,22 +1,9 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-header('Content-Type: application/json');
-header("Access-Control-Allow-Origin: *"); // Allow CORS for testing
-
-
-// Database config
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "Amar_Recipe";
+require_once __DIR__ . '/config.php';
 
 // Connect to DB
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => "DB Connection failed"]);
-    exit;
-}
+$conn = getDbConnection();
+
 
 // Helper function to sanitize input
 function sanitize($conn, $data)
@@ -56,7 +43,7 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $destPath = $uploadDir . $newFileName;
 
     if (move_uploaded_file($fileTmpPath, $destPath)) {
-        // Assuming your backend URL is http://yourdomain.com/
+        // Store relative path - will be resolved by frontend using API_BASE_URL
         $image_url = "uploads/" . $newFileName;
     } else {
         echo json_encode(['success' => false, 'message' => "Failed to move uploaded image"]);

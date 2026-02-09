@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import AdminViewRecipeModal from './AdminViewRecipeModal';
 
-const backendBaseUrl = 'http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/';
+const backendBaseUrl = 'API_BASE_URL + ';
 
 const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -217,3 +218,4 @@ const Reports = () => {
 };
 
 export default Reports;
+

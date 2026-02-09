@@ -1,12 +1,7 @@
 <?php
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
+require_once __DIR__ . '/config.php';
 
-$conn = new mysqli('localhost', 'root', '', 'Amar_Recipe');
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
-    exit;
-}
+$conn = getDbConnection();
 
 $sql = "SELECT * FROM recipes ORDER BY created_at DESC";
 $result = $conn->query($sql);
@@ -20,3 +15,4 @@ if ($result->num_rows > 0) {
 
 echo json_encode(['success' => true, 'recipes' => $recipes]);
 $conn->close();
+

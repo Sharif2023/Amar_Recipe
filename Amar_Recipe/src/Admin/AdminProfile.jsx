@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 
 const AdminProfile = () => {
   const [profileImage, setProfileImage] = useState(
@@ -71,7 +72,7 @@ const AdminProfile = () => {
 
   useEffect(() => {
     const adminData = JSON.parse(localStorage.getItem("admin"));
-    const BASE_URL = "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/";
+    const BASE_URL = API_BASE_URL;
 
     if (adminData) {
       setAdmin(adminData);
@@ -107,7 +108,7 @@ const AdminProfile = () => {
 
     try {
       const res = await fetch(
-        "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/update_admin_profile.php",
+        API_BASE_URL + "update_admin_profile.php",
         {
           method: "POST",
           body: formDataToSend,
@@ -122,7 +123,7 @@ const AdminProfile = () => {
 
         const fullProfileImagePath = (result.profileImage || profileImage).startsWith("http")
           ? result.profileImage
-          : "http://localhost/Amar_Recipies_jsx/Amar_Recipe/src/api/" + result.profileImage;
+          : API_BASE_URL + result.profileImage;
 
         const updatedAdminWithImage = {
           ...updatedAdmin,
@@ -336,3 +337,4 @@ const AdminProfile = () => {
 };
 
 export default AdminProfile;
+
