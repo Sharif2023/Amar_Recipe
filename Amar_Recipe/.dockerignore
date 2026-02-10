@@ -2,8 +2,6 @@
 # Frontend files (these go to Vercel, not Railway)
 node_modules/
 dist/
-src/
-public/
 .git/
 .gitignore
 .env.local
@@ -24,3 +22,13 @@ vercel.json
 railway.json
 .dockerignore
 Dockerfile
+
+# React source files (NOT src/api/ - that's the backend!)
+src/Admin/
+src/Components/
+src/Pages/
+src/config/
+src/App.jsx
+src/main.jsx
+src/index.css
+public/
