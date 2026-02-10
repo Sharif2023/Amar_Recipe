@@ -28,10 +28,9 @@ RUN a2enmod rewrite headers
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy API files
+# Copy API files only (backend)
 COPY src/api/ /var/www/html/src/api/
 COPY admin_api/ /var/www/html/admin_api/
-COPY .htaccess /var/www/html/.htaccess
 
 # Create upload directories with proper permissions
 RUN mkdir -p /var/www/html/src/api/uploads \

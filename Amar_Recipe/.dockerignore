@@ -1,4 +1,5 @@
 # Exclude from Docker build
+# Frontend files (these go to Vercel, not Railway)
 node_modules/
 dist/
 src/
@@ -14,8 +15,12 @@ vite.config.js
 tailwind.config.js
 eslint.config.js
 index.html
+.htaccess
 *.md
 database/
 api/
 update-api-urls.ps1
 vercel.json
+railway.json
+.dockerignore
+Dockerfile

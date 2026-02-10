@@ -18,6 +18,9 @@ Railway charges based on usage:
 
 You get $5 free credit each month, so actual costs may be lower.
 
+> [!IMPORTANT]
+> **Root Directory Configuration**: If your GitHub repository contains the entire `Amar_Recipies_Live` folder, you MUST set the root directory to `Amar_Recipe` in Railway settings. Otherwise, Railway will try to deploy the wrong directory and fail with "No start command found" error.
+
 ## 🚀 Deployment Steps
 
 ### 1. Push Code to GitHub
@@ -37,8 +40,13 @@ git push origin main
 2. Click **"New Project"**
 3. Select **"Deploy from GitHub repo"**
 4. Authorize Railway to access your GitHub account
-5. Select your `Amar_Recipies_ReactJS` repository
-6. Railway will detect the Dockerfile automatically
+5. Select your repository
+6. **IMPORTANT**: Set Root Directory
+   - Go to **Settings** tab
+   - Scroll to **Source** section
+   - Set **Root Directory** to: `Amar_Recipe`
+   - This tells Railway where to find the Dockerfile
+7. Railway will now detect the Dockerfile and start building
 
 ### 3. Add MySQL Database
 
@@ -158,8 +166,17 @@ Expected response: JSON with recipes data
 
 ### Build Fails
 
+**Error: "No start command was found" / "Detected Node"**
+- **Cause**: Railway is using Node.js buildpack instead of Dockerfile
+- **Solution**: Set Root Directory in Railway
+  1. Go to Service → Settings → Source
+  2. Set **Root Directory** to: `Amar_Recipe`
+  3. Redeploy the service
+- This tells Railway where to find your Dockerfile
+
 **Error: Dockerfile not found**
-- Solution: Ensure `Dockerfile` is in the root of `Amar_Recipe` directory
+- Solution: Ensure `Dockerfile` is in `Amar_Recipe` directory
+- Verify Root Directory is set to `Amar_Recipe` in Railway settings
 - Check Railway's build logs for specific errors
 
 **Error: Database connection failed**
