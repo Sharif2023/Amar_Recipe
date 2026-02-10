@@ -22,6 +22,10 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     pdo \
     pdo_mysql
 
+# Fix Apache MPM conflict - disable all MPMs except event
+RUN a2dismod mpm_prefork mpm_worker || true
+RUN a2enmod mpm_event
+
 # Enable Apache modules
 RUN a2enmod rewrite headers
 
@@ -40,11 +44,7 @@ RUN mkdir -p /var/www/html/src/api/uploads \
     && chmod -R 775 /var/www/html/src/api/uploads \
     && chmod -R 775 /var/www/html/src/api/admin_dp_uploads
 
-# Configure Apache to listen on Railway's PORT (defaults to 80)
-RUN sed -i 's/Listen 80/Listen ${PORT:-80}/g' /etc/apache2/ports.conf && \
-    sed -i 's/:80/:${PORT:-80}/g' /etc/apache2/sites-available/000-default.conf
-
-# Expose port 80 (Railway will map it)
+# Expose port 80
 EXPOSE 80
 
 # Start Apache in foreground
