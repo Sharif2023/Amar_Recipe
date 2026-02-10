@@ -1,5 +1,5 @@
 # render.yaml
-# Render Blueprint for Amar Recipe Backend
+# Render Blueprint for Amar Recipe Backend with PostgreSQL
 
 services:
   - type: web
@@ -8,16 +8,13 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: DB_HOST
-        sync: false
-      - key: DB_PORT
-        value: 3306
-      - key: DB_USER
-        sync: false
-      - key: DB_PASS
-        sync: false
-      - key: DB_NAME
-        sync: false
+      - key: RENDER
+        value: "true"
       - key: ALLOWED_ORIGIN
         value: "*"
-    healthCheckPath: /src/api/get_recipes.php
+    # Database will be created separately and linked
+
+databases:
+  - name: amar-recipe-db
+    databaseName: amar_recipe
+    plan: free

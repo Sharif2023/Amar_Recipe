@@ -43,42 +43,63 @@ ini_set('display_errors', 0);
 // ==========================================
 // DATABASE CONFIGURATION
 // ==========================================
-// For Railway (Production): Uses environment variables
-// For Local Development: Falls back to localhost
+// For Render (Production): Uses PostgreSQL with environment variables
+// For Local Development: Falls back to localhost MySQL
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 define('DB_NAME', getenv('DB_NAME') ?: 'amar_recipe');
 define('DB_PORT', getenv('DB_PORT') ?: 3306);
 
+// Detect database type (PostgreSQL for Render, MySQL for local)
+$isRender = getenv('RENDER') === 'true' || getenv('DATABASE_URL');
+define('DB_TYPE', $isRender ? 'pgsql' : 'mysql');
+
 // ==========================================
 // BASE URLs
 // ==========================================
-// For Railway: Uses RAILWAY_PUBLIC_DOMAIN environment variable
-// For Local: Falls back to localhost
-$isRailway = getenv('RAILWAY_PUBLIC_DOMAIN');
-if ($isRailway) {
-    define('BASE_URL', 'https://' . getenv('RAILWAY_PUBLIC_DOMAIN') . '/');
+if ($isRender) {
+    // Render uses RENDER_EXTERNAL_URL or we can construct it
+    $renderUrl = getenv('RENDER_EXTERNAL_URL') ?: 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME');
+    define('BASE_URL', $renderUrl . '/');
 } else {
+    // Local development
     define('BASE_URL', 'http://localhost/Amar_Recipies_Live/Amar_Recipe/');
 }
 define('API_BASE_URL', BASE_URL . 'src/api/');
 
 // Database Connection Function
 function getDbConnection() {
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
-    
-    if ($conn->connect_error) {
+    try {
+        if (DB_TYPE === 'pgsql') {
+            // PostgreSQL connection for Render
+            $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME;
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false
+            ]);
+            return $pdo;
+        } else {
+            // MySQL connection for local development
+            $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
+            
+            if ($conn->connect_error) {
+                throw new Exception('Database connection failed: ' . $conn->connect_error);
+            }
+            
+            $conn->set_charset('utf8mb4');
+            return $conn;
+        }
+    } catch (Exception $e) {
         http_response_code(500);
         echo json_encode([
-            'success' => false, 
-            'message' => 'Database connection failed: ' . $conn->connect_error
+            'success' => false,
+            'message' => 'Database connection failed',
+            'error' => $e->getMessage()
         ]);
         exit();
     }
-    
-    $conn->set_charset('utf8mb4');
-    return $conn;
 }
 ?>
 
