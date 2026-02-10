@@ -41,8 +41,17 @@ RUN mkdir -p /var/www/html/src/api/uploads \
     && chmod -R 775 /var/www/html/src/api/uploads \
     && chmod -R 775 /var/www/html/src/api/admin_dp_uploads
 
-# Configure Apache virtual host
-RUN echo '<VirtualHost *:${PORT}>\n\
+# Create startup script that configures Apache with Railway's PORT
+RUN echo '#!/bin/bash\n\
+# Use Railway PORT or default to 80\n\
+export PORT=${PORT:-80}\n\
+\n\
+# Configure Apache to listen on the PORT\n\
+echo "Listen $PORT" > /etc/apache2/ports.conf\n\
+\n\
+# Configure virtual host\n\
+cat > /etc/apache2/sites-available/000-default.conf <<EOF\n\
+<VirtualHost *:$PORT>\n\
     ServerAdmin webmaster@localhost\n\
     DocumentRoot /var/www/html\n\
     \n\
@@ -52,15 +61,17 @@ RUN echo '<VirtualHost *:${PORT}>\n\
         Require all granted\n\
     </Directory>\n\
     \n\
-    ErrorLog ${APACHE_LOG_DIR}/error.log\n\
-    CustomLog ${APACHE_LOG_DIR}/access.log combined\n\
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+    ErrorLog /dev/stderr\n\
+    CustomLog /dev/stdout combined\n\
+</VirtualHost>\n\
+EOF\n\
+\n\
+# Start Apache\n\
+exec apache2-foreground\n\
+' > /usr/local/bin/start-apache.sh && chmod +x /usr/local/bin/start-apache.sh
 
-# Update Apache to listen on Railway's PORT
-RUN echo 'Listen ${PORT}' > /etc/apache2/ports.conf
+# Expose port
+EXPOSE 80
 
-# Expose Railway PORT
-EXPOSE ${PORT}
-
-# Start Apache in foreground
-CMD ["apache2-foreground"]
+# Start Apache with dynamic PORT configuration
+CMD ["/usr/local/bin/start-apache.sh"]
