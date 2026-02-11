@@ -5,7 +5,7 @@
  */
 
 // Define allowed origins
-$envOrigin = getenv('ALLOWED_ORIGIN') ?: '';
+$envOrigin = rtrim(getenv('ALLOWED_ORIGIN') ?: '', '/');
 
 // Get the request origin
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
