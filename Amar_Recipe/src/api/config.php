@@ -43,16 +43,29 @@ ini_set('display_errors', 0);
 // ==========================================
 // DATABASE CONFIGURATION
 // ==========================================
-// For Render (Production): Uses PostgreSQL with environment variables
+// For Render (Production): Uses PostgreSQL via DATABASE_URL
 // For Local Development: Falls back to localhost MySQL
-define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') ?: '');
-define('DB_NAME', getenv('DB_NAME') ?: 'amar_recipe');
-define('DB_PORT', getenv('DB_PORT') ?: 3306);
+$databaseUrl = getenv('DATABASE_URL');
+$isRender = getenv('RENDER') === 'true' || $databaseUrl;
 
-// Detect database type (PostgreSQL for Render, MySQL for local)
-$isRender = getenv('RENDER') === 'true' || getenv('DATABASE_URL');
+if ($databaseUrl) {
+    // Parse the DATABASE_URL into components
+    // Format: postgresql://user:password@host:port/dbname
+    $dbParts = parse_url($databaseUrl);
+    define('DB_HOST', $dbParts['host'] ?? 'localhost');
+    define('DB_PORT', $dbParts['port'] ?? 5432);
+    define('DB_USER', $dbParts['user'] ?? '');
+    define('DB_PASS', $dbParts['pass'] ?? '');
+    define('DB_NAME', ltrim($dbParts['path'] ?? '/amar_recipe', '/'));
+} else {
+    // Local development defaults
+    define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+    define('DB_PORT', getenv('DB_PORT') ?: 3306);
+    define('DB_USER', getenv('DB_USER') ?: 'root');
+    define('DB_PASS', getenv('DB_PASS') ?: '');
+    define('DB_NAME', getenv('DB_NAME') ?: 'amar_recipe');
+}
+
 define('DB_TYPE', $isRender ? 'pgsql' : 'mysql');
 
 // ==========================================
