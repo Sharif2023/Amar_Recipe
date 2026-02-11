@@ -1,34 +1,30 @@
 // API Configuration
-// In production, use Vercel proxy to bypass Bytehost anti-bot security
-// In development, call Bytehost directly
+// In production (Vercel), call Render backend directly
+// In development, call localhost
 
 const isDev = import.meta.env.DEV;
 
-// For production, use Vercel API routes as proxy
-// For development, use direct Bytehost URLs (or local)
+// Production: Render backend URL
+// Development: local XAMPP server
+const RENDER_BACKEND = 'https://amar-recipe-backend.onrender.com/';
+
 const API_BASE_URL = isDev
     ? (import.meta.env.VITE_API_BASE_URL || 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/')
-    : '/api/proxy?endpoint=';
+    : RENDER_BACKEND + 'src/api/';
 
 const ADMIN_API_BASE_URL = isDev
     ? (import.meta.env.VITE_ADMIN_API_BASE_URL || 'http://localhost/Amar_Recipies_Live/Amar_Recipe/admin_api/')
-    : '/api/admin-proxy?endpoint=';
+    : RENDER_BACKEND + 'admin_api/';
 
 // Helper function to build API URL
 export function buildApiUrl(endpoint) {
-    if (isDev) {
-        return API_BASE_URL + endpoint;
-    }
-    // In production, use proxy
-    return `/api/proxy?endpoint=${endpoint}`;
+    return API_BASE_URL + endpoint;
 }
 
 export function buildAdminApiUrl(endpoint) {
-    if (isDev) {
-        return ADMIN_API_BASE_URL + endpoint;
-    }
-    return `/api/admin-proxy?endpoint=${endpoint}`;
+    return ADMIN_API_BASE_URL + endpoint;
 }
 
 export { API_BASE_URL, ADMIN_API_BASE_URL };
+
 

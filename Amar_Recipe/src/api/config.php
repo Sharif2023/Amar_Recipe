@@ -5,21 +5,27 @@
  */
 
 // Define allowed origins
-$allowedOrigins = [
-    getenv('ALLOWED_ORIGIN') ?: 'https://amar-recipe.vercel.app', // Railway env variable or default
-    'http://localhost:5173', // Local Vite dev server
-    'http://localhost:3000'  // Alternative local port
-];
+$envOrigin = getenv('ALLOWED_ORIGIN') ?: '';
 
 // Get the request origin
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 
-// Check if origin is allowed
-if (in_array($origin, $allowedOrigins)) {
-    header("Access-Control-Allow-Origin: $origin");
+// Handle CORS
+if ($envOrigin === '*') {
+    // Allow all origins
+    header("Access-Control-Allow-Origin: *");
 } else {
-    // Default to first allowed origin (production)
-    header("Access-Control-Allow-Origin: " . $allowedOrigins[0]);
+    $allowedOrigins = [
+        $envOrigin ?: 'https://amar-recipe.vercel.app',
+        'http://localhost:5173',
+        'http://localhost:3000'
+    ];
+
+    if (in_array($origin, $allowedOrigins)) {
+        header("Access-Control-Allow-Origin: $origin");
+    } else {
+        header("Access-Control-Allow-Origin: " . $allowedOrigins[0]);
+    }
 }
 
 // Handle OPTIONS preflight request immediately
