@@ -42,7 +42,7 @@ export default function SubmitRecipe() {
         }
 
         try {
-            const response = await fetch('API_BASE_URL + submit_recipe_request.php', {
+            const response = await fetch(API_BASE_URL + 'submit_recipe_request.php', {
                 method: 'POST',
                 body: data,
             });
