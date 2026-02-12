@@ -58,6 +58,7 @@ const AdminLogin = () => {
                             ইমেইল <span className="text-red-500">*</span>
                         </label>
                         <input
+                            id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -73,6 +74,7 @@ const AdminLogin = () => {
                             পাসওয়ার্ড <span className="text-red-500">*</span>
                         </label>
                         <input
+                            id="password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
