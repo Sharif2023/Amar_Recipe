@@ -15,7 +15,7 @@ const Reports = () => {
       const res = await fetch(`${backendBaseUrl}get_reports.php`);
       const json = await res.json();
       if (json.success) {
-        setReports(json.data);
+        setReports(json.reports || []);
       }
     } catch (error) {
       console.error(error);
@@ -152,15 +152,22 @@ const Reports = () => {
         <tbody>
           {reports.map((report) => (
             <tr key={report.id} className="odd:bg-white even:bg-gray-100 dark:odd:bg-[#1b1b1b] dark:even:bg-[#262525]">
-              <td className="border border-gray-300 p-2 text-center">{report.report_id}</td>
-              <td className="border border-gray-300 p-2 text-center">{report.recipe_id}</td>
+              <td className="border border-gray-300 p-2 text-center">{report?.report_id}</td>
+              <td className="border border-gray-300 p-2 text-center">{report?.recipe_id}</td>
 
               <td className="border border-gray-300 p-2">
-                {JSON.parse(report.reasons).join(', ')}
+                {report?.reasons ? (() => {
+                  try {
+                    const parsed = JSON.parse(report.reasons);
+                    return Array.isArray(parsed) ? parsed.join(', ') : report.reasons;
+                  } catch (e) {
+                    return report.reasons;
+                  }
+                })() : '-'}
               </td>
-              <td className="border border-gray-300 p-2">{report.other_reason || '-'}</td>
-              <td className="border border-gray-300 p-2">{report.reporter_email || '-'}</td>
-              <td className="border border-gray-300 p-2 text-center">{report.status}</td>
+              <td className="border border-gray-300 p-2">{report?.other_reason || '-'}</td>
+              <td className="border border-gray-300 p-2">{report?.reporter_email || '-'}</td>
+              <td className="border border-gray-300 p-2 text-center">{report?.status}</td>
               <td className="border border-gray-300 p-2 flex justify-center gap-2">
                 <button
                   className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"

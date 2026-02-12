@@ -50,7 +50,7 @@ const SubmissionRequest = () => {
       );
       const json = await res.json();
       if (json.success) {
-        setRequests(json.data);
+        setRequests(json.requests || []);
       } else {
         alert("রিকুয়েষ্ট লোড করতে ব্যর্থ হয়েছে।");
       }
@@ -161,34 +161,34 @@ const SubmissionRequest = () => {
               <div className="flex-grow min-w-0">
                 <h3
                   className="text-lg font-semibold dark:text-white truncate"
-                  title={req.title}
+                  title={req?.title}
                 >
-                  {req.title}
+                  {req?.title}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{req.category}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{req?.category}</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  প্রেরকের নাম: <strong>{req.organizerName}</strong>
+                  প্রেরকের নাম: <strong>{req?.organizerName}</strong>
                 </p>
                 <p className="text-sm mt-1">
                   অবস্থা:{" "}
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${req.status === "Approved"
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${req?.status === "Approved"
                       ? "bg-green-700 text-green-300"
-                      : req.status === "Rejected"
+                      : req?.status === "Rejected"
                         ? "bg-red-700 text-red-300"
                         : "bg-yellow-700 text-yellow-300"
                       }`}
                   >
-                    {req.status === "Pending"
+                    {req?.status === "Pending"
                       ? "Pending"
-                      : req.status === "Approved"
+                      : req?.status === "Approved"
                         ? "অনুমোদিত"
                         : "প্রত্যাখ্যাত"}
                   </span>
                 </p>
-                {req.status === "Rejected" && req.comment && (
+                {req?.status === "Rejected" && req?.comment && (
                   <p className="text-sm mt-1 text-red-400 italic">
-                    বাতিলের কারণ: {req.comment}
+                    বাতিলের কারণ: {req?.comment}
                   </p>
                 )}
               </div>
