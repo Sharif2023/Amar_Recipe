@@ -9,40 +9,60 @@ if (empty($id)) {
     exit;
 }
 
-$conn = getDbConnection();
+try {
+    $conn = getDbConnection();
 
-// Fetch the submission request
-$stmt = $conn->prepare("SELECT * FROM submission_requests WHERE id = :id");
-$stmt->execute([':id' => $id]);
-$submission = $stmt->fetch();
+    // Fetch the submission request
+    $stmt = $conn->prepare("SELECT * FROM submission_requests WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $submission = $stmt->fetch();
 
-if (!$submission) {
-    echo json_encode(['success' => false, 'message' => 'Submission not found']);
-    exit;
+    if (!$submission) {
+        echo json_encode(['success' => false, 'message' => 'Submission not found']);
+        exit;
+    }
+
+    // Start transaction
+    $conn->beginTransaction();
+
+    // Update submission status to Approved
+    $admin_name = $data['admin_name'] ?? 'Admin';
+    $updateStmt = $conn->prepare("UPDATE submission_requests SET status = 'Approved', action_date = NOW(), admin_name = :admin_name WHERE id = :id");
+    $updateStmt->execute([':id' => $id, ':admin_name' => $admin_name]);
+
+    // Insert into recipes table
+    // Note: Column names in PostgreSQL are returned in lowercase unless quoted.
+    // submission_requests columns: title, category, description, image, location, organizername, organizeremail, organizeraddress, tags, reference, tutorialvideo, comment, source
+    // recipes columns: title, category, description, image_url, location, organizername, organizeremail, organizeraddress, tags, reference, tutorialvideo, comment, source, created_at
+    
+    $insertStmt = $conn->prepare("INSERT INTO recipes 
+        (title, category, description, image_url, location, organizername, organizeremail, organizeraddress, tags, reference, tutorialvideo, comment, source, created_at)
+        VALUES (:title, :category, :description, :image_url, :location, :organizername, :organizeremail, :organizeraddress, :tags, :reference, :tutorialvideo, :comment, :source, NOW())");
+    
+    $insertStmt->execute([
+        ':title' => $submission['title'] ?? '',
+        ':category' => $submission['category'] ?? 'Miscellaneous',
+        ':description' => $submission['description'] ?? '',
+        ':image_url' => $submission['image'] ?? '',
+        ':location' => $submission['location'] ?? 'Unknown',
+        ':organizername' => $submission['organizername'] ?? 'User',
+        ':organizeremail' => $submission['organizeremail'] ?? '',
+        ':organizeraddress' => $submission['organizeraddress'] ?? '',
+        ':tags' => $submission['tags'] ?? '',
+        ':reference' => $submission['reference'] ?? '',
+        ':tutorialvideo' => $submission['tutorialvideo'] ?? '',
+        ':comment' => $submission['comment'] ?? '',
+        ':source' => $submission['source'] ?? ''
+    ]);
+
+    $conn->commit();
+    echo json_encode(['success' => true, 'message' => 'Submission approved and recipe added']);
+
+} catch (Exception $e) {
+    if (isset($conn) && $conn->inTransaction()) {
+        $conn->rollBack();
+    }
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Approval failed: ' . $e->getMessage()]);
 }
 
-// Update submission status to Approved
-$updateStmt = $conn->prepare("UPDATE submission_requests SET status = 'Approved' WHERE id = :id");
-$updateStmt->execute([':id' => $id]);
-
-// Insert into recipes table
-$insertStmt = $conn->prepare("INSERT INTO recipes 
-    (title, category, description, image_url, location, organizername, organizeremail, organizeraddress, tags, reference, tutorialvideo, comment, source, created_at)
-    VALUES (:title, :category, :description, :image_url, :location, :organizername, :organizeremail, :organizeraddress, :tags, :reference, :tutorialvideo, :comment, :source, NOW())");
-$insertStmt->execute([
-    ':title' => $submission['title'],
-    ':category' => $submission['category'],
-    ':description' => $submission['description'],
-    ':image_url' => $submission['image'],
-    ':location' => $submission['location'],
-    ':organizername' => $submission['organizername'],
-    ':organizeremail' => $submission['organizeremail'],
-    ':organizeraddress' => $submission['organizeraddress'],
-    ':tags' => $submission['tags'] ?? '',
-    ':reference' => $submission['reference'] ?? '',
-    ':tutorialvideo' => $submission['tutorialvideo'] ?? '',
-    ':comment' => $submission['comment'] ?? '',
-    ':source' => $submission['source'] ?? ''
-]);
-
-echo json_encode(['success' => true, 'message' => 'Submission approved and recipe added']);

@@ -1,0 +1,8 @@
+
+CREATE TABLE IF NOT EXISTS reports (
+    id SERIAL PRIMARY KEY,
+    recipe_id INTEGER NOT NULL,
+    reporter_email VARCHAR(255) NOT NULL,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

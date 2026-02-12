@@ -1,0 +1,6 @@
+unrecognized win32 error code: 2150694912psql: warning: extra command-line argument "pager" ignored
+psql: warning: extra command-line argument "off\ -c \\d" ignored
+psql: warning: extra command-line argument "submission_requests\ " ignored
+unrecognized win32 error code: 2150694912ERROR:  unterminated quoted identifier at or near """
+LINE 1: "
+        ^
