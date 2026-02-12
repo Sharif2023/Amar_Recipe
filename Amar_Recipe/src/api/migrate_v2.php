@@ -85,29 +85,43 @@ try {
         }
     }
 
-    // 3. Sync recipes table (ID column)
-    echo "\nProcessing 'recipes' table...\n";
-    if (DB_TYPE === 'pgsql') {
-        try {
-            // Check if default exists
-            $stmt = $conn->prepare("SELECT column_default FROM information_schema.columns WHERE table_name = 'recipes' AND column_name = 'id'");
-            $stmt->execute();
-            $default = $stmt->fetchColumn();
-            
-            if (!$default) {
-                echo " - Converting 'id' to auto-incrementing...\n";
-                $conn->exec("CREATE SEQUENCE IF NOT EXISTS recipes_id_seq");
-                $conn->exec("ALTER TABLE recipes ALTER COLUMN id SET DEFAULT nextval('recipes_id_seq')");
-                $conn->exec("ALTER SEQUENCE recipes_id_seq OWNED BY recipes.id");
-                $conn->exec("SELECT setval('recipes_id_seq', (SELECT MAX(id) FROM recipes))");
-                echo " - Successfully converted 'id' to auto-incrementing and reset sequence.\n";
-            } else {
-                echo " - 'id' already has a default: $default. Resetting sequence anyway...\n";
-                $conn->exec("SELECT setval(pg_get_serial_sequence('recipes', 'id'), (SELECT MAX(id) FROM recipes))");
-                echo " - Sequence reset.\n";
+    // 3. Sync sequences for all tables
+    echo "\nProcessing sequences for all tables...\n";
+    $tables = ['recipes', 'reports', 'ratings', 'admin_chat_messages', 'submission_requests'];
+    
+    foreach ($tables as $table) {
+        if (DB_TYPE === 'pgsql') {
+            try {
+                echo " - Processing '$table'...\n";
+                // Check if default exists
+                $stmt = $conn->prepare("SELECT column_default FROM information_schema.columns WHERE table_name = :table AND column_name = 'id'");
+                $stmt->execute([':table' => $table]);
+                $default = $stmt->fetchColumn();
+                
+                $seqName = $table . "_id_seq";
+                if (!$default) {
+                    echo "   - Converting 'id' to auto-incrementing...\n";
+                    $conn->exec("CREATE SEQUENCE IF NOT EXISTS $seqName");
+                    $conn->exec("ALTER TABLE $table ALTER COLUMN id SET DEFAULT nextval('$seqName')");
+                    $conn->exec("ALTER SEQUENCE $seqName OWNED BY $table.id");
+                    $conn->exec("SELECT setval('$seqName', (SELECT COALESCE(MAX(id), 0) + 1 FROM $table))");
+                    echo "   - Success.\n";
+                } else {
+                    echo "   - 'id' already has a default. Resetting sequence...\n";
+                    // Try to get sequence name dynamically
+                    $stmt = $conn->prepare("SELECT pg_get_serial_sequence(:table, 'id')");
+                    $stmt->execute([':table' => $table]);
+                    $actualSeq = $stmt->fetchColumn();
+                    if ($actualSeq) {
+                        $conn->exec("SELECT setval('$actualSeq', (SELECT COALESCE(MAX(id), 0) + 1 FROM $table))");
+                        echo "   - Sequence reset.\n";
+                    } else {
+                        echo "   - Could not find serial sequence name.\n";
+                    }
+                }
+            } catch (Throwable $e) {
+                echo "   - Error: " . $e->getMessage() . "\n";
             }
-        } catch (Throwable $e) {
-            echo " - Error syncing 'recipes' ID: " . $e->getMessage() . "\n";
         }
     }
 
