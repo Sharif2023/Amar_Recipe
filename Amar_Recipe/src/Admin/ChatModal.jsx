@@ -40,7 +40,7 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
 
 
   const fetchMessages = (receiverId) => {
-    fetch(`API_BASE_URL + admin_get_messages.php?sender_id=${senderId}&receiver_id=${receiverId}`)
+    fetch(API_BASE_URL + `admin_get_messages.php?sender_id=${senderId}&receiver_id=${receiverId}`)
       .then(response => response.json())
       .then(data => {
         if (data.success) {

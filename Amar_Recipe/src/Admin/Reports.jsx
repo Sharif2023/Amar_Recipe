@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import AdminViewRecipeModal from './AdminViewRecipeModal';
 
-const backendBaseUrl = 'API_BASE_URL + ';
+const backendBaseUrl = API_BASE_URL;
 
 const Reports = () => {
   const [reports, setReports] = useState([]);

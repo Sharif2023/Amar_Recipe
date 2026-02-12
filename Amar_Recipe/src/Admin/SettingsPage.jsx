@@ -23,11 +23,12 @@ const SettingsPage = () => {
         const email = admin.email;  // Extract email from the logged-in admin
 
         try {
-            const response = await fetch('API_BASE_URL + change_password.php', {
+            const response = await fetch(API_BASE_URL + 'change_password.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ currentPassword, newPassword, email }) // Include email here
             });
+
 
             const result = await response.json();
             if (result.success) {
@@ -51,7 +52,7 @@ const SettingsPage = () => {
             const email = admin.email;  // Extract email from the logged-in admin
 
             try {
-                const response = await fetch('API_BASE_URL + delete_account.php', {
+                const response = await fetch(API_BASE_URL + 'delete_account.php', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email }) // Include email here
@@ -159,7 +160,7 @@ const SettingsPage = () => {
                     <div id="delete" className="mb-12 flex-grow">
                         <h3 className="text-xl font-medium text-gray-700 mb-4">একাউন্ট মুছুন</h3>
                         <p className="text-sm text-gray-600 mb-4">
-                        আপনার অ্যাকাউন্ট মুছে ফেললে আপনার সমস্ত ডেটা স্থায়ীভাবে মুছে যাবে। এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।
+                            আপনার অ্যাকাউন্ট মুছে ফেললে আপনার সমস্ত ডেটা স্থায়ীভাবে মুছে যাবে। এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।
                         </p>
                         <button
                             onClick={handleAccountDelete}

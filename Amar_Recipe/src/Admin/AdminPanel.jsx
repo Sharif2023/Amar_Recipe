@@ -11,7 +11,7 @@ const AdminPanel = () => {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const baseImageUrl = 'API_BASE_URL + ';
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const recipesPerPage = 8;
@@ -19,7 +19,7 @@ const AdminPanel = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch('API_BASE_URL + get_recipes.php');
+        const res = await fetch(API_BASE_URL + 'get_recipes.php');
         if (!res.ok) throw new Error('Failed to fetch recipes');
         const data = await res.json();
         setRecipes(data.recipes || []);
@@ -60,7 +60,7 @@ const AdminPanel = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedRecipe),
       });
-  
+
       const json = await res.json();
       if (json.success) {
         setRecipes((prev) =>
@@ -76,7 +76,7 @@ const AdminPanel = () => {
     } catch (error) {
       alert('রেসিপি আপডেট করার সময় ত্রুটি: ' + error.message);
     }
-  };  
+  };
 
   const handleDelete = async (recipe) => {
     const confirmDelete = window.confirm(`আপনি কি নিশ্চিত যে রেসিপি মুছে ফেলতে চান "${recipe.title}"?`);
