@@ -55,38 +55,52 @@ $comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';
 function is_similar_description($conn, $new_desc)
 {
     $threshold = 90;
-    $stmt = $conn->query("SELECT description FROM recipes");
-    while ($row = $stmt->fetch()) {
-        similar_text(strip_tags($new_desc), strip_tags($row['description']), $percent);
-        if ($percent >= $threshold) return true;
+    try {
+        $stmt = $conn->query("SELECT description FROM recipes");
+        while ($row = $stmt->fetch()) {
+            $db_desc = $row['description'] ?? ''; // Handle NULL
+            similar_text(strip_tags($new_desc), strip_tags($db_desc), $percent);
+            if ($percent >= $threshold) return true;
+        }
+    } catch (Exception $e) {
+        // Ignore errors in similarity check to allow submission? 
+        // Or log them. For now, just continue or return false.
+        return false; 
     }
     return false;
 }
 
-if (is_similar_description($conn, $description)) {
-    echo json_encode(["success" => false, "message" => "A similar recipe already exists."]);
+try {
+    if (is_similar_description($conn, $description)) {
+        echo json_encode(["success" => false, "message" => "A similar recipe already exists."]);
+        exit;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO submission_requests 
+        (title, category, description, image, location, organizerName, organizerEmail, organizerAddress, status, tags, reference, tutorialVideo, comment, source)
+        VALUES (:title, :category, :description, :image, :location, :organizerName, :organizerEmail, :organizerAddress, :status, :tags, :reference, :tutorialVideo, :comment, :source)");
+
+    $stmt->execute([
+        ':title' => $title,
+        ':category' => $category,
+        ':description' => $description,
+        ':image' => $image_url,
+        ':location' => $location,
+        ':organizerName' => $organizerName,
+        ':organizerEmail' => $organizerEmail,
+        ':organizerAddress' => $organizerAddress,
+        ':status' => $status,
+        ':tags' => $tags,
+        ':reference' => $reference,
+        ':tutorialVideo' => $tutorialVideo,
+        ':comment' => $comment,
+        ':source' => $source
+    ]);
+
+    echo json_encode(['success' => true]);
+
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()]);
     exit;
 }
-
-$stmt = $conn->prepare("INSERT INTO submission_requests 
-    (title, category, description, image, location, organizerName, organizerEmail, organizerAddress, status, tags, reference, tutorialVideo, comment, source)
-    VALUES (:title, :category, :description, :image, :location, :organizerName, :organizerEmail, :organizerAddress, :status, :tags, :reference, :tutorialVideo, :comment, :source)");
-
-$stmt->execute([
-    ':title' => $title,
-    ':category' => $category,
-    ':description' => $description,
-    ':image' => $image_url,
-    ':location' => $location,
-    ':organizerName' => $organizerName,
-    ':organizerEmail' => $organizerEmail,
-    ':organizerAddress' => $organizerAddress,
-    ':status' => $status,
-    ':tags' => $tags,
-    ':reference' => $reference,
-    ':tutorialVideo' => $tutorialVideo,
-    ':comment' => $comment,
-    ':source' => $source
-]);
-
-echo json_encode(['success' => true]);
