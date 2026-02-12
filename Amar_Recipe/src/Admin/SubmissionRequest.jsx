@@ -167,7 +167,7 @@ const SubmissionRequest = () => {
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{req?.category}</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  প্রেরকের নাম: <strong>{req?.organizerName}</strong>
+                  প্রেরকের নাম: <strong>{req?.organizername}</strong>
                 </p>
                 <p className="text-sm mt-1">
                   অবস্থা:{" "}
@@ -261,16 +261,16 @@ const SubmissionRequest = () => {
             </p>
             <p className="mb-4 whitespace-pre-line text-gray-700 dark:text-gray-300">
               {selectedSubmission.description
-                .replace(/\r\n/g, '\n')
-                .replace(/\\n/g, '\n')
-                .replace(/\\r/g, '\n')}
+                ?.replace(/\r\n/g, '\n')
+                ?.replace(/\\n/g, '\n')
+                ?.replace(/\\r/g, '\n')}
             </p>
             <p className="mb-4 text-gray-700 dark:text-gray-300">
               <strong>মন্তব্য:</strong><br />
               {selectedSubmission.comment && selectedSubmission.comment.trim() !== '' ? selectedSubmission.comment
-                .replace(/\r\n/g, '\n')
-                .replace(/\\n/g, '\n')
-                .replace(/\\r/g, '\n') : 'নেই'}
+                ?.replace(/\r\n/g, '\n')
+                ?.replace(/\\n/g, '\n')
+                ?.replace(/\\r/g, '\n') : 'নেই'}
             </p>
 
             {selectedSubmission.reference && (
@@ -287,11 +287,11 @@ const SubmissionRequest = () => {
               </p>
             )}
 
-            {selectedSubmission.tutorialVideo && (
+            {selectedSubmission.tutorialvideo && (
               <p className="mb-4">
                 <strong>টিউটোরিয়াল ভিডিও: </strong>
                 <a
-                  href={selectedSubmission.tutorialVideo}
+                  href={selectedSubmission.tutorialvideo}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
@@ -303,8 +303,8 @@ const SubmissionRequest = () => {
 
             <div className="border-t pt-4 text-sm text-gray-600 dark:text-gray-400">
               <p><strong>অবস্থান:</strong> {selectedSubmission.location}</p>
-              <p><strong>রেসিপিদাতার নাম:</strong> {selectedSubmission.organizerName}</p>
-              <p><strong>ইমেইল:</strong> {selectedSubmission.organizerEmail || 'নাই'}</p>
+              <p><strong>রেসিপিদাতার নাম:</strong> {selectedSubmission.organizername}</p>
+              <p><strong>ইমেইল:</strong> {selectedSubmission.organizeremail || 'নাই'}</p>
             </div>
           </div>
         </div>

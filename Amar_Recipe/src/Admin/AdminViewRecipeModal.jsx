@@ -61,20 +61,20 @@ const RecipeDetail = ({ isOpen, onClose, recipe }) => {
             <p className="text-gray-700 dark:text-gray-300 mb-2">
               <strong>ভিডিও টিউটোরিয়াল:</strong>{' '}
               <a
-                href={recipe.tutorialVideo}
+                href={recipe.tutorialvideo}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500"
               >
-                {recipe.tutorialVideo && recipe.tutorialVideo.trim() !== '' ? recipe.tutorialVideo : 'নেই'}
+                {recipe.tutorialvideo && recipe.tutorialvideo.trim() !== '' ? recipe.tutorialvideo : 'নেই'}
               </a>
             </p>
 
           </div>
           <div className="border-t pt-4 text-sm text-gray-600 dark:text-gray-400">
             <p><strong>রেসিপিটির উৎপত্তিস্থল:</strong> {recipe.location}</p>
-            <p><strong>রেসিপিদাতার নাম:</strong> {recipe.organizerName}</p>
-            <p><strong>ইমেইল:</strong> {recipe.organizerEmail}</p>
+            <p><strong>রেসিপিদাতার নাম:</strong> {recipe.organizername}</p>
+            <p><strong>ইমেইল:</strong> {recipe.organizeremail || 'নাই'}</p>
           </div>
         </div>
         <div className="flex justify-center items-center p-4 border-t">

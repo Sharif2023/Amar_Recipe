@@ -239,12 +239,12 @@ const AdminPanel = () => {
                   </div>
                   <p
                     className="text-gray-700 dark:text-gray-300 mt-1 line-clamp-2"
-                    title={item.description}
+                    title={item?.description}
                   >
-                    {item.description
-                      .replace(/\r\n/g, '\n')
-                      .replace(/\\n/g, '\n')
-                      .replace(/\\r/g, '\n') || 'বিস্তারিত তথ্য পাওয়া যায়নি।'}
+                    {item?.description
+                      ?.replace(/\r\n/g, '\n')
+                      ?.replace(/\\n/g, '\n')
+                      ?.replace(/\\r/g, '\n') || 'বিস্তারিত তথ্য পাওয়া যায়নি।'}
                   </p>
                 </div>
                 <div className="flex flex-col items-center space-y-2 ml-4 flex-shrink-0">

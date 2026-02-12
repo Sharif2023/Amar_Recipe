@@ -12,7 +12,7 @@ if (empty($id)) {
 $conn = getDbConnection();
 
 // Fetch the submission request
-$stmt = $conn->prepare("SELECT * FROM recipe_submission_requests WHERE id = :id");
+$stmt = $conn->prepare("SELECT * FROM submission_requests WHERE id = :id");
 $stmt->execute([':id' => $id]);
 $submission = $stmt->fetch();
 
@@ -22,25 +22,25 @@ if (!$submission) {
 }
 
 // Update submission status to Approved
-$updateStmt = $conn->prepare("UPDATE recipe_submission_requests SET status = 'approved', approved_at = NOW() WHERE id = :id");
+$updateStmt = $conn->prepare("UPDATE submission_requests SET status = 'Approved' WHERE id = :id");
 $updateStmt->execute([':id' => $id]);
 
 // Insert into recipes table
 $insertStmt = $conn->prepare("INSERT INTO recipes 
-    (title, category, description, image_url, location, organizerName, organizerEmail, organizerAddress, tags, reference, tutorialVideo, comment, source, created_at)
-    VALUES (:title, :category, :description, :image_url, :location, :organizerName, :organizerEmail, :organizerAddress, :tags, :reference, :tutorialVideo, :comment, :source, NOW())");
+    (title, category, description, image_url, location, organizername, organizeremail, organizeraddress, tags, reference, tutorialvideo, comment, source, created_at)
+    VALUES (:title, :category, :description, :image_url, :location, :organizername, :organizeremail, :organizeraddress, :tags, :reference, :tutorialvideo, :comment, :source, NOW())");
 $insertStmt->execute([
     ':title' => $submission['title'],
     ':category' => $submission['category'],
     ':description' => $submission['description'],
     ':image_url' => $submission['image'],
     ':location' => $submission['location'],
-    ':organizerName' => $submission['organizerName'],
-    ':organizerEmail' => $submission['organizerEmail'],
-    ':organizerAddress' => $submission['organizerAddress'],
+    ':organizername' => $submission['organizername'],
+    ':organizeremail' => $submission['organizeremail'],
+    ':organizeraddress' => $submission['organizeraddress'],
     ':tags' => $submission['tags'] ?? '',
     ':reference' => $submission['reference'] ?? '',
-    ':tutorialVideo' => $submission['tutorialVideo'] ?? '',
+    ':tutorialvideo' => $submission['tutorialvideo'] ?? '',
     ':comment' => $submission['comment'] ?? '',
     ':source' => $submission['source'] ?? ''
 ]);
