@@ -13,14 +13,24 @@ if (empty($id)) {
 try {
     $conn = getDbConnection();
     $admin_name = $data['admin_name'] ?? 'Admin';
+    // Check for audit columns
+    $hasAuditCols = false;
     try {
+        $checkStmt = $conn->query("SELECT action_date, admin_name FROM submission_requests LIMIT 0");
+        $hasAuditCols = true;
+    } catch (Throwable $e) {
+        $hasAuditCols = false;
+    }
+
+    if ($hasAuditCols) {
         $stmt = $conn->prepare("UPDATE submission_requests SET status = 'Rejected', comment = :reason, action_date = NOW(), admin_name = :admin_name WHERE id = :id");
         $stmt->execute([':reason' => $reason, ':id' => $id, ':admin_name' => $admin_name]);
-    } catch (Throwable $e) {
+    } else {
         // Fallback: columns might be missing
         $stmt = $conn->prepare("UPDATE submission_requests SET status = 'Rejected', comment = :reason WHERE id = :id");
         $stmt->execute([':reason' => $reason, ':id' => $id]);
     }
+
 
     echo json_encode(['success' => true, 'message' => 'Submission rejected']);
 } catch (Exception $e) {

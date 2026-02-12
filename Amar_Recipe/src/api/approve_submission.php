@@ -22,19 +22,28 @@ try {
         exit;
     }
 
+    // Check if new columns exist (to avoid Postgres transaction abort)
+    $hasNewCols = false;
+    try {
+        $checkStmt = $conn->query("SELECT action_date, admin_name FROM submission_requests LIMIT 0");
+        $hasNewCols = true;
+    } catch (Throwable $e) {
+        $hasNewCols = false;
+    }
+
     // Start transaction
     $conn->beginTransaction();
 
     // Update submission status to Approved
     $admin_name = $data['admin_name'] ?? 'Admin';
-    try {
+    if ($hasNewCols) {
         $updateStmt = $conn->prepare("UPDATE submission_requests SET status = 'Approved', action_date = NOW(), admin_name = :admin_name WHERE id = :id");
         $updateStmt->execute([':id' => $id, ':admin_name' => $admin_name]);
-    } catch (Throwable $e) {
-        // Fallback: the columns action_date or admin_name might be missing
+    } else {
         $updateStmt = $conn->prepare("UPDATE submission_requests SET status = 'Approved' WHERE id = :id");
         $updateStmt->execute([':id' => $id]);
     }
+
 
     // Insert into recipes table
     // Note: Column names in PostgreSQL are returned in lowercase unless quoted.
