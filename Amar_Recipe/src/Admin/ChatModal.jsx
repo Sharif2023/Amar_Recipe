@@ -10,7 +10,7 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
 
   useEffect(() => {
     if (isOpen) {
-      fetch('API_BASE_URL + admin_requests.php')
+      fetch(API_BASE_URL + 'admin_requests.php')
         .then(response => response.json())
         .then(data => {
           const approvedAdmins = data.filter(admin => admin.status === 'approved');
@@ -72,7 +72,7 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
         message: userInput,
       };
 
-      fetch('API_BASE_URL + admin_send_message.php', {
+      fetch(API_BASE_URL + 'admin_send_message.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
