@@ -11,6 +11,7 @@ const AdminPanel = () => {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const baseImageUrl = API_BASE_URL;
 
 
   const [currentPage, setCurrentPage] = useState(1);
