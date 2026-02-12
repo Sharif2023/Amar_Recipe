@@ -1,18 +1,17 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+$data = json_decode(file_get_contents('php://input'), true);
+$email = $data['email'] ?? '';
+$password = $data['password'] ?? '';
+
 $conn = getDbConnection();
+$stmt = $conn->prepare("SELECT * FROM admin_requests WHERE email = :email AND status = 'approved'");
+$stmt->execute([':email' => $email]);
+$admin = $stmt->fetch();
 
-$result = $conn->prepare("SELECT * FROM admin_requests WHERE email=? AND status='approved'");
-$result->bind_param("s", $data['email']);
-$result->execute();
-$user = $result->get_result()->fetch_assoc();
-
-if ($user && password_verify($data['password'], $user['password'])) {
-    echo json_encode(["success" => true, "admin" => $user]);
+if ($admin && password_verify($password, $admin['password'])) {
+    echo json_encode(['success' => true, 'admin' => $admin]);
 } else {
-    echo json_encode(["success" => false, "message" => "Invalid Email or Password"]);
+    echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
 }
-?>
-

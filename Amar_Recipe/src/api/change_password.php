@@ -1,33 +1,28 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+$data = json_decode(file_get_contents('php://input'), true);
+$email = $data['email'] ?? '';
+$currentPassword = $data['currentPassword'] ?? '';
+$newPassword = $data['newPassword'] ?? '';
+
+if (empty($email) || empty($currentPassword) || empty($newPassword)) {
+    echo json_encode(['success' => false, 'message' => 'Missing fields']);
+    exit;
+}
+
 $conn = getDbConnection();
+$stmt = $conn->prepare("SELECT * FROM admin_requests WHERE email = :email AND status = 'approved'");
+$stmt->execute([':email' => $email]);
+$admin = $stmt->fetch();
 
-$email = $data['email'];
-$currentPassword = $data['currentPassword'];
-$newPassword = $data['newPassword'];
-
-// First verify current password
-$stmt = $conn->prepare("SELECT password FROM admin_requests WHERE email = ? AND status = 'approved'");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-if (!$user || !password_verify($currentPassword, $user['password'])) {
-    echo json_encode(["success" => false, "message" => "Current password is incorrect"]);
-    exit();
+if (!$admin || !password_verify($currentPassword, $admin['password'])) {
+    echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
+    exit;
 }
 
-// Update password
 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-$updateStmt = $conn->prepare("UPDATE admin_requests SET password = ? WHERE email = ? AND status = 'approved'");
-$updateStmt->bind_param("ss", $hashedPassword, $email);
+$updateStmt = $conn->prepare("UPDATE admin_requests SET password = :password WHERE email = :email");
+$updateStmt->execute([':password' => $hashedPassword, ':email' => $email]);
 
-if ($updateStmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Password updated successfully"]);
-} else {
-    echo json_encode(["success" => false, "message" => "Failed to update password"]);
-}
-?>
+echo json_encode(['success' => true, 'message' => 'Password updated successfully']);

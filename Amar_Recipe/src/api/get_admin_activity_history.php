@@ -2,13 +2,7 @@
 require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
+$stmt = $conn->query("SELECT * FROM submission_requests WHERE status != 'Pending' ORDER BY approved_at DESC");
+$history = $stmt->fetchAll();
 
-$result = $conn->query("SELECT * FROM admin_chat_messages ORDER BY created_at DESC LIMIT 100");
-$history = [];
-
-while ($row = $result->fetch_assoc()) {
-    $history[] = $row;
-}
-
-echo json_encode(["success" => true, "history" => $history]);
-?>
+echo json_encode(['success' => true, 'history' => $history]);

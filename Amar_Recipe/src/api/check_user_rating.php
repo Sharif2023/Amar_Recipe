@@ -1,25 +1,21 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-$conn = getDbConnection();
+$recipe_id = $_GET['recipe_id'] ?? '';
+$user_email = $_GET['user_email'] ?? '';
 
-
-$data = json_decode(file_get_contents("php://input"), true);
-$recipeId = $data['recipeId'];
-$email = $data['email'];
-
-// Check if email has already rated the recipe
-$sql = "SELECT id FROM ratings WHERE recipe_id = ? AND email = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("is", $recipeId, $email);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    // Rating already exists
-    echo json_encode(['success' => true, 'exists' => true]);
-} else {
-    // Rating does not exist
-    echo json_encode(['success' => true, 'exists' => false]);
+if (empty($recipe_id) || empty($user_email)) {
+    echo json_encode(['success' => false, 'message' => 'Missing fields']);
+    exit;
 }
-?>
+
+$conn = getDbConnection();
+$stmt = $conn->prepare("SELECT * FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
+$stmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
+$rating = $stmt->fetch();
+
+if ($rating) {
+    echo json_encode(['success' => true, 'hasRated' => true, 'rating' => $rating['rating']]);
+} else {
+    echo json_encode(['success' => true, 'hasRated' => false]);
+}

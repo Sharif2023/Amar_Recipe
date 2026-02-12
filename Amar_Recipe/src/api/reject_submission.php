@@ -1,17 +1,17 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
-$conn = getDbConnection();
+$data = json_decode(file_get_contents('php://input'), true);
+$id = $data['id'] ?? '';
+$comment = $data['comment'] ?? '';
 
-$requestId = $data['id'];
-
-$stmt = $conn->prepare("UPDATE recipe_submission_requests SET status = 'rejected', updated_at = NOW() WHERE id = ?");
-$stmt->bind_param("i", $requestId);
-
-if ($stmt->execute()) {
-    echo json_encode(["success" => true]);
-} else {
-    echo json_encode(["success" => false, "message" => "Failed to reject submission"]);
+if (empty($id)) {
+    echo json_encode(['success' => false, 'message' => 'Missing submission ID']);
+    exit;
 }
-?>
+
+$conn = getDbConnection();
+$stmt = $conn->prepare("UPDATE recipe_submission_requests SET status = 'rejected', comment = :comment, approved_at = NOW() WHERE id = :id");
+$stmt->execute([':comment' => $comment, ':id' => $id]);
+
+echo json_encode(['success' => true, 'message' => 'Submission rejected']);

@@ -87,29 +87,20 @@ if ($isRender) {
 }
 define('API_BASE_URL', BASE_URL . 'src/api/');
 
-// Database Connection Function
+// Database Connection Function — always returns PDO (works with both MySQL and PostgreSQL)
 function getDbConnection() {
     try {
         if (DB_TYPE === 'pgsql') {
-            // PostgreSQL connection for Render
             $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME;
-            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false
-            ]);
-            return $pdo;
         } else {
-            // MySQL connection for local development
-            $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
-            
-            if ($conn->connect_error) {
-                throw new Exception('Database connection failed: ' . $conn->connect_error);
-            }
-            
-            $conn->set_charset('utf8mb4');
-            return $conn;
+            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
         }
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false
+        ]);
+        return $pdo;
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode([

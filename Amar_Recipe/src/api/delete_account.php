@@ -1,31 +1,26 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+$data = json_decode(file_get_contents('php://input'), true);
+$email = $data['email'] ?? '';
+$password = $data['password'] ?? '';
+
+if (empty($email) || empty($password)) {
+    echo json_encode(['success' => false, 'message' => 'Missing fields']);
+    exit;
+}
+
 $conn = getDbConnection();
+$stmt = $conn->prepare("SELECT * FROM admin_requests WHERE email = :email");
+$stmt->execute([':email' => $email]);
+$admin = $stmt->fetch();
 
-$email = $data['email'];
-$password = $data['password'];
-
-// Verify credentials
-$stmt = $conn->prepare("SELECT id FROM admin_requests WHERE email = ? AND status = 'approved'");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-if (!$user || !password_verify($password, $user['password'])) {
-    echo json_encode(["success" => false, "message" => "Invalid credentials"]);
-    exit();
+if (!$admin || !password_verify($password, $admin['password'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+    exit;
 }
 
-// Delete the account
-$deleteStmt = $conn->prepare("DELETE FROM admin_requests WHERE id = ?");
-$deleteStmt->bind_param("i", $user['id']);
+$deleteStmt = $conn->prepare("DELETE FROM admin_requests WHERE id = :id");
+$deleteStmt->execute([':id' => $admin['id']]);
 
-if ($deleteStmt->execute()) {
-    echo json_encode(["success" => true, "message" => "Account deleted successfully"]);
-} else {
-    echo json_encode(["success" => false, "message" => "Failed to delete account"]);
-}
-?>
+echo json_encode(['success' => true, 'message' => 'Account deleted successfully']);

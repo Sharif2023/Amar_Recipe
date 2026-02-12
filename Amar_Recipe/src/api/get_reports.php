@@ -2,24 +2,7 @@
 require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
+$stmt = $conn->query("SELECT r.*, rec.title as recipe_title FROM reports r LEFT JOIN recipes rec ON r.recipe_id = rec.id ORDER BY r.created_at DESC");
+$reports = $stmt->fetchAll();
 
-$result = $conn->query("SELECT * FROM reports ORDER BY created_at DESC");
-
-// Check if query was successful
-if (!$result) {
-    echo json_encode([
-        "success" => false, 
-        "message" => "Query failed: " . $conn->error
-    ]);
-    $conn->close();
-    exit;
-}
-
-$reports = [];
-while ($row = $result->fetch_assoc()) {
-    $reports[] = $row;
-}
-
-echo json_encode(["success" => true, "reports" => $reports]);
-$conn->close();
-?>
+echo json_encode(['success' => true, 'reports' => $reports]);

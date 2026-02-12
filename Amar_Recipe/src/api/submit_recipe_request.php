@@ -3,12 +3,7 @@ require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
 
-
-function sanitize($conn, $data)
-{
-    return $conn->real_escape_string(trim($data));
-}
-
+// Validate required fields
 $required_fields = ['title', 'category', 'description', 'location', 'organizerName', 'organizerEmail', 'organizerAddress'];
 foreach ($required_fields as $field) {
     if (empty($_POST[$field])) {
@@ -17,6 +12,7 @@ foreach ($required_fields as $field) {
     }
 }
 
+// Handle image upload
 $image_url = null;
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $uploadDir = __DIR__ . '/uploads/';
@@ -41,25 +37,26 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     }
 }
 
-$title = sanitize($conn, $_POST['title']);
-$category = sanitize($conn, $_POST['category']);
-$description = sanitize($conn, $_POST['description']);
-$location = sanitize($conn, $_POST['location']);
-$organizerName = sanitize($conn, $_POST['organizerName']);
-$organizerEmail = sanitize($conn, $_POST['organizerEmail']);
-$organizerAddress = sanitize($conn, $_POST['organizerAddress']);
+$title = trim($_POST['title']);
+$category = trim($_POST['category']);
+$description = trim($_POST['description']);
+$location = trim($_POST['location']);
+$organizerName = trim($_POST['organizerName']);
+$organizerEmail = trim($_POST['organizerEmail']);
+$organizerAddress = trim($_POST['organizerAddress']);
 $status = 'Pending';
-$source = isset($_POST['source']) ? sanitize($conn, $_POST['source']) : '';
-$tags = isset($_POST['tags']) ? sanitize($conn, $_POST['tags']) : '';
-$reference = isset($_POST['reference']) ? sanitize($conn, $_POST['reference']) : '';
-$tutorialVideo = isset($_POST['tutorialVideo']) ? sanitize($conn, $_POST['tutorialVideo']) : '';
-$comment = isset($_POST['comment']) ? sanitize($conn, $_POST['comment']) : '';
+$source = isset($_POST['source']) ? trim($_POST['source']) : '';
+$tags = isset($_POST['tags']) ? trim($_POST['tags']) : '';
+$reference = isset($_POST['reference']) ? trim($_POST['reference']) : '';
+$tutorialVideo = isset($_POST['tutorialVideo']) ? trim($_POST['tutorialVideo']) : '';
+$comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';
 
+// Check for similar descriptions
 function is_similar_description($conn, $new_desc)
 {
     $threshold = 90;
-    $res = $conn->query("SELECT description FROM recipes");
-    while ($row = $res->fetch_assoc()) {
+    $stmt = $conn->query("SELECT description FROM recipes");
+    while ($row = $stmt->fetch()) {
         similar_text(strip_tags($new_desc), strip_tags($row['description']), $percent);
         if ($percent >= $threshold) return true;
     }
@@ -73,36 +70,23 @@ if (is_similar_description($conn, $description)) {
 
 $stmt = $conn->prepare("INSERT INTO submission_requests 
     (title, category, description, image, location, organizerName, organizerEmail, organizerAddress, status, tags, reference, tutorialVideo, comment, source)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    VALUES (:title, :category, :description, :image, :location, :organizerName, :organizerEmail, :organizerAddress, :status, :tags, :reference, :tutorialVideo, :comment, :source)");
 
-if (!$stmt) {
-    echo json_encode(['success' => false, 'message' => "Prepare failed: " . $conn->error]);
-    exit;
-}
+$stmt->execute([
+    ':title' => $title,
+    ':category' => $category,
+    ':description' => $description,
+    ':image' => $image_url,
+    ':location' => $location,
+    ':organizerName' => $organizerName,
+    ':organizerEmail' => $organizerEmail,
+    ':organizerAddress' => $organizerAddress,
+    ':status' => $status,
+    ':tags' => $tags,
+    ':reference' => $reference,
+    ':tutorialVideo' => $tutorialVideo,
+    ':comment' => $comment,
+    ':source' => $source
+]);
 
-$stmt->bind_param(
-    'ssssssssssssss',
-    $title,
-    $category,
-    $description,
-    $image_url,
-    $location,
-    $organizerName,
-    $organizerEmail,
-    $organizerAddress,
-    $status,
-    $tags,
-    $reference,
-    $tutorialVideo,
-    $comment,
-    $source
-);
-
-if ($stmt->execute()) {
-    echo json_encode(['success' => true]);
-} else {
-    echo json_encode(['success' => false, 'message' => "Insert failed: " . $stmt->error]);
-}
-
-$stmt->close();
-$conn->close();
+echo json_encode(['success' => true]);

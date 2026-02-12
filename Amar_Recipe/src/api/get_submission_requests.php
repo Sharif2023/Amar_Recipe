@@ -2,13 +2,7 @@
 require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
+$stmt = $conn->query("SELECT * FROM submission_requests WHERE status = 'Pending' ORDER BY created_at DESC");
+$requests = $stmt->fetchAll();
 
-$result = $conn->query("SELECT * FROM recipe_submission_requests WHERE status = 'pending' ORDER BY created_at DESC");
-$requests = [];
-
-while ($row = $result->fetch_assoc()) {
-    $requests[] = $row;
-}
-
-echo json_encode(["success" => true, "requests" => $requests]);
-?>
+echo json_encode(['success' => true, 'requests' => $requests]);

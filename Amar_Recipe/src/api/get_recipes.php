@@ -4,15 +4,8 @@ require_once __DIR__ . '/config.php';
 $conn = getDbConnection();
 
 $sql = "SELECT * FROM recipes ORDER BY created_at DESC";
-$result = $conn->query($sql);
+$stmt = $conn->query($sql);
 
-$recipes = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $recipes[] = $row;
-    }
-}
+$recipes = $stmt->fetchAll();
 
 echo json_encode(['success' => true, 'recipes' => $recipes]);
-$conn->close();
-

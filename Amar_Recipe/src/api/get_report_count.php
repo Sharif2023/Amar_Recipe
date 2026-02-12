@@ -2,9 +2,7 @@
 require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
+$stmt = $conn->query("SELECT COUNT(*) as count FROM reports WHERE status = 'pending'");
+$row = $stmt->fetch();
 
-$result = $conn->query("SELECT COUNT(*) as count FROM reports WHERE status = 'pending'");
-$row = $result->fetch_assoc();
-
-echo json_encode(["success" => true, "count" => $row['count']]);
-?>
+echo json_encode(['success' => true, 'count' => (int)$row['count']]);

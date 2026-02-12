@@ -62,7 +62,8 @@ CREATE TABLE recipe_submission_requests (
     source VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    admin_name VARCHAR(100) DEFAULT NULL
+    admin_name VARCHAR(100) DEFAULT NULL,
+    approved_at TIMESTAMP DEFAULT NULL
 );
 
 CREATE INDEX idx_status ON recipe_submission_requests(status);
@@ -170,8 +171,9 @@ CREATE INDEX idx_conversation ON admin_chat_messages(sender_id, receiver_id);
 -- =============================================
 -- Insert a root admin (Change email and password as needed)
 -- Password: admin123 (hashed with PASSWORD_DEFAULT)
-INSERT INTO admin_requests (name, phone, email, date, city, state, password, status) VALUES
-('Root Admin', '01700000000', 'admin@amarrecipe.com', CURRENT_TIMESTAMP, 'Dhaka', 'Bangladesh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'approved');
+-- Sample Data REMOVED to avoid conflict with imported data
+-- INSERT INTO admin_requests (name, phone, email, date, city, state, password, status) VALUES
+-- ('Root Admin', '01700000000', 'admin@amarrecipe.com', CURRENT_TIMESTAMP, 'Dhaka', 'Bangladesh', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'approved');
 
 -- =============================================
 -- Database Setup Complete

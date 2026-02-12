@@ -3,28 +3,24 @@ require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
 
+$sender_id = $_GET['sender_id'] ?? '';
+$receiver_id = $_GET['receiver_id'] ?? '';
 
-$sender_id = isset($_GET['sender_id']) ? intval($_GET['sender_id']) : 0;
-$receiver_id = isset($_GET['receiver_id']) ? intval($_GET['receiver_id']) : 0;
-
-if ($sender_id && $receiver_id) {
-    // Fetch messages from the database
-    $query = "SELECT * FROM admin_chat_messages WHERE (sender_id = $sender_id AND receiver_id = $receiver_id) 
-OR (sender_id = $receiver_id AND receiver_id = $sender_id) ORDER BY created_at ASC";
-    $result = $conn->query($query);
-
-    $messages = [];
-    while ($row = $result->fetch_assoc()) {
-        // Make sure the message field is not empty
-        if (empty($row['message'])) {
-            echo json_encode(['success' => false, 'message' => 'Message is empty for row: ' . json_encode($row)]);
-            exit();
-        }
-        $messages[] = $row;
-    }
-
-    // Send response back to frontend
-    echo json_encode(['success' => true, 'messages' => $messages]);
-} else {
-    echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
+if (empty($sender_id) || empty($receiver_id)) {
+    echo json_encode(['success' => false, 'message' => 'Missing sender_id or receiver_id']);
+    exit;
 }
+
+$stmt = $conn->prepare("SELECT * FROM admin_chat_messages 
+    WHERE (sender_id = :sid1 AND receiver_id = :rid1) 
+       OR (sender_id = :rid2 AND receiver_id = :sid2) 
+    ORDER BY created_at ASC");
+$stmt->execute([
+    ':sid1' => $sender_id,
+    ':rid1' => $receiver_id,
+    ':rid2' => $receiver_id,
+    ':sid2' => $sender_id
+]);
+$messages = $stmt->fetchAll();
+
+echo json_encode(['success' => true, 'messages' => $messages]);

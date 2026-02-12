@@ -1,61 +1,41 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-$conn = getDbConnection();
+$data = json_decode(file_get_contents('php://input'), true);
+$recipe_id = $data['recipe_id'] ?? '';
+$user_email = $data['user_email'] ?? '';
+$rating = $data['rating'] ?? '';
 
-
-$data = json_decode(file_get_contents("php://input"), true);
-$recipeId = $data['recipeId'];
-$email = $data['email'];
-$rating = $data['rating'];
-
-// Check if email is valid
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode(['success' => false, 'message' => 'Invalid email']);
+if (empty($recipe_id) || empty($user_email) || empty($rating)) {
+    echo json_encode(['success' => false, 'message' => 'Missing fields']);
     exit;
 }
 
-// Check if the user has already rated the recipe
-$sql = "SELECT id, rating FROM ratings WHERE recipe_id = ? AND email = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("is", $recipeId, $email);
-$stmt->execute();
-$result = $stmt->get_result();
+$conn = getDbConnection();
 
-if ($result->num_rows > 0) {
-    // User has already rated, update the existing rating
-    $row = $result->fetch_assoc();
-    $ratingId = $row['id'];
+// Check if user already rated
+$checkStmt = $conn->prepare("SELECT * FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
+$checkStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
+$existing = $checkStmt->fetch();
 
-    // Update the existing rating
-    $updateSql = "UPDATE ratings SET rating = ? WHERE id = ?";
-    $updateStmt = $conn->prepare($updateSql);
-    $updateStmt->bind_param("ii", $rating, $ratingId);
-    $updateStmt->execute();
+if ($existing) {
+    // Update existing rating
+    $updateStmt = $conn->prepare("UPDATE ratings SET rating = :rating WHERE recipe_id = :recipe_id AND user_email = :user_email");
+    $updateStmt->execute([':rating' => $rating, ':recipe_id' => $recipe_id, ':user_email' => $user_email]);
 } else {
     // Insert new rating
-    $sql = "INSERT INTO ratings (recipe_id, email, rating) VALUES (?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("isi", $recipeId, $email, $rating);
-    $stmt->execute();
+    $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, rating) VALUES (:recipe_id, :user_email, :rating)");
+    $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
 }
 
-// Calculate new average rating
-$sql = "SELECT AVG(rating) AS average_rating, COUNT(id) AS rating_count FROM ratings WHERE recipe_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $recipeId);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
+// Calculate new average
+$avgStmt = $conn->prepare("SELECT AVG(rating) as avg_rating FROM ratings WHERE recipe_id = :recipe_id");
+$avgStmt->execute([':recipe_id' => $recipe_id]);
+$avgRow = $avgStmt->fetch();
+$avg_rating = round($avgRow['avg_rating'], 1);
 
-$averageRating = round($row['average_rating'], 1);
-$ratingCount = $row['rating_count'];
+// Update recipe average rating
+$updateRecipeStmt = $conn->prepare("UPDATE recipes SET average_rating = :avg_rating WHERE id = :recipe_id");
+$updateRecipeStmt->execute([':avg_rating' => $avg_rating, ':recipe_id' => $recipe_id]);
 
-// Update recipe's average rating in the database
-$updateSql = "UPDATE recipes SET rating = ?, ratingCount = ? WHERE id = ?";
-$updateStmt = $conn->prepare($updateSql);
-$updateStmt->bind_param("dii", $averageRating, $ratingCount, $recipeId);
-$updateStmt->execute();
-
-echo json_encode(['success' => true, 'averageRating' => $averageRating, 'ratingCount' => $ratingCount]);
-?>
+echo json_encode(['success' => true, 'average_rating' => $avg_rating]);
