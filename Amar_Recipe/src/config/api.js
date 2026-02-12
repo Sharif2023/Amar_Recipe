@@ -13,8 +13,8 @@ const API_BASE_URL = isDev
     : RENDER_BACKEND + 'src/api/';
 
 const ADMIN_API_BASE_URL = isDev
-    ? (import.meta.env.VITE_ADMIN_API_BASE_URL || 'http://localhost/Amar_Recipies_Live/Amar_Recipe/admin_api/')
-    : RENDER_BACKEND + 'admin_api/';
+    ? (import.meta.env.VITE_ADMIN_API_BASE_URL || 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/')
+    : RENDER_BACKEND + 'src/api/';
 
 // Helper function to build API URL
 export function buildApiUrl(endpoint) {
