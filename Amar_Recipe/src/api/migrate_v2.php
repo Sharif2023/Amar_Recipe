@@ -40,6 +40,16 @@ try {
 
     // 2. Sync reports
     echo "\nProcessing 'reports' table...\n";
+    
+    // Check if reasons (plural) exists to rename it to reason (singular)
+    try {
+        $conn->exec("ALTER TABLE reports RENAME COLUMN reasons TO reason");
+        echo " - Renamed 'reasons' to 'reason'.\n";
+    } catch (Throwable $e) {
+        echo " - 'reasons' rename skipped (already renamed or doesn't exist).\n";
+    }
+
+    // Add missing columns if they don't exist
     $cols_reports = [
         "status VARCHAR(50) DEFAULT 'Pending'",
         "action_date TIMESTAMP DEFAULT NULL",
@@ -52,6 +62,26 @@ try {
             echo " - Added column: $col\n";
         } catch (Throwable $e) {
             echo " - Skip/Failed to add column " . explode(' ', $col)[0] . ": Already exists or error.\n";
+        }
+    }
+
+    // Ensure id is SERIAL for reports
+    if (DB_TYPE === 'pgsql') {
+        try {
+            $stmt = $conn->prepare("SELECT column_default FROM information_schema.columns WHERE table_name = 'reports' AND column_name = 'id'");
+            $stmt->execute();
+            $default = $stmt->fetchColumn();
+            
+            if (!$default) {
+                echo " - Converting 'reports.id' to auto-incrementing...\n";
+                $conn->exec("CREATE SEQUENCE IF NOT EXISTS reports_id_seq");
+                $conn->exec("ALTER TABLE reports ALTER COLUMN id SET DEFAULT nextval('reports_id_seq')");
+                $conn->exec("ALTER SEQUENCE reports_id_seq OWNED BY reports.id");
+                $conn->exec("SELECT setval('reports_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM reports))");
+                echo " - Successfully converted 'reports.id' to auto-incrementing.\n";
+            }
+        } catch (Throwable $e) {
+            echo " - Error syncing 'reports' ID: " . $e->getMessage() . "\n";
         }
     }
 
