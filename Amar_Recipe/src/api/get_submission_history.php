@@ -3,7 +3,13 @@ require_once __DIR__ . '/config.php';
 
 try {
     $conn = getDbConnection();
-    $stmt = $conn->query("SELECT * FROM submission_requests WHERE status != 'Pending' ORDER BY action_date DESC");
+    // Try with action_date
+    try {
+        $stmt = $conn->query("SELECT * FROM submission_requests WHERE status != 'Pending' ORDER BY action_date DESC");
+    } catch (Throwable $e) {
+        // Fallback to created_at
+        $stmt = $conn->query("SELECT * FROM submission_requests WHERE status != 'Pending' ORDER BY created_at DESC");
+    }
     $history = $stmt->fetchAll();
 
     echo json_encode(['success' => true, 'history' => $history]);

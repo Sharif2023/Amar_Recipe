@@ -27,8 +27,14 @@ try {
 
     // Update submission status to Approved
     $admin_name = $data['admin_name'] ?? 'Admin';
-    $updateStmt = $conn->prepare("UPDATE submission_requests SET status = 'Approved', action_date = NOW(), admin_name = :admin_name WHERE id = :id");
-    $updateStmt->execute([':id' => $id, ':admin_name' => $admin_name]);
+    try {
+        $updateStmt = $conn->prepare("UPDATE submission_requests SET status = 'Approved', action_date = NOW(), admin_name = :admin_name WHERE id = :id");
+        $updateStmt->execute([':id' => $id, ':admin_name' => $admin_name]);
+    } catch (Throwable $e) {
+        // Fallback: the columns action_date or admin_name might be missing
+        $updateStmt = $conn->prepare("UPDATE submission_requests SET status = 'Approved' WHERE id = :id");
+        $updateStmt->execute([':id' => $id]);
+    }
 
     // Insert into recipes table
     // Note: Column names in PostgreSQL are returned in lowercase unless quoted.

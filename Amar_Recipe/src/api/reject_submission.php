@@ -13,8 +13,14 @@ if (empty($id)) {
 try {
     $conn = getDbConnection();
     $admin_name = $data['admin_name'] ?? 'Admin';
-    $stmt = $conn->prepare("UPDATE submission_requests SET status = 'Rejected', comment = :reason, action_date = NOW(), admin_name = :admin_name WHERE id = :id");
-    $stmt->execute([':reason' => $reason, ':id' => $id, ':admin_name' => $admin_name]);
+    try {
+        $stmt = $conn->prepare("UPDATE submission_requests SET status = 'Rejected', comment = :reason, action_date = NOW(), admin_name = :admin_name WHERE id = :id");
+        $stmt->execute([':reason' => $reason, ':id' => $id, ':admin_name' => $admin_name]);
+    } catch (Throwable $e) {
+        // Fallback: columns might be missing
+        $stmt = $conn->prepare("UPDATE submission_requests SET status = 'Rejected', comment = :reason WHERE id = :id");
+        $stmt->execute([':reason' => $reason, ':id' => $id]);
+    }
 
     echo json_encode(['success' => true, 'message' => 'Submission rejected']);
 } catch (Exception $e) {
