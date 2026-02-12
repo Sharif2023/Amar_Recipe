@@ -111,5 +111,3 @@ function getDbConnection() {
         exit();
     }
 }
-?>
-
