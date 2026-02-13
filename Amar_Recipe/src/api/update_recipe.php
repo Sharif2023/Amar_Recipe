@@ -1,93 +1,104 @@
 <?php
 require_once __DIR__ . '/config.php';
 
-$conn = getDbConnection();
+// Support JSON input
+$data = json_decode(file_get_contents('php://input'), true);
 
-$id = $_POST['id'] ?? '';
+// Fallback to $_POST for binary/form data if needed (though we primarily use JSON now)
+if (!$data) {
+    $data = $_POST;
+}
+
+$id = $data['id'] ?? '';
 
 if (empty($id)) {
+    http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Missing recipe ID']);
     exit;
 }
 
-// Handle image upload
-$image_url = null;
-if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/uploads/';
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
+try {
+    $conn = getDbConnection();
+
+    // Handle image upload (if any)
+    $image_url = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/uploads/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        $fileTmpPath = $_FILES['image']['tmp_name'];
+        $fileName = basename($_FILES['image']['name']);
+        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowedExts = ['png', 'jpg', 'jpeg', 'gif'];
+        if (!in_array($fileExt, $allowedExts)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid image format']);
+            exit;
+        }
+        $newFileName = uniqid('img_', true) . '.' . $fileExt;
+        $destPath = $uploadDir . $newFileName;
+        if (move_uploaded_file($fileTmpPath, $destPath)) {
+            $image_url = "uploads/" . $newFileName;
+        }
     }
-    $fileTmpPath = $_FILES['image']['tmp_name'];
-    $fileName = basename($_FILES['image']['name']);
-    $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-    $allowedExts = ['png', 'jpg', 'jpeg', 'gif'];
-    if (!in_array($fileExt, $allowedExts)) {
-        echo json_encode(['success' => false, 'message' => 'Invalid image format']);
+
+    // Build update query dynamically
+    // Using standardized lowercase keys from config.php (PDO::CASE_LOWER)
+    $fields = [];
+    $params = [':id' => $id];
+
+    // Map possible camelCase from frontend to lowercase for safety
+    $mapping = [
+        'title' => 'title',
+        'category' => 'category',
+        'description' => 'description',
+        'location' => 'location',
+        'organizername' => 'organizername',
+        'organizeremail' => 'organizeremail',
+        'organizeraddress' => 'organizeraddress',
+        'tags' => 'tags',
+        'reference' => 'reference',
+        'tutorialvideo' => 'tutorialvideo',
+        'comment' => 'comment'
+    ];
+
+    foreach ($mapping as $apiKey => $dbKey) {
+        if (isset($data[$apiKey])) {
+            $fields[] = "$dbKey = :$apiKey";
+            $params[":$apiKey"] = trim($data[$apiKey]);
+        } 
+        // Also check camelCase variants just in case
+        else {
+            $camelKey = str_replace(' ', '', ucwords(str_replace('_', ' ', $apiKey)));
+            // Manual overrides for non-standard ucwords
+            if ($apiKey === 'organizername') $camelKey = 'organizerName';
+            if ($apiKey === 'organizeremail') $camelKey = 'organizerEmail';
+            if ($apiKey === 'organizeraddress') $camelKey = 'organizerAddress';
+            if ($apiKey === 'tutorialvideo') $camelKey = 'tutorialVideo';
+
+            if (isset($data[$camelKey])) {
+                $fields[] = "$dbKey = :$apiKey";
+                $params[":$apiKey"] = trim($data[$camelKey]);
+            }
+        }
+    }
+
+    if ($image_url) {
+        $fields[] = "image_url = :image_url";
+        $params[':image_url'] = $image_url;
+    }
+
+    if (empty($fields)) {
+        echo json_encode(['success' => false, 'message' => 'No fields to update']);
         exit;
     }
-    $newFileName = uniqid('img_', true) . '.' . $fileExt;
-    $destPath = $uploadDir . $newFileName;
-    if (move_uploaded_file($fileTmpPath, $destPath)) {
-        $image_url = "uploads/" . $newFileName;
-    }
-}
 
-// Build update query dynamically
-$fields = [];
-$params = [':id' => $id];
+    $sql = "UPDATE recipes SET " . implode(', ', $fields) . " WHERE id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute($params);
 
-if (isset($_POST['title'])) {
-    $fields[] = "title = :title";
-    $params[':title'] = trim($_POST['title']);
+    echo json_encode(['success' => true, 'message' => 'Recipe updated successfully']);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()]);
 }
-if (isset($_POST['category'])) {
-    $fields[] = "category = :category";
-    $params[':category'] = trim($_POST['category']);
-}
-if (isset($_POST['description'])) {
-    $fields[] = "description = :description";
-    $params[':description'] = trim($_POST['description']);
-}
-if (isset($_POST['location'])) {
-    $fields[] = "location = :location";
-    $params[':location'] = trim($_POST['location']);
-}
-if (isset($_POST['organizerName'])) {
-    $fields[] = "\"organizerName\" = :organizerName";
-    $params[':organizerName'] = trim($_POST['organizerName']);
-}
-if (isset($_POST['organizerEmail'])) {
-    $fields[] = "\"organizerEmail\" = :organizerEmail";
-    $params[':organizerEmail'] = trim($_POST['organizerEmail']);
-}
-if (isset($_POST['organizerAddress'])) {
-    $fields[] = "\"organizerAddress\" = :organizerAddress";
-    $params[':organizerAddress'] = trim($_POST['organizerAddress']);
-}
-if (isset($_POST['tags'])) {
-    $fields[] = "tags = :tags";
-    $params[':tags'] = trim($_POST['tags']);
-}
-if (isset($_POST['reference'])) {
-    $fields[] = "reference = :reference";
-    $params[':reference'] = trim($_POST['reference']);
-}
-if (isset($_POST['tutorialVideo'])) {
-    $fields[] = "\"tutorialVideo\" = :tutorialVideo";
-    $params[':tutorialVideo'] = trim($_POST['tutorialVideo']);
-}
-if ($image_url) {
-    $fields[] = "image_url = :image_url";
-    $params[':image_url'] = $image_url;
-}
-
-if (empty($fields)) {
-    echo json_encode(['success' => false, 'message' => 'No fields to update']);
-    exit;
-}
-
-$sql = "UPDATE recipes SET " . implode(', ', $fields) . " WHERE id = :id";
-$stmt = $conn->prepare($sql);
-$stmt->execute($params);
-
-echo json_encode(['success' => true, 'message' => 'Recipe updated successfully']);

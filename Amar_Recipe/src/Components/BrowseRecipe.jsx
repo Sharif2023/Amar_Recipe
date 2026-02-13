@@ -193,7 +193,9 @@ const BrowseRecipe = () => {
           currentRecipes.map((item) => (
             <div key={item.id} className="w-[280px] sm:w-[300px] bg-white dark:bg-[#262525] rounded-xl shadow-xl overflow-hidden hover:scale-105 transition-transform duration-300 cursor-pointer group" onClick={() => handleViewRecipe(item)}>
               <img
-                src={item.image_url ? baseImageUrl + item.image_url : 'https://via.placeholder.com/300x200?text=No+Image'}
+                src={item.image_url
+                  ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
+                  : 'https://via.placeholder.com/300x200?text=No+Image'}
                 alt={item.title}
                 className="w-full h-[200px] object-cover group-hover:brightness-90"
               />

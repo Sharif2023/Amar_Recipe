@@ -58,6 +58,10 @@ if (isset($_FILES['image'])) {
         echo json_encode(['success' => false, 'message' => "Image upload error: $errMsg"]);
         exit;
     }
+} else {
+    // REQUIRE image for new submissions to ensure persistence
+    echo json_encode(['success' => false, 'message' => "আপনার রেসিপির জন্য একটি ছবি প্রয়োজন।"]);
+    exit;
 }
 
 $title = trim($_POST['title']);

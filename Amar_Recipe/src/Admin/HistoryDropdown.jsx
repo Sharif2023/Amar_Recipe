@@ -94,7 +94,7 @@ const HistoryDropdown = () => {
                   <div className="w-24 h-20 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden mr-4">
                     {req.image ? (
                       <img
-                        src={`${API_BASE_URL}${req.image}`}
+                        src={req.image.startsWith('http') ? req.image : `${API_BASE_URL}${req.image}`}
                         alt={req.title}
                         className="w-full h-full object-cover"
                       />
@@ -105,7 +105,7 @@ const HistoryDropdown = () => {
                   <div className="flex-grow min-w-0">
                     <h3 className="text-lg font-semibold dark:text-white truncate">রেসিপির নামঃ {req.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">রেসিপির ধরণঃ {categoryBanglaMap[req.category] || req.category}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">রেসিপিদাতার নামঃ <strong>{req.organizerName}</strong></p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">রেসিপিদাতার নামঃ <strong>{req.organizername}</strong></p>
                     <p className="text-sm mt-1">
                       স্ট্যাটাসঃ
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${req.status.toLowerCase() === "approved" ? "bg-green-700 text-green-300" : "bg-red-700 text-red-300"}`}>

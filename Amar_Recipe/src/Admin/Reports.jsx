@@ -67,8 +67,8 @@ const Reports = () => {
       description: matchedReport.description,
       comment: matchedReport.comment,
       location: matchedReport.location,
-      organizerName: matchedReport.organizerName,
-      organizerEmail: matchedReport.organizerEmail,
+      organizername: matchedReport.organizername,
+      organizeremail: matchedReport.organizeremail,
     };
 
     setSelectedRecipe(recipe);
@@ -219,6 +219,7 @@ const Reports = () => {
           onClose={() => setShowEditModal(false)}
           recipe={selectedRecipe}
           onSave={handleSaveRecipe}
+          mode="edit"
         />
       )}
     </div>

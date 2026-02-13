@@ -149,7 +149,7 @@ const SubmissionRequest = () => {
               <div className="flex-shrink-0 w-24 h-20 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden mr-4">
                 {req.image ? (
                   <img
-                    src={API_BASE_URL + req.image}
+                    src={req.image.startsWith('http') ? req.image : API_BASE_URL + req.image}
                     alt={req.title}
                     className="w-full h-full object-cover"
                   />
@@ -241,7 +241,7 @@ const SubmissionRequest = () => {
 
             {selectedSubmission.image ? (
               <img
-                src={API_BASE_URL + selectedSubmission.image}
+                src={selectedSubmission.image.startsWith('http') ? selectedSubmission.image : API_BASE_URL + selectedSubmission.image}
                 alt={selectedSubmission.title}
                 className="w-full max-h-64 object-cover rounded mb-4"
               />

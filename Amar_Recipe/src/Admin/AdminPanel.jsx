@@ -10,6 +10,7 @@ const AdminPanel = () => {
   const [recipes, setRecipes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [modalMode, setModalMode] = useState('view'); // 'view' or 'edit'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const baseImageUrl = API_BASE_URL;
@@ -47,11 +48,13 @@ const AdminPanel = () => {
 
   const handleViewRecipe = (recipe) => {
     setSelectedRecipe(recipe);
+    setModalMode('view');
     setShowModal(true);
   };
 
   const handleEdit = (recipe) => {
     setSelectedRecipe(recipe);
+    setModalMode('edit');
     setShowModal(true);
   };
 
@@ -74,12 +77,14 @@ const AdminPanel = () => {
         setShowModal(false);
       } else {
         alert('রেসিপি আপডেট করা যায়নি: ' + json.message);
+        throw new Error(json.message);
       }
     } catch (error) {
       alert('রেসিপি আপডেট করার সময় ত্রুটি: ' + error.message);
+      throw error;
     }
   };
-
+  // ... rest of the component handlers ...
   const handleDelete = async (recipe) => {
     const confirmDelete = window.confirm(`আপনি কি নিশ্চিত যে রেসিপি মুছে ফেলতে চান "${recipe.title}"?`);
     if (!confirmDelete) return;
@@ -223,7 +228,9 @@ const AdminPanel = () => {
                 className="flex items-center gap-4 py-4 px-2 bg-white dark:bg-[#262525] rounded-md shadow hover:shadow-lg transition cursor-default"
               >
                 <img
-                  src={item.image_url ? baseImageUrl + item.image_url : 'https://via.placeholder.com/80x60?text=No+Image'}
+                  src={item.image_url
+                    ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
+                    : 'https://via.placeholder.com/80x60?text=No+Image'}
                   alt={item.title}
                   className="w-20 h-16 object-cover rounded-md flex-shrink-0"
                 />
@@ -317,6 +324,7 @@ const AdminPanel = () => {
             onClose={() => setShowModal(false)}
             recipe={selectedRecipe}
             onSave={handleSaveRecipe}
+            mode={modalMode}
           />
         )}
       </div>
