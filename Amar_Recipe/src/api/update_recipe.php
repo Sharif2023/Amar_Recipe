@@ -97,7 +97,11 @@ try {
     $stmt = $conn->prepare($sql);
     $stmt->execute($params);
 
-    echo json_encode(['success' => true, 'message' => 'Recipe updated successfully']);
+    $response = ['success' => true, 'message' => 'Recipe updated successfully'];
+    if ($image_url) {
+        $response['image_url'] = $image_url;
+    }
+    echo json_encode($response);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()]);

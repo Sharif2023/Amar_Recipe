@@ -58,19 +58,43 @@ const AdminPanel = () => {
     setShowModal(true);
   };
 
-  const handleSaveRecipe = async (updatedRecipe) => {
+  const handleSaveRecipe = async (updatedRecipe, imageFile) => {
     try {
-      const res = await fetch(`${baseImageUrl}update_recipe.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedRecipe),
-      });
+      let res;
+      if (imageFile) {
+        // If there's an image, we MUST use FormData
+        const formData = new FormData();
+        // Append all fields from updatedRecipe
+        Object.keys(updatedRecipe).forEach(key => {
+          formData.append(key, updatedRecipe[key]);
+        });
+        formData.append('image', imageFile);
+
+        res = await fetch(`${baseImageUrl}update_recipe.php`, {
+          method: 'POST',
+          body: formData,
+          // Note: Browser automatically sets Content-Type to multipart/form-data with boundary
+        });
+      } else {
+        // Just JSON for metadata updates
+        res = await fetch(`${baseImageUrl}update_recipe.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedRecipe),
+        });
+      }
 
       const json = await res.json();
       if (json.success) {
+        // Update local state with the returned image_url if present
+        const finalRecipe = {
+          ...updatedRecipe,
+          image_url: json.image_url || updatedRecipe.image_url
+        };
+
         setRecipes((prev) =>
           prev.map((r) =>
-            r.id === updatedRecipe.id ? { ...r, ...updatedRecipe } : r
+            r.id === finalRecipe.id ? finalRecipe : r
           )
         );
         alert('রেসিপি সফলভাবে আপডেট করা হয়েছে।');

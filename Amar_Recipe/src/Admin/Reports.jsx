@@ -75,29 +75,51 @@ const Reports = () => {
     setShowEditModal(true);
   };
 
-  const handleSaveRecipe = async (updatedRecipe) => {
+  const handleSaveRecipe = async (updatedRecipe, imageFile) => {
     try {
-      const res = await fetch(`${backendBaseUrl}update_recipe.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedRecipe),
-      });
+      let res;
+      if (imageFile) {
+        const formData = new FormData();
+        Object.keys(updatedRecipe).forEach(key => {
+          formData.append(key, updatedRecipe[key]);
+        });
+        formData.append('image', imageFile);
+
+        res = await fetch(`${backendBaseUrl}update_recipe.php`, {
+          method: 'POST',
+          body: formData,
+        });
+      } else {
+        res = await fetch(`${backendBaseUrl}update_recipe.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedRecipe),
+        });
+      }
 
       const json = await res.json();
       if (json.success) {
+        // Update local state with new image_url if provided
+        const finalRecipe = {
+          ...updatedRecipe,
+          image_url: json.image_url || updatedRecipe.image_url
+        };
+
         setReports((prev) =>
           prev.map((report) =>
-            report.recipe_id === updatedRecipe.id ? { ...report, ...updatedRecipe } : report
+            report.recipe_id === finalRecipe.id ? { ...report, ...finalRecipe } : report
           )
         );
         alert('রেসিপি সফলভাবে আপডেট করা হয়েছে।');
         setShowEditModal(false);
       } else {
         alert('রেসিপি আপডেট করা যায়নি: ' + json.message);
+        throw new Error(json.message);
       }
     } catch (error) {
       console.error(error);
       alert('ত্রুটি: ' + error.message);
+      throw error;
     }
   };
 
