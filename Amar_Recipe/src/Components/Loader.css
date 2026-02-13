@@ -16,10 +16,11 @@
 .loader-container h1 {
     position: relative;
     margin: 0 auto;
-    width: 100vw;
+    width: 90%;
+    max-width: 600px;
     text-align: center;
     font-family: 'Amatic SC', cursive;
-    font-size: 6vh;
+    font-size: 5vh;
     color: #333;
     opacity: 0.75;
     animation: loader-pulse 2.5s linear infinite;
@@ -27,10 +28,25 @@
 
 #cooking {
     position: relative;
-    margin: -10vh auto 0;
-    width: 60vh;
-    height: 60vh;
+    margin: -5vh auto 0;
+    width: 50vh;
+    height: 50vh;
+    max-width: 90vw;
+    max-height: 90vw;
     overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .loader-container h1 {
+        font-size: 28px;
+        line-height: 1.2;
+    }
+
+    #cooking {
+        width: 40vh;
+        height: 40vh;
+        margin-top: -2vh;
+    }
 }
 
 #cooking #area {
