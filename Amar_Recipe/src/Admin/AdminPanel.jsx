@@ -192,7 +192,13 @@ const AdminPanel = () => {
   };
 
   if (loading) {
-    return <Loader />;
+    return (
+      <>
+        <AdminHeader />
+        <Loader />
+        <AdminFooter />
+      </>
+    );
   }
 
   if (error) {

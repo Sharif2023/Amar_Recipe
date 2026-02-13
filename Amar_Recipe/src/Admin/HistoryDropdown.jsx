@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import Loader from "../Components/Loader";
 
 const categoryBanglaMap = {
   Meat: 'মাংস',
@@ -78,7 +79,7 @@ const HistoryDropdown = () => {
       <h1 className="text-3xl font-bold mb-6 text-center">অ্যাডমিন একটিভিটি ইতিহাস</h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <Loader />
       ) : requests.length === 0 ? (
         <p className="text-center text-neutral-500 mt-10">কোনো সাবমিশন পাওয়া যায়নি।</p>
       ) : (
