@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { IoStar } from 'react-icons/io5';
 import RecipeModal from './RecipeModal';
+import Loader from './Loader';
 import { API_BASE_URL } from '../config/api';
 
 const BrowseRecipe = () => {
@@ -170,11 +171,7 @@ const BrowseRecipe = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen dark:bg-[#1b1b1b]">
-        <p className="text-lg dark:text-white">লোড হচ্ছে, অপেক্ষা করুন...</p>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import AdminViewRecipeModal from './AdminViewRecipeModal';
+import Loader from '../Components/Loader';
 
 const backendBaseUrl = API_BASE_URL;
 
@@ -130,7 +131,7 @@ const Reports = () => {
     alert(`মেইল পাঠান: ${report.reporter_email} কে রিপোর্ট সম্পর্কে। #${report.id}`);
   };
 
-  if (loading) return <p>লোড হচ্ছে...</p>;
+  if (loading) return <Loader />;
 
   if (reports.length === 0) return <p className='text-center text-neutral-500 mt-10'>কোনো রিপোর্ট পাওয়া যায়নি।</p>;
 

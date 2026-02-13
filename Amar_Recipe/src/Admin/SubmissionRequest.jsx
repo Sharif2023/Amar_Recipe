@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import Loader from "../Components/Loader";
 
 const SubmissionRequest = () => {
   const [requests, setRequests] = useState([]);
@@ -135,7 +136,7 @@ const SubmissionRequest = () => {
       <h1 className="text-3xl font-bold mb-6">সাবমিশন রিকুয়েষ্ট তালিকা</h1>
 
       {loading ? (
-        <p>লোড হচ্ছে...</p>
+        <Loader />
       ) : requests.length === 0 ? (
         <p className="text-center text-neutral-500 mt-10">কোনো সাবমিশন পাওয়া যায়নি।</p>
       ) : (

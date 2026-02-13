@@ -4,6 +4,7 @@ import AdminHeader from "../Components/AdminHeader";
 import AdminFooter from '../Components/AdminFooter';
 import { IoStar, IoTrashBinOutline, IoPencilOutline, IoEyeOutline } from 'react-icons/io5';
 import AdminViewRecipeModal from './AdminViewRecipeModal';
+import Loader from '../Components/Loader';
 
 const AdminPanel = () => {
   const [recipes, setRecipes] = useState([]);
@@ -191,11 +192,7 @@ const AdminPanel = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen dark:bg-[#1b1b1b]">
-        <p className="text-lg dark:text-white">লোড হচ্ছে, অপেক্ষা করুন...</p>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error) {
