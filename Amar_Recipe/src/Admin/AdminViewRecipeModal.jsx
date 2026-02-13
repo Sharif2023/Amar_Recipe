@@ -42,7 +42,7 @@ const RecipeDetail = ({ isOpen, onClose, recipe }) => {
             {recipe.description.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\n\s*\n/g, '\n\n')}
           </p>
 
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
+          <p className="text-gray-700 dark:text-gray-300 mb-4" style={{ whiteSpace: 'pre-line' }}>
             <strong>মন্তব্য:</strong><br /><br /> {recipe.comment && recipe.comment.trim() !== '' ? recipe.comment.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\n\s*\n/g, '\n\n') : 'নেই'}
           </p>
 
