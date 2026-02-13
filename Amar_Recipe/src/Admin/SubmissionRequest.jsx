@@ -188,7 +188,7 @@ const SubmissionRequest = () => {
                   </span>
                 </p>
                 {req?.status === "Rejected" && req?.comment && (
-                  <p className="text-sm mt-1 text-red-400 italic">
+                  <p className="text-sm mt-1 text-red-400 italic whitespace-pre-line">
                     বাতিলের কারণ: {req?.comment}
                   </p>
                 )}
@@ -266,7 +266,7 @@ const SubmissionRequest = () => {
                 ?.replace(/\\n/g, '\n')
                 ?.replace(/\\r/g, '\n')}
             </p>
-            <p className="mb-4 text-gray-700 dark:text-gray-300">
+            <p className="mb-4 whitespace-pre-line text-gray-700 dark:text-gray-300">
               <strong>মন্তব্য:</strong><br />
               {selectedSubmission.comment && selectedSubmission.comment.trim() !== '' ? selectedSubmission.comment
                 ?.replace(/\r\n/g, '\n')
