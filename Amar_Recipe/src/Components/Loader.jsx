@@ -1,10 +1,10 @@
 import React from 'react';
 import './Loader.css';
 
-const Loader = () => {
+const Loader = ({ message = "আপনার খাবার লোড হচ্ছে, অপেক্ষা করুন..." }) => {
     return (
         <div className="loader-container">
-            <h1>আপনার খাবার লোড হচ্ছে, অপেক্ষা করুন...</h1>
+            <h1>{message}</h1>
             <div id="cooking">
                 <div className="bubble"></div>
                 <div className="bubble"></div>

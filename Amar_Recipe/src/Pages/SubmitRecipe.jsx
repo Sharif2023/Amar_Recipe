@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import Loader from '../Components/Loader';
 
 export default function SubmitRecipe() {
     const [formData, setFormData] = useState({
@@ -280,11 +281,8 @@ export default function SubmitRecipe() {
                 </button>
             </form>
             {isSubmitting && (
-                <div
-                    className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
-                    style={{ color: 'white', fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center', padding: '1rem' }}
-                >
-                    সাবমিশন প্রসেস চলমান, দয়া করে অপেক্ষা করুণ।
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+                    <Loader message="সাবমিশন প্রসেস চলমান, দয়া করে অপেক্ষা করুণ।" />
                 </div>
             )}
         </div>
