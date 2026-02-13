@@ -10,6 +10,12 @@ if (empty($id)) {
 }
 
 $conn = getDbConnection();
+
+// 1. Delete from recipe_images (Good practice, even if FK triggers cascade)
+$imgStmt = $conn->prepare("DELETE FROM recipe_images WHERE recipe_id = :id");
+$imgStmt->execute([':id' => $id]);
+
+// 2. Delete from recipes
 $stmt = $conn->prepare("DELETE FROM recipes WHERE id = :id");
 $stmt->execute([':id' => $id]);
 

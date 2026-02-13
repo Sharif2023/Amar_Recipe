@@ -12,30 +12,23 @@ foreach ($required_fields as $field) {
     }
 }
 
-// Handle image upload
-$image_url = null;
-if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/uploads/';
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
+    // Handle Image Upload (Database Storage)
+    $imageData = null;
+    $fileType = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['image']['tmp_name'];
+        $fileType = $_FILES['image']['type'];
+        
+        // Read file content
+        $imageData = file_get_contents($fileTmpPath);
+        
+        // Validate image type
+        $allowedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
+        if (!in_array($fileType, $allowedTypes)) {
+            echo json_encode(['success' => false, 'message' => "Invalid image format"]);
+            exit;
+        }
     }
-    $fileTmpPath = $_FILES['image']['tmp_name'];
-    $fileName = basename($_FILES['image']['name']);
-    $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-    $allowedExts = ['png', 'jpg', 'jpeg', 'gif'];
-    if (!in_array($fileExt, $allowedExts)) {
-        echo json_encode(['success' => false, 'message' => "Invalid image format"]);
-        exit;
-    }
-    $newFileName = uniqid('img_', true) . '.' . $fileExt;
-    $destPath = $uploadDir . $newFileName;
-    if (move_uploaded_file($fileTmpPath, $destPath)) {
-        $image_url = "uploads/" . $newFileName;
-    } else {
-        echo json_encode(['success' => false, 'message' => "Failed to move uploaded image"]);
-        exit;
-    }
-}
 
 $title = trim($_POST['title']);
 $category = trim($_POST['category']);
@@ -67,24 +60,59 @@ if (is_similar_description($conn, $description)) {
     exit;
 }
 
-$stmt = $conn->prepare("INSERT INTO recipes 
-    (title, category, description, image_url, location, organizerName, organizerEmail, organizerAddress, tags, reference, tutorialVideo, comment, source)
-    VALUES (:title, :category, :description, :image_url, :location, :organizerName, :organizerEmail, :organizerAddress, :tags, :reference, :tutorialVideo, :comment, :source)");
+    // Use a placeholder URL first, will update after insertion
+    $placeholderUrl = 'pending';
+    
+    $sql = "INSERT INTO recipes 
+            (title, category, description, image_url, location, organizerName, organizerEmail, organizerAddress, tags, reference, tutorialVideo, comment, source)
+            VALUES (:title, :category, :description, :image_url, :location, :organizerName, :organizerEmail, :organizerAddress, :tags, :reference, :tutorialVideo, :comment, :source)";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([
+        ':title' => $title,
+        ':category' => $category,
+        ':description' => $description,
+        ':image_url' => $placeholderUrl, // Use placeholder initially
+        ':location' => $location,
+        ':organizerName' => $organizerName,
+        ':organizerEmail' => $organizerEmail,
+        ':organizerAddress' => $organizerAddress,
+        ':tags' => $tags,
+        ':reference' => $reference,
+        ':tutorialVideo' => $tutorialVideo,
+        ':comment' => $comment,
+        ':source' => $source
+    ]);
 
-$stmt->execute([
-    ':title' => $title,
-    ':category' => $category,
-    ':description' => $description,
-    ':image_url' => $image_url,
-    ':location' => $location,
-    ':organizerName' => $organizerName,
-    ':organizerEmail' => $organizerEmail,
-    ':organizerAddress' => $organizerAddress,
-    ':tags' => $tags,
-    ':reference' => $reference,
-    ':tutorialVideo' => $tutorialVideo,
-    ':comment' => $comment,
-    ':source' => $source
-]);
+    $recipeId = $conn->lastInsertId();
+
+    // Save Image to DB and update URL
+    if ($imageData) {
+        try {
+            // Insert binary data
+            $imgSql = "INSERT INTO recipe_images (recipe_id, image_data, file_type) VALUES (:id, :data, :type)";
+            $imgStmt = $conn->prepare($imgSql);
+            $imgStmt->bindParam(':id', $recipeId);
+            $imgStmt->bindParam(':data', $imageData, PDO::PARAM_LOB);
+            $imgStmt->bindParam(':type', $fileType);
+            $imgStmt->execute();
+
+            // Update recipe with generic URL
+            // Assuming API_BASE_URL is defined in config.php or elsewhere
+            $finalImageUrl = (defined('API_BASE_URL') ? API_BASE_URL : '') . "get_image.php?id=" . $recipeId;
+            $updateStmt = $conn->prepare("UPDATE recipes SET image_url = :url WHERE id = :id");
+            $updateStmt->execute([':url' => $finalImageUrl, ':id' => $recipeId]);
+        } catch (Exception $e) {
+            // Log error but don't fail the whole request
+            error_log("Image save failed: " . $e->getMessage());
+            // Optionally, update image_url to an error state or empty
+            $updateStmt = $conn->prepare("UPDATE recipes SET image_url = '' WHERE id = :id");
+            $updateStmt->execute([':id' => $recipeId]);
+        }
+    } else {
+         // Clear the placeholder if no image was uploaded
+         $updateStmt = $conn->prepare("UPDATE recipes SET image_url = '' WHERE id = :id");
+         $updateStmt->execute([':id' => $recipeId]);
+    }
 
 echo json_encode(['success' => true, 'message' => 'Recipe submitted successfully']);

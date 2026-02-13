@@ -20,25 +20,41 @@ if (empty($id)) {
 try {
     $conn = getDbConnection();
 
-    // Handle image upload (if any)
+    // Handle image upload
     $image_url = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/uploads/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
         $fileTmpPath = $_FILES['image']['tmp_name'];
-        $fileName = basename($_FILES['image']['name']);
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedExts = ['png', 'jpg', 'jpeg', 'gif'];
-        if (!in_array($fileExt, $allowedExts)) {
-            echo json_encode(['success' => false, 'message' => 'Invalid image format']);
-            exit;
-        }
-        $newFileName = uniqid('img_', true) . '.' . $fileExt;
-        $destPath = $uploadDir . $newFileName;
-        if (move_uploaded_file($fileTmpPath, $destPath)) {
-            $image_url = "uploads/" . $newFileName;
+        $fileType = $_FILES['image']['type'];
+        
+        // Read file content
+        $imageData = file_get_contents($fileTmpPath);
+        
+        if ($imageData) {
+            try {
+                // Check if image exists
+                $checkStmt = $conn->prepare("SELECT 1 FROM recipe_images WHERE recipe_id = :id");
+                $checkStmt->execute([':id' => $id]);
+                
+                if ($checkStmt->fetch()) {
+                    // Update existing
+                    $imgSql = "UPDATE recipe_images SET image_data = :data, file_type = :type WHERE recipe_id = :id";
+                } else {
+                    // Insert new
+                    $imgSql = "INSERT INTO recipe_images (recipe_id, image_data, file_type) VALUES (:id, :data, :type)";
+                }
+                
+                $imgStmt = $conn->prepare($imgSql);
+                $imgStmt->bindParam(':id', $id);
+                $imgStmt->bindParam(':data', $imageData, PDO::PARAM_LOB);
+                $imgStmt->bindParam(':type', $fileType);
+                $imgStmt->execute();
+
+                // Set the new image URL
+                $image_url = API_BASE_URL . "get_image.php?id=" . $id;
+                
+            } catch (Exception $e) {
+                error_log("Image update failed: " . $e->getMessage());
+            }
         }
     }
 
