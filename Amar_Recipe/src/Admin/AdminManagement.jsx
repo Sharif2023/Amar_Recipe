@@ -35,8 +35,13 @@ const AdminManagement = () => {
       const data = await res.json();
       console.log("Fetched updated data:", data);
 
-      setPendingRequests(data.filter(admin => admin.status === "pending"));
-      setApprovedAdmins(data.filter(admin => admin.status === "approved"));
+      if (data.success && Array.isArray(data.requests)) {
+        setPendingRequests(data.requests.filter(admin => admin.status === "pending"));
+        setApprovedAdmins(data.requests.filter(admin => admin.status === "approved"));
+      } else {
+        setPendingRequests([]);
+        setApprovedAdmins([]);
+      }
     } catch (error) {
       console.error("Error fetching requests:", error);
     } finally {
