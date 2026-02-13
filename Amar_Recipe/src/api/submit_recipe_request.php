@@ -28,16 +28,23 @@ if (isset($_FILES['image'])) {
             echo json_encode(['success' => false, 'message' => "Invalid image format. Allowed: PNG, JPG, JPEG, GIF"]);
             exit;
         }
+        if (!is_writable($uploadDir)) {
+            echo json_encode(['success' => false, 'message' => "Upload directory is not writable. Please check permissions."]);
+            exit;
+        }
+
         $newFileName = uniqid('img_', true) . '.' . $fileExt;
         $destPath = $uploadDir . $newFileName;
+
         if (move_uploaded_file($fileTmpPath, $destPath)) {
             $image_url = "uploads/" . $newFileName;
         } else {
-            echo json_encode(['success' => false, 'message' => "Failed to move uploaded image to destination."]);
+            $last_error = error_get_last();
+            $error_info = $last_error ? " (Error: " . $last_error['message'] . ")" : "";
+            echo json_encode(['success' => false, 'message' => "Failed to move uploaded image to destination." . $error_info]);
             exit;
         }
     } else if ($_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
-        // Report specific PHP upload errors
         $php_errors = [
             UPLOAD_ERR_INI_SIZE   => "The uploaded file exceeds the upload_max_filesize directive in php.ini",
             UPLOAD_ERR_FORM_SIZE  => "The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form",
@@ -46,7 +53,8 @@ if (isset($_FILES['image'])) {
             UPLOAD_ERR_CANT_WRITE => "Failed to write file to disk",
             UPLOAD_ERR_EXTENSION  => "A PHP extension stopped the file upload",
         ];
-        $errMsg = isset($php_errors[$_FILES['image']['error']]) ? $php_errors[$_FILES['image']['error']] : "Unknown upload error";
+        $errorCode = $_FILES['image']['error'];
+        $errMsg = isset($php_errors[$errorCode]) ? $php_errors[$errorCode] : "Unknown upload error (Code $errorCode)";
         echo json_encode(['success' => false, 'message' => "Image upload error: $errMsg"]);
         exit;
     }
