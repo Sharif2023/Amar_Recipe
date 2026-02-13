@@ -1,183 +1,81 @@
 # Amar Recipe - Recipe Management System
 
-A full-stack recipe management system with React frontend and PHP backend, designed for deployment on Vercel (frontend) and Railway (backend).
+A full-stack recipe management system with a React frontend and a PHP backend, optimized for deployment on Render (backend + PostgreSQL) and Vercel (frontend).
 
 ## 🚀 Features
 
-- Browse and search recipes by category
-- Submit new recipes for admin approval
-- Rate and review recipes
-- Report inappropriate content
-- Admin panel for managing recipes and users
-- Admin chat system
-- Responsive design with dark mode support
+- **Browse & Search**: Explore recipes by category with a dynamic search engine.
+- **Recipe Submission**: Users can submit recipes for administrative review.
+- **Reporting System**: Robust reporting flow for inappropriate content.
+- **Animated Loader**: Custom "Cooking" themed animation for a premium user experience.
+- **Admin Dashboard**: Comprehensive panel for managing recipes, approvals, and reports.
+- **PostgreSQL Ready**: Migrated from MySQL to PostgreSQL for better performance and reliability.
+- **Responsive Design**: Fully compatible with desktop and mobile devices.
 
 ## 📋 Tech Stack
 
 ### Frontend
 - **Framework**: React 19 + Vite 6
-- **Styling**: Tailwind CSS 4
-- **Routing**: React Router DOM 7
-- **Icons**: React Icons
+- **Styling**: Vanilla CSS + Tailwind Utility Classes
+- **Components**: Custom animated Loader, Modals for ratings and reporting.
 - **Deployment**: Vercel
 
 ### Backend
-- **Language**: PHP 8.2+
-- **Database**: MySQL (Railway)
-- **Hosting**: Railway (Docker)
-- **Features**: RESTful API, CORS enabled
+- **Language**: PHP 8.2+ (PDO for database abstraction)
+- **Database**: PostgreSQL (Managed on Render)
+- **Features**: Resilient sorting, Transaction-safe audit logs, JSON-based error reporting.
+- **Deployment**: Render (Native PHP environment or Docker)
 
-## 🛠️ Installation
+## 🛠️ Local Development
 
 ### Prerequisites
-- Node.js 18+ and npm
-- PHP 8.0+
-- MySQL 5.7+ or MariaDB
-- Git
+- PHP 8.1+
+- PostgreSQL or MySQL
+- Node.js 18+
 
-### Local Development Setup
-
-1. **Clone the repository**
+### Setup
+1. **Clone & Install**:
    ```bash
    git clone <repository-url>
-   cd Amar_Recipies_Live/Amar_Recipe
-   ```
-
-2. **Install frontend dependencies**
-   ```bash
+   cd Amar_Recipe
    npm install
    ```
 
-3. **Setup local database**
-   - Create a MySQL database named `amar_recipe`
-   - Import `database/schema.sql`
+2. **Database Config**:
+   - Production uses PostgreSQL. For local development, update `src/api/config.php` with your credentials.
+   - Use `src/api/migrate_v2.php` to synchronize schema and reset ID sequences on Render.
 
-4. **Configure backend (for local development)**
-   - Copy `src/api/config.example.php` to `src/api/config.php`
-   - Update with local credentials:
-     ```php
-     define('DB_HOST', 'localhost');
-     define('DB_USER', 'root');
-     define('DB_PASS', '');
-     define('DB_NAME', 'amar_recipe');
-     ```
-
-5. **Configure frontend**
-   - Copy `.env.local.example` to `.env.local`
-   - Update API URLs to your local PHP server:
-     ```
-     VITE_API_BASE_URL=http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/
-     VITE_ADMIN_API_BASE_URL=http://localhost/Amar_Recipies_Live/Amar_Recipe/admin_api/
-     ```
-
-6. **Run development server**
+3. **Running**:
    ```bash
    npm run dev
    ```
 
-## 📦 Deployment
+## 📦 Deployment Guides
 
-### Comprehensive Deployment Guides
+### Backend (Render)
+1. Link your GitHub repository to a Web Service on Render.
+2. Set up a PostgreSQL instance.
+3. Configure Environment Variables (DB connection string).
+4. **Crucial**: After deployment, run [your-render-url]/src/api/migrate_v2.php to initialize the PostgreSQL schema and sequences.
 
-- **[Backend Deployment](../DEPLOYMENT_RAILWAY.md)** - Deploy PHP backend to Railway
-- **[Frontend Deployment](../DEPLOYMENT_VERCEL.md)** - Deploy React app to Vercel
-- **[Database Setup](../DATABASE_SETUP.md)** - Complete database configuration guide
+### Frontend (Vercel)
+1. Add your project to Vercel.
+2. Set `VITE_API_BASE_URL` to your Render backend URL.
+3. Deploys automatically on push.
 
-### Quick Deploy Overview
+## 📁 Key Directories
 
-**Backend (Railway)**:
-1. Push code to GitHub
-2. Create Railway project from GitHub repo
-3. Add MySQL database service
-4. Import `database/schema.sql`
-5. Set environment variables
-6. Railway auto-deploys via Dockerfile
+- `src/api`: PHP backend endpoints and core logic.
+- `src/Components`: Shared React components (including the new `Loader`).
+- `src/Admin`: Administrative panel views and logic.
+- `database`: SQL schema files for both MySQL and PostgreSQL.
 
-**Frontend (Vercel)**:
-```bash
-# Build the project
-npm run build
-
-# Deploy via Vercel CLI
-vercel --prod
-```
-
-Set environment variables in Vercel dashboard:
-```
-VITE_API_BASE_URL=https://your-project-production.up.railway.app/src/api/
-VITE_ADMIN_API_BASE_URL=https://your-project-production.up.railway.app/admin_api/
-```
-
-## 📁 Project Structure
-
-```
-Amar_Recipe/
-├── src/
-│   ├── Admin/              # Admin panel components
-│   ├── Components/         # Reusable UI components
-│   ├── Pages/              # Page components
-│   ├── api/                # PHP backend API
-│   │   ├── *.php          # API endpoints
-│   │   ├── config.php     # Database config
-│   │   ├── uploads/       # Recipe images
-│   │   └── admin_dp_uploads/ # Admin profiles
-│   ├── config/             # Frontend configuration
-│   └── App.jsx             # Main app component
-├── admin_api/              # Admin-specific endpoints
-├── database/               # Database schema
-│   └── schema.sql         # MySQL schema
-├── public/                 # Static assets
-├── .htaccess               # Apache configuration
-├── .env.example            # Environment template
-├── package.json            # Node dependencies
-└── vite.config.js          # Vite configuration
-```
-
-## 🔐 Environment Variables
-
-### Frontend (.env.local / .env.production)
-```env
-VITE_API_BASE_URL=https://your-backend-domain.com/src/api/
-VITE_ADMIN_API_BASE_URL=https://your-backend-domain.com/admin_api/
-```
-
-### Backend (config.php)
-- Database credentials (DB_HOST, DB_USER, DB_PASS, DB_NAME)
-- API base URLs (BASE_URL, API_BASE_URL)
-- CORS settings
-
-## 🧪 Build & Test
-
-```bash
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
-```
-
-## 📞 Support
-
-For deployment help and troubleshooting:
-- [Railway Backend Deployment](../DEPLOYMENT_RAILWAY.md)
-- [Vercel Frontend Deployment](../DEPLOYMENT_VERCEL.md)
-- [Database Setup Guide](../DATABASE_SETUP.md)
-
-## 🔒 Security Notes
-
-- Never commit `.env.local` or `.env.production` with credentials
-- Change default admin password after first login
-- Keep `config.php` out of version control
-- Use environment variables for all sensitive data
+## ⚖️ License
+This project is private and for educational/personal use.
 
 ---
 
-**Last Updated**: December 2024  
-**Version**: 1.0.0
+**Last Updated**: February 2026
+**Version**: 1.1.0 (PostgreSQL & Custom Loader Update)
+
 

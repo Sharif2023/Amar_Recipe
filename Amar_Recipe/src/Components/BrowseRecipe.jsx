@@ -31,8 +31,6 @@ const BrowseRecipe = () => {
         if (!res.ok) throw new Error('Failed to fetch recipes');
         const data = await res.json();
 
-        console.log("Fetched Recipes: ", data);  // For debugging
-
         // Filter recipes based on category and search term
         const filteredRecipes = data.recipes.filter((recipe) => {
           const recipeCategory = recipe.category.trim().toLowerCase();
