@@ -14,25 +14,40 @@ foreach ($required_fields as $field) {
 
 // Handle image upload
 $image_url = null;
-if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/uploads/';
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-    $fileTmpPath = $_FILES['image']['tmp_name'];
-    $fileName = basename($_FILES['image']['name']);
-    $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-    $allowedExts = ['png', 'jpg', 'jpeg', 'gif'];
-    if (!in_array($fileExt, $allowedExts)) {
-        echo json_encode(['success' => false, 'message' => "Invalid image format"]);
-        exit;
-    }
-    $newFileName = uniqid('img_', true) . '.' . $fileExt;
-    $destPath = $uploadDir . $newFileName;
-    if (move_uploaded_file($fileTmpPath, $destPath)) {
-        $image_url = "uploads/" . $newFileName;
-    } else {
-        echo json_encode(['success' => false, 'message' => "Failed to move uploaded image"]);
+if (isset($_FILES['image'])) {
+    if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/uploads/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        $fileTmpPath = $_FILES['image']['tmp_name'];
+        $fileName = basename($_FILES['image']['name']);
+        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowedExts = ['png', 'jpg', 'jpeg', 'gif'];
+        if (!in_array($fileExt, $allowedExts)) {
+            echo json_encode(['success' => false, 'message' => "Invalid image format. Allowed: PNG, JPG, JPEG, GIF"]);
+            exit;
+        }
+        $newFileName = uniqid('img_', true) . '.' . $fileExt;
+        $destPath = $uploadDir . $newFileName;
+        if (move_uploaded_file($fileTmpPath, $destPath)) {
+            $image_url = "uploads/" . $newFileName;
+        } else {
+            echo json_encode(['success' => false, 'message' => "Failed to move uploaded image to destination."]);
+            exit;
+        }
+    } else if ($_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        // Report specific PHP upload errors
+        $php_errors = [
+            UPLOAD_ERR_INI_SIZE   => "The uploaded file exceeds the upload_max_filesize directive in php.ini",
+            UPLOAD_ERR_FORM_SIZE  => "The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form",
+            UPLOAD_ERR_PARTIAL    => "The uploaded file was only partially uploaded",
+            UPLOAD_ERR_NO_TMP_DIR => "Missing a temporary folder",
+            UPLOAD_ERR_CANT_WRITE => "Failed to write file to disk",
+            UPLOAD_ERR_EXTENSION  => "A PHP extension stopped the file upload",
+        ];
+        $errMsg = isset($php_errors[$_FILES['image']['error']]) ? $php_errors[$_FILES['image']['error']] : "Unknown upload error";
+        echo json_encode(['success' => false, 'message' => "Image upload error: $errMsg"]);
         exit;
     }
 }

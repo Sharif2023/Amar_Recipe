@@ -21,13 +21,25 @@ export default function SubmitRecipe() {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null);
+    const fileInputRef = React.useRef(null);
 
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
-        setFormData({
-            ...formData,
-            [name]: type === 'file' ? files[0] : value
-        });
+        if (type === 'file') {
+            const file = files[0];
+            setFormData({ ...formData, [name]: file });
+            if (file) {
+                setImagePreview(URL.createObjectURL(file));
+            } else {
+                setImagePreview(null);
+            }
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value
+            });
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -52,7 +64,7 @@ export default function SubmitRecipe() {
 
             if (result.success) {
                 alert('Recipe Submitted Successfully!');
-                // Optionally clear the form
+                // Reset form and related states
                 setFormData({
                     title: '',
                     category: '',
@@ -69,6 +81,10 @@ export default function SubmitRecipe() {
                     comment: '',
                     source: '',
                 });
+                setImagePreview(null);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
             } else {
                 alert('Submission failed: ' + result.message);
             }
@@ -158,8 +174,22 @@ export default function SubmitRecipe() {
                                 accept="image/*"
                                 className="sr-only"
                                 onChange={handleChange}
+                                ref={fileInputRef}
                             />
                         </label>
+                        {/* Show image preview if selected */}
+                        {imagePreview && (
+                            <div className="mt-4 relative group">
+                                <img
+                                    src={imagePreview}
+                                    alt="Preview"
+                                    className="w-full h-48 object-cover rounded-md border border-gray-300 shadow-sm"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
+                                    <p className="text-white font-medium">Image Preview</p>
+                                </div>
+                            </div>
+                        )}
                         {/* Show filename if an image is selected */}
                         {formData.image && (
                             <p className="mt-2 text-gray-700 text-sm">
