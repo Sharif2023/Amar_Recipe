@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../Components/Loader';
 
 const SettingsPage = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -149,7 +150,7 @@ const SettingsPage = () => {
                                 disabled={loading}
                                 className="w-full mt-4 bg-orange-600 text-white py-2 rounded-md hover:bg-orange-700 transition duration-300"
                             >
-                                {loading ? 'পাসওয়ার্ড পরিবর্তিত হচ্ছে...' : 'পাসওয়ার্ড পরিবর্তন করুন'}
+                                {loading ? 'প্রক্রিয়াধীন...' : 'পাসওয়ার্ড পরিবর্তন করুন'}
                             </button>
                         </form>
                     </div>
@@ -167,11 +168,16 @@ const SettingsPage = () => {
                             disabled={loading}
                             className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300"
                         >
-                            {loading ? 'মুছা হচ্ছে...' : 'অ্যাকাউন্ট মুছে ফেলুন'}
+                            {loading ? 'প্রক্রিয়াধীন...' : 'অ্যাকাউন্ট মুছে ফেলুন'}
                         </button>
                     </div>
                 )}
             </div>
+            {loading && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
+                    <Loader message="অনুরোধটি প্রসেসিং হচ্ছে, দয়া করে অপেক্ষা করুন..." />
+                </div>
+            )}
         </div>
     );
 };

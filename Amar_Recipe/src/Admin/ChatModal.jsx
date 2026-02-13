@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import Loader from '../Components/Loader';
 
 const ChatModal = ({ isOpen, onClose, senderId }) => {
   const [userInput, setUserInput] = useState('');
@@ -7,9 +8,12 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
   const [admins, setAdmins] = useState([]);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [filteredAdmins, setFilteredAdmins] = useState([]);
+  const [loadingAdmins, setLoadingAdmins] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      setLoadingAdmins(true);
       fetch(API_BASE_URL + 'admin_requests.php')
         .then(response => response.json())
         .then(data => {
@@ -19,6 +23,9 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
         })
         .catch(error => {
           console.error("Error fetching admin data:", error);
+        })
+        .finally(() => {
+          setLoadingAdmins(false);
         });
     }
   }, [isOpen]);
@@ -40,6 +47,7 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
 
 
   const fetchMessages = (receiverId) => {
+    setLoadingMessages(true);
     fetch(API_BASE_URL + `admin_get_messages.php?sender_id=${senderId}&receiver_id=${receiverId}`)
       .then(response => response.json())
       .then(data => {
@@ -51,6 +59,9 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
       })
       .catch(error => {
         console.error('Error fetching messages:', error);
+      })
+      .finally(() => {
+        setLoadingMessages(false);
       });
   };
 
@@ -129,40 +140,52 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
             onChange={handleSearch}
             className="w-full px-3 py-2 mb-2 border rounded-md"
           />
-          <ul className="max-h-48 overflow-y-auto">
-            {filteredAdmins.map(admin => (
-              <li key={admin.id} onClick={() => setSelectedAdmin(admin)} className="cursor-pointer p-2 mb-1 rounded-lg shadow bg-gray-100 hover:bg-gray-200">
-                {admin.name}
-              </li>
-            ))}
-          </ul>
+          {loadingAdmins ? (
+            <div className="flex justify-center py-8 scale-75">
+              <Loader message="অ্যাডমিন লোড হচ্ছে..." />
+            </div>
+          ) : (
+            <ul className="max-h-48 overflow-y-auto">
+              {filteredAdmins.map(admin => (
+                <li key={admin.id} onClick={() => setSelectedAdmin(admin)} className="cursor-pointer p-2 mb-1 rounded-lg shadow bg-gray-100 hover:bg-gray-200">
+                  {admin.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
       {/* Chat Messages */}
       {selectedAdmin && (
         <>
-          <div id="chat-box" className="p-4 h-80 overflow-y-auto">
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`mb-3 flex ${msg.sender_id == senderId ? 'justify-end' : 'justify-start'}`}
-              >
-                <div>
-                  <div
-                    className={`max-w-xs px-4 py-2 rounded-lg shadow ${msg.sender_id == senderId
-                      ? 'bg-red-500 text-white rounded-br-none'
-                      : 'bg-gray-200 text-gray-900 rounded-bl-none'
-                      }`}
-                  >
-                    {msg.message}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1 text-right pr-1">
-                    {new Date(msg.created_at).toLocaleTimeString()}
+          <div id="chat-box" className="p-4 h-80 overflow-y-auto relative">
+            {loadingMessages ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-10 scale-75">
+                <Loader message="বার্তা লোড হচ্ছে..." />
+              </div>
+            ) : (
+              messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`mb-3 flex ${msg.sender_id == senderId ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div>
+                    <div
+                      className={`max-w-xs px-4 py-2 rounded-lg shadow ${msg.sender_id == senderId
+                        ? 'bg-red-500 text-white rounded-br-none'
+                        : 'bg-gray-200 text-gray-900 rounded-bl-none'
+                        }`}
+                    >
+                      {msg.message}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1 text-right pr-1">
+                      {new Date(msg.created_at).toLocaleTimeString()}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
           <div className="p-4 border-t flex">
             <input

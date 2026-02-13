@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import Loader from "../Components/Loader";
 
 const AdminProfile = () => {
   const [profileImage, setProfileImage] = useState(
@@ -19,6 +20,7 @@ const AdminProfile = () => {
     portfolio: admin?.portfolio || "",
     certification: admin?.certification || ""
   });
+  const [loading, setLoading] = useState(false);
 
   // Handle file input change
   const handleImageChange = (event) => {
@@ -88,6 +90,7 @@ const AdminProfile = () => {
   }, []);
 
   const handleSave = async () => {
+    setLoading(true);
     const updatedAdmin = { ...admin, profileImage, ...formData };
 
     const formDataToSend = new FormData();
@@ -142,11 +145,18 @@ const AdminProfile = () => {
     } catch (error) {
       console.error("Error in fetching or parsing the response:", error);
       alert("প্রোফাইল আপডেটে একটি সমস্যা হয়েছে।");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto p-8 bg-white rounded-lg shadow-lg border border-rose-200">
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
+          <Loader message="প্রোফাইল আপডেট হচ্ছে, দয়া করে অপেক্ষা করুন..." />
+        </div>
+      )}
       <h2 className="text-3xl font-extrabold text-rose-700 mb-8 border-b border-rose-300 pb-3">
         অ্যাডমিন প্রোফাইল
       </h2>

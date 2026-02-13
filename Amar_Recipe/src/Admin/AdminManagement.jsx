@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import { useNavigate } from "react-router-dom";
+import Loader from "../Components/Loader";
 
 const AdminManagement = () => {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ const AdminManagement = () => {
   const [approvedAdmins, setApprovedAdmins] = useState([]);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [isRootAdmin, setIsRootAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const rootAdminEmail = "sharifislam0505@gmail.com";
 
@@ -25,14 +27,21 @@ const AdminManagement = () => {
   }, [navigate]);
 
   const fetchRequests = async () => {
-    const res = await fetch(API_BASE_URL + "admin_requests.php", {
-      cache: "no-store",
-    });
-    const data = await res.json();
-    console.log("Fetched updated data:", data);
+    setLoading(true);
+    try {
+      const res = await fetch(API_BASE_URL + "admin_requests.php", {
+        cache: "no-store",
+      });
+      const data = await res.json();
+      console.log("Fetched updated data:", data);
 
-    setPendingRequests(data.filter(admin => admin.status === "pending"));
-    setApprovedAdmins(data.filter(admin => admin.status === "approved"));
+      setPendingRequests(data.filter(admin => admin.status === "pending"));
+      setApprovedAdmins(data.filter(admin => admin.status === "approved"));
+    } catch (error) {
+      console.error("Error fetching requests:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -100,6 +109,10 @@ const AdminManagement = () => {
       }
     }
   };
+
+  if (loading) {
+    return <Loader message="অ্যাডমিন তথ্য লোড হচ্ছে..." />;
+  }
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
