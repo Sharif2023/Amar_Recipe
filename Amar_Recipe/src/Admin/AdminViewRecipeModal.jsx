@@ -3,6 +3,8 @@ import { API_BASE_URL } from '../config/api';
 const backendBaseUrl = API_BASE_URL;
 
 const AdminRecipeModal = ({ isOpen, onClose, recipe, onSave, mode = 'view' }) => {
+  const [formData, setFormData] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
