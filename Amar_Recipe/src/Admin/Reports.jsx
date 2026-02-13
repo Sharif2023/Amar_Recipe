@@ -175,7 +175,7 @@ const Reports = () => {
         <tbody>
           {reports.map((report) => (
             <tr key={report.id} className="odd:bg-white even:bg-gray-100 dark:odd:bg-[#1b1b1b] dark:even:bg-[#262525]">
-              <td className="border border-gray-300 p-2 text-center">{report?.report_id}</td>
+              <td className="border border-gray-300 p-2 text-center">{report?.id}</td>
               <td className="border border-gray-300 p-2 text-center">{report?.recipe_id}</td>
 
               <td className="border border-gray-300 p-2">
@@ -194,7 +194,7 @@ const Reports = () => {
               <td className="border border-gray-300 p-2 flex justify-center gap-2">
                 <button
                   className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                  onClick={() => markasDone(report.report_id)}
+                  onClick={() => markasDone(report.id)}
                   title="সম্পন্ন হিসেবে চিহ্নিত করুন"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
