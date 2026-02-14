@@ -58,8 +58,11 @@ function Header() {
             <nav className="bg-black p-2">
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
 
-                    <Link to={'/'}>
-                        <div className="text-white font-bold text-2xl mb-4 lg:mb-0 hover:text-orange-600 hover:cursor-pointer inline-flex items-center gap-2"><img src={logo} className="w-8 h-8" alt="Amar Recipe Header Logo" />আমার রেসিপি</div>
+                    <Link to={'/'} className="group">
+                        <div className="text-white font-bold text-2xl mb-4 lg:mb-0 group-hover:text-orange-600 hover:cursor-pointer inline-flex items-center gap-2">
+                            <img src={logo} className="w-8 h-8 group-hover:motion-preset-seesaw" alt="Amar Recipe Header Logo" />
+                            আমার রেসিপি
+                        </div>
                     </Link>
 
                     {/* Hamburger menu for small screens */}

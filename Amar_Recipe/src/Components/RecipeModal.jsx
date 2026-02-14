@@ -259,7 +259,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                         </div>
 
                         <label className="block mb-2">
-                            অন্যান্য কারণ:
+                            অন্যান্য কারণ/পরিবর্তনের জন্য আবেদন:
                             <textarea
                                 value={otherReason}
                                 onChange={(e) => setOtherReason(e.target.value)}
