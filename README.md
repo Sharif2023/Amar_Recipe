@@ -119,8 +119,8 @@ npm run dev
 ## 🤝 Contributing & Support
 We welcome contributions! Please refer to our contributing guidelines before opening a Pull Request.
 
-**Author**: [Sharif Ahmed](https://github.com/Sharif2023)  
-**Support**: For technical support, please open a GitHub Issue or refer to [DEPLOYMENT.md](DEPLOYMENT.md).
+**Author**: [Shariful Islam](https://engineer-sharif.infinityfreeapp.com/)  
+**Support**: For technical support, please open a GitHub Issue or refer to [Contact by Mail](https://engineer-sharif.infinityfreeapp.com/#contact).
 
 ---
 *Built with ❤️ for the Culinary Community*
