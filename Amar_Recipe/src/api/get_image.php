@@ -19,13 +19,17 @@ try {
         // If file_type is missing, default to jpeg
         $contentType = $image['file_type'] ?: 'image/jpeg';
         
+        if (is_resource($image['image_data'])) {
+            $data = stream_get_contents($image['image_data']);
+        } else {
+            $data = $image['image_data'];
+        }
+
         // Output headers
         header("Content-Type: $contentType");
-        header("Content-Length: " . strlen($stream = stream_get_contents($image['image_data'])));
+        header("Content-Length: " . strlen($data));
         
-        // Postgres BYTEA returns a stream resource or string depending on PDO config
-        // In our config, it's likely a string or resource.
-        echo $image['image_data']; 
+        echo $data; 
     } else {
         // Serve a default placeholder or 404
         http_response_code(404);
