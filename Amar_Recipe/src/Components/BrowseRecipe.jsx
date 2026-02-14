@@ -19,7 +19,7 @@ const BrowseRecipe = () => {
   const normalizedCategory = category.trim().toLowerCase();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const recipesPerPage = 8;
+  const recipesPerPage = 12;
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -205,14 +205,14 @@ const BrowseRecipe = () => {
         খুজে নিন যা খেতে চান 😇🍽️
       </h2>
 
-      <div className="flex flex-wrap justify-center gap-8 px-4">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-4">
         {currentRecipes.length === 0 ? (
-          <p className="text-center dark:text-gray-300">কোন রেসিপি পাওয়া যায়নি।</p>
+          <p className="text-center dark:text-gray-300 col-span-full">কোন রেসিপি পাওয়া যায়নি।</p>
         ) : (
           currentRecipes.map((item, index) => (
             <div
               key={item.id}
-              className="w-full sm:w-[300px] bg-white dark:bg-[#262525] rounded-xl shadow-xl overflow-hidden hover:scale-105 transition-all duration-300 cursor-pointer group reveal-on-scroll sm:opacity-100"
+              className="w-full bg-white dark:bg-[#262525] rounded-xl shadow-xl overflow-hidden hover:scale-105 transition-all duration-300 cursor-pointer group reveal-on-scroll sm:opacity-100"
               style={{ transitionDelay: `${index % 4 * 100}ms` }}
               onClick={() => handleViewRecipe(item)}
             >
