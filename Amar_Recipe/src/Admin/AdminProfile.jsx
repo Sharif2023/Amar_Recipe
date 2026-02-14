@@ -96,7 +96,7 @@ const AdminProfile = () => {
     const formDataToSend = new FormData();
 
     if (selectedImageFile) {
-      formDataToSend.append("profileImage", selectedImageFile);
+      formDataToSend.append("profile_image", selectedImageFile);
     }
 
     formDataToSend.append("name", formData.name);
@@ -118,23 +118,31 @@ const AdminProfile = () => {
         }
       );
 
-      const result = await res.json();
+      let result;
+      try {
+        result = await res.json();
+      } catch {
+        alert("প্রোফাইল আপডেটে একটি সমস্যা হয়েছে। সার্ভার থেকে সঠিক উত্তর আসেনি।");
+        return;
+      }
 
       if (result.success) {
         alert("Profile updated successfully!");
         setIsEditing(false);
 
-        const fullProfileImagePath = (result.profileImage || profileImage).startsWith("http")
-          ? result.profileImage
-          : API_BASE_URL + result.profileImage;
+        const rawProfileImage = result.profileImage ?? result.admin?.profile_image ?? profileImage;
+        const fullProfileImagePath = (typeof rawProfileImage === "string" && rawProfileImage.startsWith("http"))
+          ? rawProfileImage
+          : rawProfileImage
+            ? API_BASE_URL + rawProfileImage
+            : profileImage;
 
         const updatedAdminWithImage = {
           ...updatedAdmin,
+          ...(result.admin && { name: result.admin.name, email: result.admin.email, phone: result.admin.phone, city: result.admin.city, state: result.admin.state, experience: result.admin.experience, portfolio: result.admin.portfolio, certification: result.admin.certification }),
           profileImage: fullProfileImagePath
         };
 
-
-        // Save updated profile image in localStorage
         localStorage.setItem("admin", JSON.stringify(updatedAdminWithImage));
         setAdmin(updatedAdminWithImage);
         setProfileImage(fullProfileImagePath);

@@ -3,7 +3,8 @@ require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
 
-$admin_id = $_POST['admin_id'] ?? '';
+// Frontend sends "id"; accept both "id" and "admin_id"
+$admin_id = $_POST['admin_id'] ?? $_POST['id'] ?? '';
 
 if (empty($admin_id)) {
     echo json_encode(['success' => false, 'message' => 'Missing admin ID']);
@@ -80,6 +81,18 @@ if (isset($_POST['specialty'])) {
     $fields[] = "specialty = :specialty";
     $params[':specialty'] = trim($_POST['specialty']);
 }
+if (isset($_POST['experience'])) {
+    $fields[] = "experience = :experience";
+    $params[':experience'] = trim($_POST['experience']);
+}
+if (isset($_POST['portfolio'])) {
+    $fields[] = "portfolio = :portfolio";
+    $params[':portfolio'] = trim($_POST['portfolio']);
+}
+if (isset($_POST['certification'])) {
+    $fields[] = "certification = :certification";
+    $params[':certification'] = trim($_POST['certification']);
+}
 if ($profile_image) {
     $fields[] = "profile_image = :profile_image";
     $params[':profile_image'] = $profile_image;
@@ -94,9 +107,15 @@ $sql = "UPDATE admin_requests SET " . implode(', ', $fields) . " WHERE id = :id"
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 
-// Fetch updated admin data
+// Fetch updated admin data (PDO::CASE_LOWER so keys are lowercase)
 $fetchStmt = $conn->prepare("SELECT * FROM admin_requests WHERE id = :id");
 $fetchStmt->execute([':id' => $admin_id]);
 $admin = $fetchStmt->fetch();
 
-echo json_encode(['success' => true, 'admin' => $admin, 'message' => 'Profile updated successfully']);
+$profileImage = $admin['profile_image'] ?? null;
+echo json_encode([
+    'success' => true,
+    'admin' => $admin,
+    'profileImage' => $profileImage,
+    'message' => 'Profile updated successfully'
+]);
