@@ -33,8 +33,8 @@
 | :--- | :--- |
 | **Frontend** | React 19, Vite 6, Tailwind CSS 4, React Router 7 |
 | **Backend** | PHP 8.2+, RESTful JSON API, CORS-enabled |
-| **Database** | MySQL (Railway Hosting), PostgreSQL (Render-compatible) |
-| **Infrastructure** | Docker, Railway (Backend), Vercel (Frontend) |
+| **Database** | PostgreSQL (Render Hosting) |
+| **Infrastructure** | Docker, Render (Backend), Vercel (Frontend) |
 
 ---
 
@@ -65,7 +65,7 @@ Amar_Recipies_Live/
 ### 1. Environment Preparation
 - **Node.js**: v18.0 or higher
 - **PHP**: v8.2+ with MySQL extensions
-- **Database**: MySQL 5.7+
+- **Database**: MySQL 5.7+ (Local) / PostgreSQL (Production)
 
 ### 2. Local Installation
 ```bash
