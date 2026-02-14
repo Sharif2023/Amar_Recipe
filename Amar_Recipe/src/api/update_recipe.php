@@ -40,6 +40,22 @@ try {
         }
 
         try {
+            // Ensure recipe_images table exists (e.g. on first deploy)
+            if (defined('DB_TYPE') && DB_TYPE === 'pgsql') {
+                $conn->exec("
+                    CREATE TABLE IF NOT EXISTS recipe_images (
+                        recipe_id INT PRIMARY KEY,
+                        image_data BYTEA,
+                        file_type VARCHAR(50),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        CONSTRAINT fk_recipe
+                            FOREIGN KEY(recipe_id)
+                            REFERENCES recipes(id)
+                            ON DELETE CASCADE
+                    )
+                ");
+            }
+
             $checkStmt = $conn->prepare("SELECT 1 FROM recipe_images WHERE recipe_id = :id");
             $checkStmt->execute([':id' => $id]);
 
