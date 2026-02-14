@@ -9,12 +9,6 @@ if (!$data) {
     $data = $_POST;
 }
 
-
-// DEBUG LOGGING
-file_put_contents('update_debug.log', "Time: " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
-file_put_contents('update_debug.log', "FILES: " . print_r($_FILES, true) . "\n", FILE_APPEND);
-// END DEBUG
-
 $id = $data['id'] ?? '';
 
 if (empty($id)) {
@@ -26,44 +20,60 @@ if (empty($id)) {
 try {
     $conn = getDbConnection();
 
-    // Handle image upload
+    // Handle image upload: use stream for PostgreSQL BYTEA; fail request if image save fails
     $image_url = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $_FILES['image']['tmp_name'];
         $fileType = $_FILES['image']['type'];
-        
-        // Read file content
-        $imageData = file_get_contents($fileTmpPath);
-        
-        if ($imageData) {
-            try {
-                // Check if image exists
-                $checkStmt = $conn->prepare("SELECT 1 FROM recipe_images WHERE recipe_id = :id");
-                $checkStmt->execute([':id' => $id]);
-                
-                if ($checkStmt->fetch()) {
-                    // Update existing
-                    $imgSql = "UPDATE recipe_images SET image_data = :data, file_type = :type WHERE recipe_id = :id";
-                } else {
-                    // Insert new
-                    $imgSql = "INSERT INTO recipe_images (recipe_id, image_data, file_type) VALUES (:id, :data, :type)";
-                }
-                
-                $imgStmt = $conn->prepare($imgSql);
-                $imgStmt->bindParam(':id', $id);
-                $imgStmt->bindParam(':data', $imageData, PDO::PARAM_LOB);
-                $imgStmt->bindParam(':type', $fileType);
-                $imgStmt->execute();
 
-                // Set the new image URL with cache-busting timestamp
-                $image_url = API_BASE_URL . "get_image.php?id=" . $id . "&t=" . time();
-                
-            } catch (Exception $e) {
-                error_log("Image update failed: " . $e->getMessage());
+        if (!is_uploaded_file($fileTmpPath) || !filesize($fileTmpPath)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Image update failed: invalid or empty file']);
+            exit;
+        }
+
+        $stream = fopen($fileTmpPath, 'rb');
+        if ($stream === false) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Image update failed: could not read file']);
+            exit;
+        }
+
+        try {
+            $checkStmt = $conn->prepare("SELECT 1 FROM recipe_images WHERE recipe_id = :id");
+            $checkStmt->execute([':id' => $id]);
+
+            if ($checkStmt->fetch()) {
+                $imgSql = "UPDATE recipe_images SET image_data = :data, file_type = :type WHERE recipe_id = :id";
+            } else {
+                $imgSql = "INSERT INTO recipe_images (recipe_id, image_data, file_type) VALUES (:id, :data, :type)";
             }
+
+            $imgStmt = $conn->prepare($imgSql);
+            $imgStmt->bindParam(':id', $id);
+            $imgStmt->bindParam(':data', $stream, PDO::PARAM_LOB);
+            $imgStmt->bindParam(':type', $fileType);
+            $imgStmt->execute();
+            fclose($stream);
+            $stream = null;
+
+            $image_url = (defined('API_BASE_URL') ? API_BASE_URL : '') . "get_image.php?id=" . $id . "&t=" . time();
+        } catch (Exception $e) {
+            if (isset($stream) && is_resource($stream)) {
+                fclose($stream);
+            }
+            error_log("Image update failed: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Image update failed: ' . $e->getMessage()]);
+            exit;
         }
     } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
-        error_log("Image upload failed with error code: " . $_FILES['image']['error']);
+        $code = $_FILES['image']['error'];
+        $msg = $code === UPLOAD_ERR_INI_SIZE || $code === UPLOAD_ERR_FORM_SIZE
+            ? 'Image too large' : 'Image upload failed (error ' . $code . ')';
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => $msg]);
+        exit;
     }
 
     // Build update query dynamically
