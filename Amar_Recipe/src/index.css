@@ -32,11 +32,21 @@
     animation: var(--animate-seesaw);
 }
 
-.reveal-on-scroll {
-    opacity: 0;
-    will-change: transform, opacity;
+/* Premium Reveal Effect - Mobile Only */
+@media (max-width: 639px) {
+    .reveal-on-scroll {
+        opacity: 0;
+        will-change: transform, opacity;
+    }
+
+    .reveal-on-scroll.reveal-now {
+        animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 }
 
-.reveal-on-scroll.reveal-now {
-    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* Desktop: No initial transparency or animation flicker */
+@media (min-width: 640px) {
+    .reveal-on-scroll {
+        opacity: 1;
+    }
 }

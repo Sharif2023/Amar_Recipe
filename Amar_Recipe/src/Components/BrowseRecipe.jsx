@@ -205,43 +205,40 @@ const BrowseRecipe = () => {
         খুজে নিন যা খেতে চান 😇🍽️
       </h2>
 
-      <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-6 sm:gap-8 px-4">
+      <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-8 px-4">
         {currentRecipes.length === 0 ? (
           <p className="text-center dark:text-gray-300">কোন রেসিপি পাওয়া যায়নি।</p>
         ) : (
           currentRecipes.map((item, index) => (
             <div
               key={item.id}
-              className="w-full sm:w-[300px] bg-white dark:bg-[#262525] rounded-xl shadow-xl overflow-hidden hover:scale-[1.03] transition-all duration-500 cursor-pointer group opacity-0 reveal-on-scroll"
+              className="w-full sm:w-[300px] bg-white dark:bg-[#262525] rounded-xl shadow-xl overflow-hidden hover:scale-105 transition-all duration-300 cursor-pointer group reveal-on-scroll sm:opacity-100"
               style={{ transitionDelay: `${index % 4 * 100}ms` }}
               onClick={() => handleViewRecipe(item)}
             >
-              <div className="relative overflow-hidden h-[240px] sm:h-[200px]">
+              <div className="relative overflow-hidden h-[300px] sm:h-[200px]">
                 <img
                   src={item.image_url
                     ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
                     : 'https://via.placeholder.com/300x200?text=No+Image'}
                   alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="w-full h-full object-cover sm:group-hover:brightness-90 transition-all duration-300"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
               </div>
-              <div className="p-5 flex flex-col">
-                <div className="flex justify-between items-start mb-3 gap-2">
-                  <h3 className="text-lg font-bold dark:text-white leading-tight min-h-[3rem] line-clamp-2" title={item.title}>{item.title}</h3>
-                  <div className="flex items-center text-yellow-500 text-sm select-none shrink-0 mt-1">
+              <div className="p-5">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-lg font-semibold dark:text-white tracking-tighter" title={item.title}>{item.title}</h3>
+                  <div className="flex items-center text-yellow-500 text-sm select-none">
                     <IoStar />
-                    <span className="ml-1 text-black dark:text-white font-medium">{item.average_rating ? Number(item.average_rating).toFixed(1) : '৪.৫'}</span>
+                    <span className="ml-1 text-black dark:text-white">{item.average_rating ? Number(item.average_rating).toFixed(1) : '৪.৫'}</span>
                   </div>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-6 min-h-[4.5rem]" title={item.description}>
+                <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3 tracking-tight" title={item.description}>
                   {item.description.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n') || 'বিস্তারিত তথ্য পাওয়া যায়নি।'}
                 </p>
-                <div className="mt-auto">
-                  <button className="w-full bg-rose-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-rose-700 active:scale-95 transition-all duration-300 shadow-md shadow-rose-600/20" onClick={(e) => { e.stopPropagation(); handleViewRecipe(item); }}>
-                    বিস্তারিত রেসিপি
-                  </button>
-                </div>
+                <button className="w-full bg-rose-600 text-white py-2 rounded-full text-sm font-medium hover:bg-rose-700 transition" onClick={(e) => { e.stopPropagation(); handleViewRecipe(item); }}>
+                  বিস্তারিত রেসিপি
+                </button>
               </div>
             </div>
           ))
