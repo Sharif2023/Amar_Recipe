@@ -205,7 +205,7 @@ const BrowseRecipe = () => {
         খুজে নিন যা খেতে চান 😇🍽️
       </h2>
 
-      <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-8 px-4">
+      <div className="flex flex-wrap justify-center gap-8 px-4">
         {currentRecipes.length === 0 ? (
           <p className="text-center dark:text-gray-300">কোন রেসিপি পাওয়া যায়নি।</p>
         ) : (
