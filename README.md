@@ -4,6 +4,7 @@
 [![React](https://img.shields.io/badge/Frontend-React%2019-blue?logo=react)](https://react.dev/)
 [![PHP](https://img.shields.io/badge/Backend-PHP%208.2-777BB4?logo=php)](https://www.php.net/)
 [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%204.0-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
 **Amar Recipe** is a sophisticated, full-stack recipe management platform designed for culinary enthusiasts and community builders. It combines a sleek, modern user experience with powerful administrative tools, providing a seamless bridge between recipe discovery and community management.
 
