@@ -19,7 +19,23 @@ const BrowseRecipe = () => {
   const normalizedCategory = category.trim().toLowerCase();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const recipesPerPage = 12;
+  const [recipesPerPage, setRecipesPerPage] = useState(window.innerWidth <= 1920 ? 8 : 12);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setRecipesPerPage(window.innerWidth <= 1920 ? 8 : 12);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Ensure current page is valid when recipes per page changes
+  useEffect(() => {
+    const total = Math.ceil(recipes.length / recipesPerPage);
+    if (currentPage > total && total > 0) {
+      setCurrentPage(total);
+    }
+  }, [recipesPerPage, recipes.length, currentPage]);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -205,7 +221,7 @@ const BrowseRecipe = () => {
         খুজে নিন যা খেতে চান 😇🍽️
       </h2>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-4">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-4">
         {currentRecipes.length === 0 ? (
           <p className="text-center dark:text-gray-300 col-span-full">কোন রেসিপি পাওয়া যায়নি।</p>
         ) : (
