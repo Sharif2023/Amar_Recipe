@@ -92,9 +92,9 @@ const AdminLogin = () => {
                         </button>
                     </div>
                     <div className="flex text-sm text-blue-700 underline space-x-4 items-center justify-center py-2.5">
-                        <Link to='/adminsignup'>
+                        <a href='https://youtu.be/0vZDbKSGAJ0' target="_blank" rel="noopener noreferrer">
                             অ্যাডমিন একাউন্ট খুলুন
-                        </Link>
+                        </a>
                         <Link to={''}>
                             পাসওয়ার্ড ভুলে গেছেন?
                         </Link>
