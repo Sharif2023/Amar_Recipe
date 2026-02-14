@@ -159,15 +159,16 @@ const AdminManagement = () => {
                     </button>
                     <button
                       onClick={async () => {
+                        const requestId = admin.id;
                         const reason = prompt("আবেদন বাতিলের কারণ:");
-                        if (!reason) return alert("আবেদন বাতিলের কারণ জানানো জরুরি.");
-                        const admin = JSON.parse(localStorage.getItem("admin"));
+                        if (!reason) return alert("আবেদন বাতিলের কারণ জানানো জরুরি।");
+                        const currentAdmin = JSON.parse(localStorage.getItem("admin"));
 
                         try {
                           const res = await fetch(ADMIN_API_BASE_URL + "admin_req_reject.php", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ id: adminId, reason, admin_name: admin.name }),
+                            body: JSON.stringify({ id: requestId, reason, admin_name: currentAdmin?.name ?? "" }),
                           });
 
                           const text = await res.text();
