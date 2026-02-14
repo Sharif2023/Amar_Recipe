@@ -245,13 +245,23 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                     <div className="w-1.5 h-6 bg-rose-500 rounded-full"></div>
                                     <h3 className="text-xl font-black dark:text-white">বানানোর প্রক্রিয়া</h3>
                                 </div>
-                                <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg whitespace-pre-line bg-rose-50/20 dark:bg-[#1b1b1b] p-6 lg:p-8 rounded-3xl border border-rose-100/50 dark:border-gray-800 font-serif italic relative">
+                                <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg whitespace-pre-line bg-rose-50/20 dark:bg-[#1b1b1b] p-6 lg:p-8 rounded-3xl border border-rose-100/50 dark:border-gray-800 relative">
                                     <div className="absolute top-4 right-6 text-rose-200 dark:text-gray-800 hidden sm:block">
                                         <svg width="40" height="40" viewBox="0 0 40 40" fill="currentColor">
                                             <path d="M10 20h4l-2-6h-4l2 6zm10 0h4l-2-6h-4l2 6zM6 14c0-2.209 1.791-4 4-4s4 1.791 4 4v12l-4-4H6v-8zm10 0c0-2.209 1.791-4 4-4s4 1.791 4 4v12l-4-4h-4v-8z" />
                                         </svg>
                                     </div>
-                                    {recipe.description.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\n\s*\n/g, '\n\n')}
+                                    {recipe.description
+                                        .replace(/\r\n/g, '\n')
+                                        .replace(/\\n/g, '\n')
+                                        .replace(/\\r/g, '\n')
+                                        .replace(/\n\s*\n/g, '\n\n')
+                                        .replace(/(উপকরণ[:ঃ]|উপাদান[:ঃ])/g, '<b>$1</b>')
+                                        .replace(/(প্রস্তুত প্রণালী[:ঃ]|বানানোর নিয়ম[:ঃ])/g, '<b>$1</b>')
+                                        .split('\n').map((line, i) => (
+                                            <span key={i} dangerouslySetInnerHTML={{ __html: line + '<br/>' }} />
+                                        ))
+                                    }
                                 </div>
                             </section>
 
@@ -261,7 +271,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                         <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
                                         <h3 className="text-xl font-black dark:text-white">বিশেষ মন্তব্য</h3>
                                     </div>
-                                    <div className="bg-amber-50/40 dark:bg-amber-900/5 p-6 rounded-2xl border border-amber-100 dark:border-amber-900/20 text-gray-600 dark:text-gray-400 text-sm">
+                                    <div className="bg-amber-50/40 dark:bg-amber-900/5 p-6 rounded-2xl border border-amber-100 dark:border-amber-900/20 text-gray-600 dark:text-gray-400 text-sm whitespace-pre-line">
                                         {recipe.comment.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\n\s*\n/g, '\n\n')}
                                     </div>
                                 </section>
@@ -313,7 +323,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                     className="flex items-center gap-2 text-rose-500 hover:text-rose-600 font-bold transition-colors text-sm"
                                 >
                                     <IoAlertCircleOutline size={20} />
-                                    রিপোর্ট করুন
+                                    রিপোর্ট/পরিবর্তন আবেদন
                                 </button>
                                 <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold">আইডি: #{recipe.id}</span>
                             </div>
@@ -322,7 +332,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                             {reportOpen && (
                                 <div className="mt-6 bg-rose-50 dark:bg-rose-900/10 p-6 rounded-2xl border border-rose-100 dark:border-rose-900/20 animate-reveal">
                                     <h3 className="font-black text-rose-600 dark:text-rose-400 mb-4 flex items-center gap-2">
-                                        <IoAlertCircleOutline /> কেন রিপোর্ট করছেন?
+                                        <IoAlertCircleOutline /> কেন রিপোর্ট/পরিবর্তন আবেদন করছেন?
                                     </h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                                         {reportReasons.map(({ id, label }) => (
@@ -344,7 +354,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                         onChange={(e) => setOtherReason(e.target.value)}
                                         rows={3}
                                         className="w-full bg-white dark:bg-[#262525] border border-gray-100 dark:border-gray-800 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:text-white"
-                                        placeholder="অন্যান্য কিছু বলতে চান কি?..."
+                                        placeholder="অন্যান্য কিছু/পরিবর্তন এর কারণ বলুন..."
                                     />
                                     <div className="flex justify-end gap-3 mt-4">
                                         <button onClick={() => setReportOpen(false)} className="px-6 py-2 text-gray-400 hover:text-gray-600 font-bold text-sm">বাতিল</button>
@@ -352,7 +362,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                             onClick={handleReportSubmit}
                                             className="px-6 py-2 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 active:scale-95 transition-all text-sm shadow-lg shadow-rose-600/20"
                                         >
-                                            রিপোর্ট পাঠান
+                                            অ্যাডমিনকে জমা দিন
                                         </button>
                                     </div>
                                     {submitStatus === 'success' && <p className="text-green-600 font-bold text-xs mt-3 text-center">ধন্যবাদ, আপনার রিপোর্ট সফলভাবে জমা হয়েছে।</p>}
