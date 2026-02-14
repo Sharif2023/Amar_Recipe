@@ -1,4 +1,4 @@
-# 🍳 Amar Recipe - Premium Recipe Management Ecosystem
+# 🍳 Amar Recipe
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/Frontend-React%2019-blue?logo=react)](https://react.dev/)

@@ -1,6 +1,6 @@
 <?php
 /**
- * Database Configuration for Production (Railway) and Local Development
+ * Database Configuration for Production and Local Development
  * CORS headers MUST be first - before any output
  */
 
