@@ -4,10 +4,11 @@ require_once __DIR__ . '/config.php';
 // Support JSON input
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Fallback to $_POST for binary/form data if needed (though we primarily use JSON now)
+// Fallback to $_POST for binary/form data
 if (!$data) {
     $data = $_POST;
 }
+
 
 $id = $data['id'] ?? '';
 
@@ -73,9 +74,15 @@ try {
         'organizeremail' => 'organizeremail',
         'organizeraddress' => 'organizeraddress',
         'tags' => 'tags',
+        'ingredients' => 'ingredients',
+        'preparation_time' => 'preparation_time',
+        'cooking_time' => 'cooking_time',
+        'servings' => 'servings',
+        'calories' => 'calories',
         'reference' => 'reference',
         'tutorialvideo' => 'tutorialvideo',
-        'comment' => 'comment'
+        'comment' => 'comment',
+        'source' => 'source'
     ];
 
     foreach ($mapping as $apiKey => $dbKey) {

@@ -158,6 +158,25 @@ const AdminRecipeModal = ({ isOpen, onClose, recipe, onSave, mode = 'view' }) =>
                 )}
               </div>
 
+              {/* Ingredients */}
+              <div>
+                <label className="block text-sm font-semibold dark:text-gray-300 mb-1">উপকরণ</label>
+                {isEdit ? (
+                  <textarea
+                    name="ingredients"
+                    value={formData.ingredients || ''}
+                    onChange={handleChange}
+                    rows="6"
+                    className="w-full p-2 border rounded dark:bg-[#262525] dark:border-gray-700 dark:text-white"
+                    required
+                  />
+                ) : (
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                    {recipe.ingredients?.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n')}
+                  </p>
+                )}
+              </div>
+
               {/* Comment */}
               <div>
                 <label className="block text-sm font-semibold dark:text-gray-300 mb-1">মন্তব্য</label>
@@ -178,6 +197,62 @@ const AdminRecipeModal = ({ isOpen, onClose, recipe, onSave, mode = 'view' }) =>
 
               {/* Metadata */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+                <div>
+                  <label className="block text-sm font-semibold dark:text-gray-300">প্রস্তুতির সময়</label>
+                  {isEdit ? (
+                    <input
+                      type="text"
+                      name="preparation_time"
+                      value={formData.preparation_time || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded dark:bg-[#262525] dark:border-gray-700 dark:text-white"
+                    />
+                  ) : (
+                    <p className="text-sm dark:text-gray-400">{recipe.preparation_time || 'নেই'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold dark:text-gray-300">রান্নার সময়</label>
+                  {isEdit ? (
+                    <input
+                      type="text"
+                      name="cooking_time"
+                      value={formData.cooking_time || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded dark:bg-[#262525] dark:border-gray-700 dark:text-white"
+                    />
+                  ) : (
+                    <p className="text-sm dark:text-gray-400">{recipe.cooking_time || 'নেই'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold dark:text-gray-300">পরিবেশন</label>
+                  {isEdit ? (
+                    <input
+                      type="text"
+                      name="servings"
+                      value={formData.servings || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded dark:bg-[#262525] dark:border-gray-700 dark:text-white"
+                    />
+                  ) : (
+                    <p className="text-sm dark:text-gray-400">{recipe.servings || 'নেই'}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold dark:text-gray-300">ক্যালোরি</label>
+                  {isEdit ? (
+                    <input
+                      type="text"
+                      name="calories"
+                      value={formData.calories || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded dark:bg-[#262525] dark:border-gray-700 dark:text-white"
+                    />
+                  ) : (
+                    <p className="text-sm dark:text-gray-400">{recipe.calories || 'নেই'}</p>
+                  )}
+                </div>
                 <div>
                   <label className="block text-sm font-semibold dark:text-gray-300">রেফারেন্স লিংক</label>
                   {isEdit ? (
