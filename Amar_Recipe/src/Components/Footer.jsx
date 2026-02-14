@@ -52,7 +52,7 @@ const Footer = () => {
 
                         </a>
                     </div>
-                    <span className="text-lg text-gray-500 dark:text-gray-400 text-center block">©<a href="https://github.com/Sharif2023">Sharif Code Corner</a> 2025, All rights reserved.</span>
+                    <span className="text-lg text-gray-500 dark:text-gray-400 text-center block">©<a href="https://engineer-sharif.infinityfreeapp.com/">Sharif Code Corner</a> 2025, All rights reserved.</span>
                 </div>
             </div>
         </footer>

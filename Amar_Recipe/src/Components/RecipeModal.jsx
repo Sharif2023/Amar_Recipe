@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../config/api';
+import {
+    IoClose,
+    IoStar,
+    IoLocationOutline,
+    IoFolderOpenOutline,
+    IoPersonOutline,
+    IoLinkOutline,
+    IoPlayCircleOutline,
+    IoAlertCircleOutline,
+    IoCheckmarkCircle,
+    IoSend
+} from 'react-icons/io5';
 
 const backendBaseUrl = API_BASE_URL;
 
@@ -31,7 +43,6 @@ const reportReasons = [
     { id: 'spam', label: 'স্প্যাম' },
 ];
 
-
 const RecipeModal = ({ isOpen, onClose, recipe }) => {
     if (!isOpen || !recipe) return null;
 
@@ -61,7 +72,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             reasons: selectedReasons,
             otherReason: otherReason.trim(),
             reportedAt: new Date().toISOString(),
-            reporterEmail: recipe.organizeremail // You can replace with logged in user email if available
+            reporterEmail: recipe.organizeremail
         };
 
         try {
@@ -74,7 +85,6 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
 
             if (json.success) {
                 setSubmitStatus('success');
-                // Clear form
                 setSelectedReasons([]);
                 setOtherReason('');
                 setTimeout(() => {
@@ -91,11 +101,10 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
 
     const handleSubmitRating = async () => {
         if (!email || rating === 0) {
-            alert('Please enter your email and rating');
+            alert('দয়া করে আপনার ইমেইল এবং রেটিং প্রদান করুন');
             return;
         }
 
-        // Check if the user has already rated the recipe
         const checkRating = await fetch(API_BASE_URL + 'check_user_rating.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -105,8 +114,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
         const checkData = await checkRating.json();
 
         if (checkData.success && checkData.exists) {
-            // Notify user if they have already rated this recipe
-            alert('You have already rated this recipe!');
+            alert('আপনি ইতিমধ্যে এই রেসিপিটিকে রেটিং দিয়েছেন!');
             return;
         }
 
@@ -125,198 +133,233 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             const json = await res.json();
 
             if (json.success) {
-                // Update the average rating
-                const newTotalRatings = ratingCount * averageRating + rating;
-                const newCount = ratingCount + 1;
+                const newTotalRatings = Number(ratingCount) * Number(averageRating) + Number(rating);
+                const newCount = Number(ratingCount) + 1;
                 setAverageRating((newTotalRatings / newCount).toFixed(1));
                 setRatingCount(newCount);
+                alert('আপনার রেটিং সফলভাবে জমা হয়েছে!');
             } else {
-                alert('Failed to submit your rating');
+                alert('রেটিং জমা দিতে ব্যর্থ হয়েছে');
             }
         } catch (error) {
-            alert('Error occurred while submitting your rating');
+            alert('রেটিং জমা দিতে সমস্যা হয়েছে');
         }
     };
 
-
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-[#1b1b1b] rounded-lg max-w-2xl w-full overflow-y-auto max-h-[90vh] shadow-xl">
-                <div className="p-6">
-                    <div className="flex items-center justify-center relative mb-4">
-                        <h2 className="text-2xl font-bold dark:text-white tracking-tight">{recipe.title}</h2>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-6 h-6 absolute right-0 cursor-pointer hover:text-[#ff3300]" onClick={onClose}
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </div>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md transition-all duration-300">
+            <div className="bg-white dark:bg-[#121212] w-full max-w-5xl h-full sm:h-auto sm:max-h-[90vh] sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-reveal relative">
 
-                    <img
-                        src={recipe.image_url
-                            ? (recipe.image_url.startsWith('http') ? recipe.image_url : backendBaseUrl + recipe.image_url)
-                            : 'https://via.placeholder.com/400x300?text=No+Image'}
-                        alt={recipe.title}
-                        className="w-full h-full object-cover rounded-md mb-4"
-                    />
+                {/* Close Button - Floating on Desktop, Bar on Mobile */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 z-50 p-2 bg-white/80 dark:bg-black/40 backdrop-blur-md rounded-full text-gray-800 dark:text-white hover:bg-rose-500 hover:text-white transition-all shadow-lg hidden sm:block"
+                >
+                    <IoClose size={24} />
+                </button>
 
-                    <p className="text-gray-700 dark:text-gray-300 mb-2 py-2"><strong>রেসিপির নাম</strong> {recipe.title}</p>
-                    <p className="text-gray-700 dark:text-gray-300 mb-2 py-2">
-                        <strong>রেসিপির ধরণ:</strong> {categoryBanglaMap[recipe.category] || recipe.category}
-                    </p>
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="grid grid-cols-1 lg:grid-cols-2">
 
-                    <p
-                        className="text-gray-700 dark:text-gray-300 mb-2 py-2"
-                        style={{ whiteSpace: 'pre-line' }}
-                    >
-                        <strong>বানানোর প্রক্রিয়া:</strong><br /><br />{' '}
-                        {recipe.description.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\n\s*\n/g, '\n\n')}
-                    </p>
+                        {/* Left Side: Visuals & Metadata */}
+                        <div className="bg-gray-50 dark:bg-[#1b1b1b] p-0 lg:p-8 flex flex-col">
+                            {/* Mobile Header */}
+                            <div className="flex items-center justify-between p-4 lg:hidden bg-white dark:bg-[#121212] border-b dark:border-gray-800 sticky top-0 z-40">
+                                <h2 className="text-xl font-bold dark:text-white truncate pr-4">{recipe.title}</h2>
+                                <button onClick={onClose} className="text-gray-500">
+                                    <IoClose size={24} />
+                                </button>
+                            </div>
 
-                    <p className="text-gray-700 dark:text-gray-300 mb-4" style={{ whiteSpace: 'pre-line' }}>
-                        <strong>মন্তব্য:</strong><br /><br /> {recipe.comment && recipe.comment.trim() !== '' ? recipe.comment.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\n\s*\n/g, '\n\n') : 'নেই'}
-                    </p>
+                            <div className="relative group">
+                                <img
+                                    src={recipe.image_url
+                                        ? (recipe.image_url.startsWith('http') ? recipe.image_url : backendBaseUrl + recipe.image_url)
+                                        : 'https://via.placeholder.com/600x400?text=Premium+Recipe'}
+                                    alt={recipe.title}
+                                    className="w-full aspect-[4/3] object-cover sm:rounded-2xl shadow-lg group-hover:scale-[1.02] transition-transform duration-500"
+                                />
+                                <div className="absolute bottom-4 left-4 flex gap-2">
+                                    <span className="bg-white/90 dark:bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                                        <IoFolderOpenOutline />
+                                        {categoryBanglaMap[recipe.category] || recipe.category}
+                                    </span>
+                                </div>
+                            </div>
 
-                    <div className="border-t pt-4 text-sm text-gray-600 dark:text-gray-400">
-                        <p>
-                            <strong>রেফারেন্স লিংক:</strong>{' '}
-                            <a
-                                href={recipe.reference}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-500"
-                            >
-                                {recipe.reference}
-                            </a>
-                        </p>
-                        <p className="text-gray-700 dark:text-gray-300 mb-2">
-                            <strong>ভিডিও টিউটোরিয়াল:</strong>{' '}
-                            <a
-                                href={recipe.tutorialvideo}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-500"
-                            >
-                                {recipe.tutorialvideo && recipe.tutorialvideo.trim() !== '' ? recipe.tutorialvideo : 'নেই'}
-                            </a>
-                        </p>
+                            <div className="p-6 lg:p-0 mt-6 space-y-4">
+                                <h2 className="hidden lg:block text-3xl font-black dark:text-white leading-tight mb-4">{recipe.title}</h2>
 
-                    </div>
-                    <div className="border-t pt-4 text-sm text-gray-600 dark:text-gray-400">
-                        <p><strong>রেসিপিটির উৎপত্তিস্থল:</strong> {recipe.location}</p>
-                        <p><strong>রেসিপিদাতার নাম:</strong> {recipe.organizername}</p>
-                        <p><strong>ইমেইল:</strong> {recipe.organizeremail}</p>
-                    </div>
-                    <div className="flex items-center text-yellow-500 text-sm select-none">
-                        <span>★</span>
-                        <div className="ml-2 text-black dark:text-white">{averageRating} / 5</div>
-                        <span className="ml-2">({ratingCount} ratings)</span>
-                    </div>
-                    <div className="mt-4">
-                        <h3 className="text-lg font-semibold dark:text-white">রেসিপিটিকে রেটিং দিন</h3>
-                        <div className="flex space-x-2 mt-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <span
-                                    key={star}
-                                    className={`cursor-pointer ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
-                                    onClick={() => setRating(star)}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-white dark:bg-[#262525] p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-3">
+                                        <div className="p-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-lg">
+                                            <IoLocationOutline size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-black tracking-widest">উৎপত্তিস্থল</p>
+                                            <p className="text-sm font-bold dark:text-gray-200">{recipe.location}</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-[#262525] p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-center gap-3">
+                                        <div className="p-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-lg">
+                                            <IoPersonOutline size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-black tracking-widest">রেসিপিদাতা</p>
+                                            <p className="text-sm font-bold dark:text-gray-200 truncate">{recipe.organizername}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-between p-4 bg-white dark:bg-[#262525] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex text-amber-400">
+                                            {[...Array(5)].map((_, i) => (
+                                                <IoStar key={i} size={16} className={i < Math.floor(averageRating) ? 'fill-current' : 'opacity-30'} />
+                                            ))}
+                                        </div>
+                                        <span className="font-black text-lg dark:text-white">{averageRating}</span>
+                                    </div>
+                                    <span className="text-xs text-gray-400 font-bold uppercase tracking-tighter">({ratingCount} রিভিউ)</span>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <a href={recipe.reference} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 text-sm text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-colors">
+                                        <IoLinkOutline size={20} />
+                                        <span className="truncate">রেফারেন্স লিংক</span>
+                                    </a>
+                                    {recipe.tutorialvideo && (
+                                        <a href={recipe.tutorialvideo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 text-sm text-green-600 dark:text-green-400 bg-green-50/50 dark:bg-green-900/10 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors">
+                                            <IoPlayCircleOutline size={20} />
+                                            <span className="truncate">ভিডিও টিউটোরিয়াল</span>
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Side: Content & Actions */}
+                        <div className="p-6 lg:p-10 space-y-8 pb-32 lg:pb-10">
+                            <section>
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className="w-1.5 h-6 bg-rose-500 rounded-full"></div>
+                                    <h3 className="text-xl font-black dark:text-white">বানানোর প্রক্রিয়া</h3>
+                                </div>
+                                <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg whitespace-pre-line bg-rose-50/20 dark:bg-[#1b1b1b] p-6 lg:p-8 rounded-3xl border border-rose-100/50 dark:border-gray-800 font-serif italic relative">
+                                    <div className="absolute top-4 right-6 text-rose-200 dark:text-gray-800 hidden sm:block">
+                                        <svg width="40" height="40" viewBox="0 0 40 40" fill="currentColor">
+                                            <path d="M10 20h4l-2-6h-4l2 6zm10 0h4l-2-6h-4l2 6zM6 14c0-2.209 1.791-4 4-4s4 1.791 4 4v12l-4-4H6v-8zm10 0c0-2.209 1.791-4 4-4s4 1.791 4 4v12l-4-4h-4v-8z" />
+                                        </svg>
+                                    </div>
+                                    {recipe.description.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\n\s*\n/g, '\n\n')}
+                                </div>
+                            </section>
+
+                            {recipe.comment && recipe.comment.trim() !== '' && (
+                                <section>
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+                                        <h3 className="text-xl font-black dark:text-white">বিশেষ মন্তব্য</h3>
+                                    </div>
+                                    <div className="bg-amber-50/40 dark:bg-amber-900/5 p-6 rounded-2xl border border-amber-100 dark:border-amber-900/20 text-gray-600 dark:text-gray-400 text-sm">
+                                        {recipe.comment.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n').replace(/\n\s*\n/g, '\n\n')}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Interaction Zone */}
+                            <div className="pt-8 border-t dark:border-gray-800">
+                                <h3 className="text-lg font-black dark:text-white mb-6">রেসিপিটি আপনার কেমন লেগেছে?</h3>
+
+                                <div className="bg-gray-50 dark:bg-[#1b1b1b] p-6 rounded-3xl space-y-6">
+                                    <div className="flex justify-center gap-3">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                onClick={() => setRating(star)}
+                                                className={`transition-all duration-300 transform ${star <= rating ? 'text-yellow-400 scale-125' : 'text-gray-300 dark:text-gray-700 hover:text-yellow-200'} hover:scale-110`}
+                                            >
+                                                <IoStar size={36} className={star <= rating ? 'fill-current shadow-amber-500' : ''} />
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <div className="relative">
+                                        <input
+                                            type="email"
+                                            className="w-full px-6 py-4 bg-white dark:bg-[#262525] border border-gray-200 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all dark:text-white"
+                                            placeholder="আপনার ইমেইল দিন..."
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                        <button
+                                            onClick={handleSubmitRating}
+                                            className="absolute right-2 top-2 bottom-2 px-6 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-600/20 flex items-center gap-2 transition-transform active:scale-95"
+                                        >
+                                            <IoSend />
+                                            জমা দিন
+                                        </button>
+                                    </div>
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-4 text-center dark:text-gray-600 flex items-center justify-center gap-1 font-bold">
+                                    <IoAlertCircleOutline /> এক ইমেইল থেকে একবারই রেটিং দেওয়া যাবে
+                                </p>
+                            </div>
+
+                            {/* Action Row */}
+                            <div className="pt-8 border-t dark:border-gray-800 flex items-center justify-between">
+                                <button
+                                    onClick={() => setReportOpen(!reportOpen)}
+                                    className="flex items-center gap-2 text-rose-500 hover:text-rose-600 font-bold transition-colors text-sm"
                                 >
-                                    ★
-                                </span>
-                            ))}
-                        </div>
-                        <input
-                            type="email"
-                            className="mt-2 w-full p-2 border border-gray-300 rounded"
-                            placeholder="Enter your email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-                </div>
+                                    <IoAlertCircleOutline size={20} />
+                                    রিপোর্ট করুন
+                                </button>
+                                <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold">আইডি: #{recipe.id}</span>
+                            </div>
 
-                {/* Report modal */}
-                {reportOpen && (
-                    <div className="mt-6 border-t pt-4">
-                        <h3 className="font-semibold mb-2 text-red-600">রিপোর্ট করার কারণ</h3>
-                        <div className="flex flex-col gap-2 mb-3">
-                            {reportReasons.map(({ id, label }) => (
-                                <label key={id} className="inline-flex items-center space-x-2 rtl:space-x-reverse">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedReasons.includes(id)}
-                                        onChange={() => toggleReason(id)}
-                                        className="form-checkbox"
+                            {/* Report Drawer/Overlay */}
+                            {reportOpen && (
+                                <div className="mt-6 bg-rose-50 dark:bg-rose-900/10 p-6 rounded-2xl border border-rose-100 dark:border-rose-900/20 animate-reveal">
+                                    <h3 className="font-black text-rose-600 dark:text-rose-400 mb-4 flex items-center gap-2">
+                                        <IoAlertCircleOutline /> কেন রিপোর্ট করছেন?
+                                    </h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                                        {reportReasons.map(({ id, label }) => (
+                                            <button
+                                                key={id}
+                                                onClick={() => toggleReason(id)}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all font-bold text-xs text-left
+                                                    ${selectedReasons.includes(id)
+                                                        ? 'bg-rose-600 border-rose-600 text-white'
+                                                        : 'bg-white dark:bg-[#262525] border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-400'}`}
+                                            >
+                                                {selectedReasons.includes(id) && <IoCheckmarkCircle />}
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <textarea
+                                        value={otherReason}
+                                        onChange={(e) => setOtherReason(e.target.value)}
+                                        rows={3}
+                                        className="w-full bg-white dark:bg-[#262525] border border-gray-100 dark:border-gray-800 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-rose-500/20 transition-all dark:text-white"
+                                        placeholder="অন্যান্য কিছু বলতে চান কি?..."
                                     />
-                                    <span>{label}</span>
-                                </label>
-                            ))}
+                                    <div className="flex justify-end gap-3 mt-4">
+                                        <button onClick={() => setReportOpen(false)} className="px-6 py-2 text-gray-400 hover:text-gray-600 font-bold text-sm">বাতিল</button>
+                                        <button
+                                            onClick={handleReportSubmit}
+                                            className="px-6 py-2 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 active:scale-95 transition-all text-sm shadow-lg shadow-rose-600/20"
+                                        >
+                                            রিপোর্ট পাঠান
+                                        </button>
+                                    </div>
+                                    {submitStatus === 'success' && <p className="text-green-600 font-bold text-xs mt-3 text-center">ধন্যবাদ, আপনার রিপোর্ট সফলভাবে জমা হয়েছে।</p>}
+                                    {submitStatus === 'error' && <p className="text-rose-600 font-bold text-xs mt-3 text-center">দুঃখিত, আবার চেষ্টা করুন।</p>}
+                                </div>
+                            )}
                         </div>
-
-                        <label className="block mb-2">
-                            অন্যান্য কারণ/পরিবর্তনের জন্য আবেদন:
-                            <textarea
-                                value={otherReason}
-                                onChange={(e) => setOtherReason(e.target.value)}
-                                rows={3}
-                                className="w-full rounded border border-gray-300 p-2 text-sm dark:bg-[#2a2a2a] dark:text-white"
-                                placeholder="আপনার মতামত লিখুন..."
-                            />
-                        </label>
-
-                        <div className="flex justify-end space-x-2 rtl:space-x-reverse">
-                            <button
-                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                                onClick={() => setReportOpen(false)}
-                            >
-                                বাতিল করুন
-                            </button>
-                            <button
-                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                                onClick={handleReportSubmit}
-                            >
-                                রিপোর্ট জমা দিন
-                            </button>
-                        </div>
-
-                        {submitStatus === 'success' && (
-                            <p className="text-green-600 mt-2">রিপোর্ট সফলভাবে জমা হয়েছে।</p>
-                        )}
-                        {submitStatus === 'error' && (
-                            <p className="text-red-600 mt-2">রিপোর্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।</p>
-                        )}
-                    </div>
-                )}
-                <div className="flex justify-between items-center p-4 border-t">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-amber-600 hover:text-red-600"
-                        title="রিপোর্ট করুন"
-                        onClick={() => setReportOpen(!reportOpen)}>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                    </svg>
-                    <div className='flex space-x-1'>
-                        <button
-                            onClick={handleSubmitRating}
-                            className="flex bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
-                            </svg>
-                            রেটিং করুন
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="flex bg-rose-600 text-white px-4 py-2 rounded hover:bg-rose-700"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                            </svg>
-                            বন্ধ করুন
-                        </button>
                     </div>
                 </div>
             </div>

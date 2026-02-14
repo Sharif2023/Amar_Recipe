@@ -32,6 +32,10 @@
     animation: var(--animate-seesaw);
 }
 
+.animate-reveal {
+    animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Premium Reveal Effect - Mobile Only */
 @media (max-width: 639px) {
     .reveal-on-scroll {
