@@ -54,3 +54,6 @@ Thumbs.db
 .cache
 
 .vercel
+
+# Database dumps
+database/*.sql
