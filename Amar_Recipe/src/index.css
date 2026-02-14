@@ -1,14 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --animate-seesaw: seesaw 0.5s ease-in-out infinite;
+    --animate-seesaw: seesaw 0.8s ease-in-out infinite;
 
-  @keyframes seesaw {
-    0%, 100% { transform: rotate(-10deg); }
-    50% { transform: rotate(10deg); }
-  }
+    @keyframes seesaw {
+
+        0%,
+        100% {
+            transform: rotate(-8deg);
+        }
+
+        50% {
+            transform: rotate(8deg);
+        }
+    }
 }
 
 .motion-preset-seesaw {
-  @apply animate-seesaw;
+    @apply animate-seesaw;
 }

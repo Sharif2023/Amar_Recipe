@@ -8,7 +8,7 @@ const Footer = () => {
                 <div className="max-w-3xl mx-auto">
                     <a href="/" className="flex justify-center group">
                         <div className="text-black font-bold text-2xl mb-4 lg:mb-0 group-hover:text-orange-600 hover:cursor-pointer inline-flex items-center gap-2">
-                            <img src={logo} className="w-8 h-8 group-hover:motion-preset-seesaw" alt="Amar Recipe Header Logo" />
+                            <img src={logo} className="w-8 h-8 group-hover:animate-seesaw" alt="Amar Recipe Header Logo" />
                             আমার রেসিপি
                         </div>
                     </a>
