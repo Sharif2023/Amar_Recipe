@@ -24,13 +24,21 @@ try {
 }
 
 foreach ($recipes as &$recipe) {
+    $imageUrl = $recipe['image_url'] ?? '';
+    $imageUrlStr = trim((string) $imageUrl);
+    $id = (int) $recipe['id'];
+
     if ($hasImageTable && array_key_exists('has_image', $recipe)) {
-        $imageUrl = $recipe['image_url'] ?? '';
         $hasImage = !empty($recipe['has_image']);
-        if ((trim((string) $imageUrl) === '' || $imageUrl === null) && $hasImage) {
-            $recipe['image_url'] = $baseUrl . 'get_image.php?id=' . (int) $recipe['id'];
+        $dbImageUrl = $baseUrl . 'get_image.php?id=' . $id;
+        if ($hasImage) {
+            $recipe['image_url'] = $dbImageUrl;
+        } elseif ($imageUrlStr !== '' && strpos((string) $imageUrl, 'uploads/') !== false) {
+            $recipe['image_url'] = null;
         }
         unset($recipe['has_image']);
+    } elseif ($imageUrlStr !== '' && strpos((string) $imageUrl, 'uploads/') !== false) {
+        $recipe['image_url'] = null;
     }
 }
 unset($recipe);
