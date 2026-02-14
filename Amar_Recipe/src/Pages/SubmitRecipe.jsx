@@ -188,7 +188,7 @@ export default function SubmitRecipe() {
                         <h1 className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-4 tracking-tighter">
                             আপনার রেসিপি <span className="text-[#8c0327] dark:text-rose-500">শেয়ার করুন</span>
                         </h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">সহজেই আপনার সেরা ম্যাজিক রেসিপিটি সকলের মাঝে পৌঁছে দিন।</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">সহজেই আপনার রেসিপিটি সকলের মাঝে পৌঁছে দিন।</p>
                     </header>
 
                     {submissionStatus.message && (
@@ -248,7 +248,7 @@ export default function SubmitRecipe() {
                                         <option value="SaucesAndCondiments">সস/মশলা</option>
                                         <option value="Bangladeshi">বাঙ্গালী</option>
                                         <option value="Chinese">চাইনিজ্জ</option>
-                                        <option value="Italian">イতালীয়ান</option>
+                                        <option value="Italian">ইতালীয়ান</option>
                                     </select>
                                 </div>
                             </div>
