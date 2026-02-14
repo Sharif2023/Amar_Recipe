@@ -3,7 +3,7 @@ import logo from "../assets/Amar_Recipe_Header_Logo.svg";
 
 const Footer = () => {
     return (
-        <footer className="w-full py-5 dark:bg-[#121212] dark:border-t dark:border-gray-800">
+        <footer className="w-full py-10 bg-white dark:bg-black border-t border-gray-100 dark:border-white/5 transition-colors duration-500">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="max-w-3xl mx-auto">
                     <a href="/" className="flex justify-center group">
