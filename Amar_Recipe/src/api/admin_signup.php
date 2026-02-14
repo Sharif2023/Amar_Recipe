@@ -39,11 +39,11 @@ if ($stmt->fetch()) {
 
 try {
     $sql = "INSERT INTO admin_requests (
-        name, email, password, phone, date, area, city, state, postcode, 
-        experience, specialty, portfolio, certification, status, created_at
+        name, email, password, phone, date, area, city, state, postcode,
+        experience, specialty, portfolio, certification, status
     ) VALUES (
         :name, :email, :password, :phone, :date, :area, :city, :state, :postcode,
-        :experience, :specialty, :portfolio, :certification, 'pending', NOW()
+        :experience, :specialty, :portfolio, :certification, 'pending'
     )";
 
     $stmt = $conn->prepare($sql);
