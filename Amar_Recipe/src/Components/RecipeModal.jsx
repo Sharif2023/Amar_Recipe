@@ -41,7 +41,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
     const [submitStatus, setSubmitStatus] = useState(null);
     const [rating, setRating] = useState(0);
     const [email, setEmail] = useState('');
-    const [averageRating, setAverageRating] = useState(recipe.rating || 0);
+    const [averageRating, setAverageRating] = useState(recipe.average_rating || 0);
     const [ratingCount, setRatingCount] = useState(recipe.ratingcount || 0);
 
     const toggleReason = (id) => {
