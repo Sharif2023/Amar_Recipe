@@ -10,6 +10,11 @@ if (!$data) {
 }
 
 
+// DEBUG LOGGING
+file_put_contents('update_debug.log', "Time: " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+file_put_contents('update_debug.log', "FILES: " . print_r($_FILES, true) . "\n", FILE_APPEND);
+// END DEBUG
+
 $id = $data['id'] ?? '';
 
 if (empty($id)) {
@@ -50,13 +55,15 @@ try {
                 $imgStmt->bindParam(':type', $fileType);
                 $imgStmt->execute();
 
-                // Set the new image URL
-                $image_url = API_BASE_URL . "get_image.php?id=" . $id;
+                // Set the new image URL with cache-busting timestamp
+                $image_url = API_BASE_URL . "get_image.php?id=" . $id . "&t=" . time();
                 
             } catch (Exception $e) {
                 error_log("Image update failed: " . $e->getMessage());
             }
         }
+    } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        error_log("Image upload failed with error code: " . $_FILES['image']['error']);
     }
 
     // Build update query dynamically

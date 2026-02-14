@@ -99,7 +99,7 @@ if (is_similar_description($conn, $description)) {
 
             // Update recipe with generic URL
             // Assuming API_BASE_URL is defined in config.php or elsewhere
-            $finalImageUrl = (defined('API_BASE_URL') ? API_BASE_URL : '') . "get_image.php?id=" . $recipeId;
+            $finalImageUrl = (defined('API_BASE_URL') ? API_BASE_URL : '') . "get_image.php?id=" . $recipeId . "&t=" . time();
             $updateStmt = $conn->prepare("UPDATE recipes SET image_url = :url WHERE id = :id");
             $updateStmt->execute([':url' => $finalImageUrl, ':id' => $recipeId]);
         } catch (Exception $e) {
