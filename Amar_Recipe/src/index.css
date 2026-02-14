@@ -14,8 +14,29 @@
             transform: rotate(8deg);
         }
     }
+
+    @keyframes reveal {
+        from {
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
 }
 
-.motion-preset-seesaw {
-    @apply animate-seesaw;
+.animate-seesaw {
+    animation: var(--animate-seesaw);
+}
+
+.reveal-on-scroll {
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.reveal-on-scroll.reveal-now {
+    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

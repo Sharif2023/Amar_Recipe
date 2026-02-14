@@ -168,6 +168,25 @@ const BrowseRecipe = () => {
     return pages;
   };
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-now');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = document.querySelectorAll('.reveal-on-scroll');
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [currentRecipes]);
+
   if (loading) {
     return <Loader />;
   }
@@ -181,38 +200,48 @@ const BrowseRecipe = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-rose-100/30 dark:bg-[#1b1b1b] py-10 px-4">
-      <h2 className="text-3xl lg:text-4xl text-center font-serif font-extrabold mb-10 dark:text-white tracking-wide">
+    <div className="w-full min-h-screen bg-rose-100/30 dark:bg-[#1b1b1b] py-10 px-0 sm:px-4">
+      <h2 className="text-3xl lg:text-4xl text-center font-serif font-extrabold mb-10 dark:text-white tracking-wide px-4">
         খুজে নিন যা খেতে চান 😇🍽️
       </h2>
 
-      <div className="flex flex-wrap justify-center gap-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-10 sm:gap-x-6 px-4 sm:px-6">
         {currentRecipes.length === 0 ? (
-          <p className="text-center dark:text-gray-300">কোন রেসিপি পাওয়া যায়নি।</p>
+          <p className="text-center dark:text-gray-300 col-span-full">কোন রেসিপি পাওয়া যায়নি।</p>
         ) : (
-          currentRecipes.map((item) => (
-            <div key={item.id} className="w-[280px] sm:w-[300px] bg-white dark:bg-[#262525] rounded-xl shadow-xl overflow-hidden hover:scale-105 transition-transform duration-300 cursor-pointer group" onClick={() => handleViewRecipe(item)}>
-              <img
-                src={item.image_url
-                  ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
-                  : 'https://via.placeholder.com/300x200?text=No+Image'}
-                alt={item.title}
-                className="w-full h-[200px] object-cover group-hover:brightness-90"
-              />
-              <div className="p-5">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-lg font-semibold dark:text-white tracking-tighter" title={item.title}>{item.title}</h3>
-                  <div className="flex items-center text-yellow-500 text-sm select-none">
+          currentRecipes.map((item, index) => (
+            <div
+              key={item.id}
+              className="w-full max-w-[340px] mx-auto bg-white dark:bg-[#262525] rounded-xl shadow-xl overflow-hidden hover:scale-[1.03] transition-all duration-500 cursor-pointer group opacity-0 reveal-on-scroll"
+              style={{ transitionDelay: `${index % 4 * 100}ms` }}
+              onClick={() => handleViewRecipe(item)}
+            >
+              <div className="relative overflow-hidden h-[200px]">
+                <img
+                  src={item.image_url
+                    ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
+                    : 'https://via.placeholder.com/300x200?text=No+Image'}
+                  alt={item.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+              </div>
+              <div className="p-5 flex flex-col h-[180px]">
+                <div className="flex justify-between items-start mb-2 gap-2">
+                  <h3 className="text-lg font-bold dark:text-white leading-tight line-clamp-2" title={item.title}>{item.title}</h3>
+                  <div className="flex items-center text-yellow-500 text-sm select-none shrink-0 mt-1">
                     <IoStar />
-                    <span className="ml-1 text-black dark:text-white">{item.rating ? Number(item.rating).toFixed(1) : '৪.৫'}</span>
+                    <span className="ml-1 text-black dark:text-white font-medium">{item.average_rating ? Number(item.average_rating).toFixed(1) : '৪.৫'}</span>
                   </div>
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3 tracking-tight" title={item.description}>
+                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-auto" title={item.description}>
                   {item.description.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n') || 'বিস্তারিত তথ্য পাওয়া যায়নি।'}
                 </p>
-                <button className="w-full bg-rose-600 text-white py-2 rounded-full text-sm font-medium hover:bg-rose-700 transition" onClick={(e) => { e.stopPropagation(); handleViewRecipe(item); }}>
-                  বিস্তারিত রেসিপি
-                </button>
+                <div className="pt-4 mt-auto">
+                  <button className="w-full bg-rose-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-rose-700 active:scale-95 transition-all duration-300 shadow-md shadow-rose-600/20" onClick={(e) => { e.stopPropagation(); handleViewRecipe(item); }}>
+                    বিস্তারিত রেসিপি
+                  </button>
+                </div>
               </div>
             </div>
           ))
