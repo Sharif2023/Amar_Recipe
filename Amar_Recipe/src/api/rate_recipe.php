@@ -41,8 +41,32 @@ try {
         exit;
     } else {
         // Insert new rating
-        $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, rating) VALUES (:recipe_id, :user_email, :rating)");
-        $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
+        try {
+            $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, rating) VALUES (:recipe_id, :user_email, :rating)");
+            $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
+        } catch (PDOException $e) {
+             if ($e->getCode() === '23502' && strpos($e->getMessage(), 'id') !== false) {
+                // SQLSTATE 23502: Not null violation (likely missing AUTO_INCREMENT/SERIAL on id)
+                // Auto-fix: Create sequence and attach to ID
+                $conn->exec("CREATE SEQUENCE IF NOT EXISTS ratings_id_seq");
+                $conn->exec("ALTER TABLE ratings ALTER COLUMN id SET DEFAULT nextval('ratings_id_seq')");
+                
+                // Sync sequence to max ID to avoid collisions
+                $maxIdStmt = $conn->query("SELECT MAX(id) FROM ratings");
+                $maxId = $maxIdStmt->fetchColumn();
+                // If table is empty, maxId is null/false, so standard nextval start is fine.
+                // If strict, setval(seq, maxId) sets the *last* used value, so next is maxId+1.
+                if ($maxId) {
+                    $conn->exec("SELECT setval('ratings_id_seq', $maxId)");
+                }
+
+                // Retry the insert
+                $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, rating) VALUES (:recipe_id, :user_email, :rating)");
+                $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
+            } else {
+                throw $e;
+            }
+        }
     }
 
     // Calculate new average and count
