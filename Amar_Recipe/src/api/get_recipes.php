@@ -30,8 +30,10 @@ foreach ($recipes as &$recipe) {
 
     if ($hasImageTable && array_key_exists('has_image', $recipe)) {
         $hasImage = !empty($recipe['has_image']);
-        $dbImageUrl = $baseUrl . 'get_image.php?id=' . $id;
-        if ($hasImage) {
+        // Prioritize file update (uploads/) over DB image (orphan check)
+        $isUpload = ($imageUrlStr !== '' && strpos((string) $imageUrl, 'uploads/') !== false);
+        
+        if ($hasImage && !$isUpload) {
             $recipe['image_url'] = $dbImageUrl;
         }
         unset($recipe['has_image']);
