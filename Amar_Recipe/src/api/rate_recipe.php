@@ -44,8 +44,8 @@ try {
         try {
             // Attempt insert with both user_email (new) and email (legacy/constraint)
             // We populate 'email' with the same value as 'user_email' to satisfy NOT NULL 'email' constraint
-            $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, email, rating) VALUES (:recipe_id, :user_email, :user_email, :rating)");
-            $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
+            $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, email, rating) VALUES (:recipe_id, :user_email, :email, :rating)");
+            $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':email' => $user_email, ':rating' => $rating]);
         } catch (PDOException $e) {
             if ($e->getCode() === '23502') {
                 // SQLSTATE 23502: Not null violation (ID missing sequence OR email missing)
@@ -69,8 +69,8 @@ try {
                         $nextId = $conn->query("SELECT nextval('ratings_id_seq')")->fetchColumn();
 
                         // Retry insert with EXPLICIT ID AND EMAIL
-                        $retryStmt = $conn->prepare("INSERT INTO ratings (id, recipe_id, user_email, email, rating) VALUES (:id, :recipe_id, :user_email, :user_email, :rating)");
-                        $retryStmt->execute([':id' => $nextId, ':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
+                        $retryStmt = $conn->prepare("INSERT INTO ratings (id, recipe_id, user_email, email, rating) VALUES (:id, :recipe_id, :user_email, :email, :rating)");
+                        $retryStmt->execute([':id' => $nextId, ':recipe_id' => $recipe_id, ':user_email' => $user_email, ':email' => $user_email, ':rating' => $rating]);
 
                     } catch (Exception $ex) {
                         throw $e;
