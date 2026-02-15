@@ -17,8 +17,22 @@ $conn = getDbConnection();
 
 try {
     // Check if user already rated
-    $checkStmt = $conn->prepare("SELECT id FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
-    $checkStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
+    try {
+        $checkStmt = $conn->prepare("SELECT id FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
+        $checkStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
+    } catch (PDOException $e) {
+        // SQLSTATE 42703: Undefined column
+        if ($e->getCode() === '42703') {
+            // Auto-fix: Add the missing column
+            $conn->exec("ALTER TABLE ratings ADD COLUMN IF NOT EXISTS user_email VARCHAR(255)");
+            
+            // Retry the query
+            $checkStmt = $conn->prepare("SELECT id FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
+            $checkStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
+        } else {
+            throw $e;
+        }
+    }
     $existing = $checkStmt->fetch();
 
     if ($existing) {
