@@ -33,12 +33,8 @@ foreach ($recipes as &$recipe) {
         $dbImageUrl = $baseUrl . 'get_image.php?id=' . $id;
         if ($hasImage) {
             $recipe['image_url'] = $dbImageUrl;
-        } elseif ($imageUrlStr !== '' && strpos((string) $imageUrl, 'uploads/') !== false) {
-            $recipe['image_url'] = null;
         }
         unset($recipe['has_image']);
-    } elseif ($imageUrlStr !== '' && strpos((string) $imageUrl, 'uploads/') !== false) {
-        $recipe['image_url'] = null;
     }
 }
 unset($recipe);
