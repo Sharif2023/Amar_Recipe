@@ -22,9 +22,9 @@ try {
     $existing = $checkStmt->fetch();
 
     if ($existing) {
-        // Update existing rating
-        $updateStmt = $conn->prepare("UPDATE ratings SET rating = :rating WHERE recipe_id = :recipe_id AND user_email = :user_email");
-        $updateStmt->execute([':rating' => $rating, ':recipe_id' => $recipe_id, ':user_email' => $user_email]);
+        // Prevent update - One time rating only
+        echo json_encode(['success' => false, 'message' => 'You have already rated this recipe.']);
+        exit;
     } else {
         // Insert new rating
         $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, rating) VALUES (:recipe_id, :user_email, :rating)");
