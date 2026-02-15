@@ -45,24 +45,34 @@ try {
             $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, rating) VALUES (:recipe_id, :user_email, :rating)");
             $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
         } catch (PDOException $e) {
-             if ($e->getCode() === '23502' && strpos($e->getMessage(), 'id') !== false) {
-                // SQLSTATE 23502: Not null violation (likely missing AUTO_INCREMENT/SERIAL on id)
-                // Auto-fix: Create sequence and attach to ID
-                $conn->exec("CREATE SEQUENCE IF NOT EXISTS ratings_id_seq");
-                $conn->exec("ALTER TABLE ratings ALTER COLUMN id SET DEFAULT nextval('ratings_id_seq')");
-                
-                // Sync sequence to max ID to avoid collisions
-                $maxIdStmt = $conn->query("SELECT MAX(id) FROM ratings");
-                $maxId = $maxIdStmt->fetchColumn();
-                // If table is empty, maxId is null/false, so standard nextval start is fine.
-                // If strict, setval(seq, maxId) sets the *last* used value, so next is maxId+1.
-                if ($maxId) {
-                    $conn->exec("SELECT setval('ratings_id_seq', $maxId)");
-                }
+            if ($e->getCode() === '23502' && strpos($e->getMessage(), 'id') !== false) {
+                // SQLSTATE 23502: Not null violation (missing AUTO_INCREMENT)
+                // Auto-fix strategy: Manually generate ID
+                try {
+                    $conn->exec("CREATE SEQUENCE IF NOT EXISTS ratings_id_seq");
+                    
+                    // Attempt to set default for future, but don't rely on it for this request
+                    try {
+                        $conn->exec("ALTER TABLE ratings ALTER COLUMN id SET DEFAULT nextval('ratings_id_seq')");
+                    } catch (Exception $ignore) {}
 
-                // Retry the insert
-                $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, rating) VALUES (:recipe_id, :user_email, :rating)");
-                $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
+                    // Sync sequence if needed (only if verify fails)
+                    $maxId = $conn->query("SELECT MAX(id) FROM ratings")->fetchColumn();
+                    if ($maxId) {
+                        // Ensure sequence is at least past maxId
+                        $conn->exec("SELECT setval('ratings_id_seq', $maxId)");
+                    }
+                    
+                    // Generate explicit ID for this request
+                    $nextId = $conn->query("SELECT nextval('ratings_id_seq')")->fetchColumn();
+
+                    // Retry insert with EXPLICIT ID
+                    $retryStmt = $conn->prepare("INSERT INTO ratings (id, recipe_id, user_email, rating) VALUES (:id, :recipe_id, :user_email, :rating)");
+                    $retryStmt->execute([':id' => $nextId, ':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
+
+                } catch (Exception $ex) {
+                    throw $e; // Throw original error if fix fails
+                }
             } else {
                 throw $e;
             }
