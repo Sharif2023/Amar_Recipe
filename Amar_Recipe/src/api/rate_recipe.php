@@ -42,36 +42,45 @@ try {
     } else {
         // Insert new rating
         try {
-            $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, rating) VALUES (:recipe_id, :user_email, :rating)");
+            // Attempt insert with both user_email (new) and email (legacy/constraint)
+            // We populate 'email' with the same value as 'user_email' to satisfy NOT NULL 'email' constraint
+            $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, email, rating) VALUES (:recipe_id, :user_email, :user_email, :rating)");
             $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
         } catch (PDOException $e) {
-            if ($e->getCode() === '23502' && strpos($e->getMessage(), 'id') !== false) {
-                // SQLSTATE 23502: Not null violation (missing AUTO_INCREMENT)
-                // Auto-fix strategy: Manually generate ID
-                try {
-                    $conn->exec("CREATE SEQUENCE IF NOT EXISTS ratings_id_seq");
-                    
-                    // Attempt to set default for future, but don't rely on it for this request
+            if ($e->getCode() === '23502') {
+                // SQLSTATE 23502: Not null violation (ID missing sequence OR email missing)
+                $msg = $e->getMessage();
+                
+                // Case 1: ID is null
+                if (strpos($msg, 'id') !== false) {
+                     // Auto-fix strategy: Manually generate ID
                     try {
-                        $conn->exec("ALTER TABLE ratings ALTER COLUMN id SET DEFAULT nextval('ratings_id_seq')");
-                    } catch (Exception $ignore) {}
+                        $conn->exec("CREATE SEQUENCE IF NOT EXISTS ratings_id_seq");
+                        
+                        try {
+                            $conn->exec("ALTER TABLE ratings ALTER COLUMN id SET DEFAULT nextval('ratings_id_seq')");
+                        } catch (Exception $ignore) {}
 
-                    // Sync sequence if needed (only if verify fails)
-                    $maxId = $conn->query("SELECT MAX(id) FROM ratings")->fetchColumn();
-                    if ($maxId) {
-                        // Ensure sequence is at least past maxId
-                        $conn->exec("SELECT setval('ratings_id_seq', $maxId)");
+                        $maxId = $conn->query("SELECT MAX(id) FROM ratings")->fetchColumn();
+                        if ($maxId) {
+                            $conn->exec("SELECT setval('ratings_id_seq', $maxId)");
+                        }
+                        
+                        $nextId = $conn->query("SELECT nextval('ratings_id_seq')")->fetchColumn();
+
+                        // Retry insert with EXPLICIT ID AND EMAIL
+                        $retryStmt = $conn->prepare("INSERT INTO ratings (id, recipe_id, user_email, email, rating) VALUES (:id, :recipe_id, :user_email, :user_email, :rating)");
+                        $retryStmt->execute([':id' => $nextId, ':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
+
+                    } catch (Exception $ex) {
+                        throw $e;
                     }
-                    
-                    // Generate explicit ID for this request
-                    $nextId = $conn->query("SELECT nextval('ratings_id_seq')")->fetchColumn();
-
-                    // Retry insert with EXPLICIT ID
-                    $retryStmt = $conn->prepare("INSERT INTO ratings (id, recipe_id, user_email, rating) VALUES (:id, :recipe_id, :user_email, :rating)");
-                    $retryStmt->execute([':id' => $nextId, ':recipe_id' => $recipe_id, ':user_email' => $user_email, ':rating' => $rating]);
-
-                } catch (Exception $ex) {
-                    throw $e; // Throw original error if fix fails
+                }
+                // Case 2: Email is null (Handled by main insert update, but kept if we fall through?)
+                // If the main insert failed on EMAIL, it wouldn't match 'id' check above, so rethrow.
+                // But now main insert HAS email, so this shouldn't happen for email.
+                 else {
+                    throw $e;
                 }
             } else {
                 throw $e;
