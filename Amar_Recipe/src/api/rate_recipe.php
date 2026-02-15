@@ -23,7 +23,7 @@ try {
 
     if ($existing) {
         // Prevent update - One time rating only
-        echo json_encode(['success' => false, 'message' => 'You have already rated this recipe.']);
+        echo json_encode(['success' => false, 'message' => 'আপনি ইতিমধ্যে এই রেসিপিটিকে রেটিং দিয়েছেন।']);
         exit;
     } else {
         // Insert new rating

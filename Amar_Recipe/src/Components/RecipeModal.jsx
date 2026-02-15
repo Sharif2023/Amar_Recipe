@@ -139,7 +139,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                 setRatingCount(newCount);
                 alert('আপনার রেটিং সফলভাবে জমা হয়েছে!');
             } else {
-                alert('রেটিং জমা দিতে ব্যর্থ হয়েছে');
+                alert(json.message || 'রেটিং জমা দিতে ব্যর্থ হয়েছে');
             }
         } catch (error) {
             alert('রেটিং জমা দিতে সমস্যা হয়েছে');
