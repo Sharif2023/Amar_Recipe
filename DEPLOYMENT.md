@@ -5,7 +5,7 @@ Complete guide for deploying Amar Recipe to production.
 **Stack:**
 - **Frontend:** Vercel (free)
 - **Backend:** Render (free)
-- **Database:** Render PostgreSQL (free)
+- **Database:** Supabase (free)
 
 **Total Cost:** $0/month
 
@@ -13,7 +13,21 @@ Complete guide for deploying Amar Recipe to production.
 
 ## 🚀 Quick Deployment (15 minutes)
 
-### Step 1: Deploy Backend to Render
+### Step 1: Set Up Supabase Database
+
+1. **Sign up:** Go to https://supabase.com and create a new project named `amar-recipe`.
+2. **Get Connection String:**
+   - Go to **Project Settings** → **Database**.
+   - Copy the **URI** connection string.
+   - **Direct Connection**: `postgresql://postgres:[YOUR-PASSWORD]@db.iseehucuytvgtpdqupzp.supabase.co:5432/postgres`
+   - **Transaction Pooler** (Recommended for Render): `postgresql://postgres.iseehucuytvgtpdqupzp:[YOUR-PASSWORD]@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres`
+3. **Import Schema:**
+   - In Supabase, go to the **SQL Editor**.
+   - Click **"New query"**.
+   - Copy contents of `Amar_Recipe/database/schema_postgres.sql` from your local files.
+   - Paste into the editor and click **Run**.
+
+### Step 2: Deploy Backend to Render
 
 1. **Sign up:** Go to https://render.com and login with GitHub
 2. **Create Web Service:**
@@ -21,42 +35,18 @@ Complete guide for deploying Amar Recipe to production.
    - Select your repository
    - Configure:
      - Name: `amar-recipe-backend`
-     - Region: Choose closest
-     - Branch: `main`
      - **Root Directory:** `Amar_Recipe`
      - Runtime: **Docker**
      - Instance Type: **Free**
-3. **Create PostgreSQL Database:**
-   - In your Render dashboard, click **"New +"** → **"PostgreSQL"**
-   - Name: `amar-recipe-db`
-   - Database: `amar_recipe`
-   - Plan: **Free**
-   - Click **"Create Database"**
-4. **Link Database to Web Service:**
-   - Go back to your web service → **Environment** tab
-   - Click **"Add Environment Variable"**
-   - Add these (use values from your PostgreSQL database):
+3. **Configure Environment Variables:**
+   - Go to the **Environment** tab.
+   - Add:
      ```
-     DB_HOST = <Internal Database URL from PostgreSQL>
-     DB_PORT = 5432
-     DB_USER = <from PostgreSQL>
-     DB_PASS = <from PostgreSQL>
-     DB_NAME = amar_recipe
+     DATABASE_URL = postgresql://postgres.iseehucuytvgtpdqupzp:[YOUR-PASSWORD]@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres
      RENDER = true
-     ALLOWED_ORIGIN = *
+     ALLOWED_ORIGIN = https://your-app.vercel.app
      ```
-5. **Import Schema:**
-   - Go to your PostgreSQL database → **"Query"** tab
-   - Copy contents of `Amar_Recipe/database/schema_postgres.sql`
-   - Paste and **Execute**
-6. **Wait for deployment** (~3-5 minutes)
-7. **Copy your Render URL:** `https://amar-recipe-backend.onrender.com`
-
-### Step 2: Test Backend
-
-Open: `https://your-render-url.onrender.com/src/api/get_recipes.php`
-
-Should see: `[]` or recipe JSON data
+   - *Note: Replace `[YOUR-PASSWORD]` in the URI with `amar-recipepostgres`.*
 
 ### Step 3: Deploy Frontend to Vercel
 
@@ -68,25 +58,32 @@ Should see: `[]` or recipe JSON data
    - **Root Directory:** `Amar_Recipe`
    - Framework: Vite (auto-detected)
 4. **Environment Variables:**
-   - Add:
+   - Add backend URLs:
      ```
      VITE_API_BASE_URL = https://your-render-url.onrender.com/src/api/
-     VITE_ADMIN_API_BASE_URL = https://your-render-url.onrender.com/admin_api/
+     VITE_ADMIN_API_BASE_URL = https://your-render-url.onrender.com/src/api/
      ```
-   - Replace `your-render-url` with your actual Render URL
-   - Keep the trailing slashes!
-5. **Deploy** (2-3 minutes)
-6. **Copy your Vercel URL:** `https://your-app.vercel.app`
+   - Add Supabase details (if needed for future JS SDK use):
+     ```
+     VITE_SUPABASE_URL = https://iseehucuytvgtpdqupzp.supabase.co
+     VITE_SUPABASE_ANON_KEY = sb_publishable_RQrGCRUYSEgMDlzvyG7E0g_Be-0uXS3
+     ```
+   - Replace `your-render-url` with your actual Render service URL.
+     ```
+     VITE_API_BASE_URL = https://your-render-url.onrender.com/src/api/
+     VITE_ADMIN_API_BASE_URL = https://your-render-url.onrender.com/src/api/
+     ```
+   - Replace `your-render-url` with your actual Render service URL.
+5. **Deploy**
+
+---
 
 ### Step 4: Update CORS
 
 1. Go to Render → Your web service → **Environment**
-2. Update `ALLOWED_ORIGIN` to your Vercel URL:
-   ```
-   ALLOWED_ORIGIN = https://your-app.vercel.app
-   ```
+2. Update `ALLOWED_ORIGIN` to your Vercel URL (e.g., `https://your-app.vercel.app`).
 3. No trailing slash!
-4. Save (auto-redeploys in ~1 minute)
+4. Save (auto-redeploys in ~1 minute).
 
 ### Step 5: Test Everything!
 
@@ -96,6 +93,7 @@ Visit your Vercel URL and verify:
 - ✅ Can submit recipes
 - ✅ Admin login works
 - ✅ No CORS errors (F12 → Console)
+- ✅ Results are coming from Supabase
 
 ---
 
@@ -104,7 +102,9 @@ Visit your Vercel URL and verify:
 Your app is live:
 - **Frontend:** https://your-app.vercel.app
 - **Backend:** https://your-render-url.onrender.com
-- **Database:** Render PostgreSQL
+- **Database:** Supabase PostgreSQL
+
+---
 
 ---
 
@@ -112,20 +112,21 @@ Your app is live:
 
 ### Free Tier Limitations
 
-**Render Free Tier:**
-- Services **spin down after 15 minutes** of inactivity
-- First request after spin-down takes **~30 seconds** to respond
-- 750 hours/month (sufficient for 24/7)
-- 512 MB RAM
+**Supabase Free Tier (Database):**
+- 500MB database size.
+- 5GB bandwidth.
+- Project pauses after 1 week of inactivity (can be manually resumed).
 
-**Render PostgreSQL Free Tier:**
-- 1 GB storage
-- 90-day expiration (backup your data!)
-- 97 connection limit
+**Render Free Tier (Backend):**
+- Services **spin down after 15 minutes** of inactivity.
+- First request after spin-down takes **~30 seconds** to respond.
+- 750 hours/month (sufficient for 24/7).
+- 512 MB RAM.
 
-**Vercel Free Tier:**
-- 100 GB bandwidth/month
-- Unlimited deployments
+**Vercel Free Tier (Frontend):**
+- 100 GB bandwidth/month.
+- Unlimited deployments.
+
 
 ### Local Development
 
@@ -145,9 +146,9 @@ No changes needed to your local database.
 - Ensure Dockerfile exists in repository
 
 ### Database Connection Error
-- Verify all DB environment variables are correct
-- Check database is running in Render dashboard
-- Ensure using internal database URL (not external)
+- Verify all DB environment variables are correct in Render
+- Check database is active in Supabase dashboard
+- Ensure using the correct transaction pooler or direct URI
 
 ### Frontend Can't Connect to Backend
 - Check environment variables have correct Render URL
@@ -177,16 +178,17 @@ No changes needed to your local database.
 2. Vercel auto-deploys
 
 ### Update Database Schema
-1. Go to Render PostgreSQL → Query tab
+1. Go to Supabase → **SQL Editor**
 2. Execute ALTER TABLE or new schema changes
 
 ---
 
 ## 💾 Database Backup (Important!)
 
-Render free PostgreSQL expires after 90 days. **Back up your data regularly!**
+Supabase provides automated backups for free projects (with some limitations) or you can export manually.
 
-1. Go to Render PostgreSQL → **Backups** tab
+1. Go to Supabase → **Table Editor** or **SQL Editor**
+2. Regularly export your data or use the Supabase CLI for backups.
 2. Download backup file
 3. Store safely
 

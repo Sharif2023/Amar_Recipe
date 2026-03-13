@@ -12,7 +12,6 @@ $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 
 // Handle CORS
 if ($envOrigin === '*') {
-    // Allow all origins
     header("Access-Control-Allow-Origin: *");
 } else {
     $allowedOrigins = [
@@ -47,70 +46,83 @@ header("Pragma: no-cache");
 
 // Error reporting
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
 
 // ==========================================
 // DATABASE CONFIGURATION
 // ==========================================
-// For Render (Production): Uses PostgreSQL via DATABASE_URL
-// For Local Development: Falls back to localhost MySQL
 $databaseUrl = getenv('DATABASE_URL');
-$isRender = getenv('RENDER') === 'true' || $databaseUrl;
+$dbTypeEnv = getenv('DB_TYPE');
 
 if ($databaseUrl) {
     // Parse the DATABASE_URL into components
-    // Format: postgresql://user:password@host:port/dbname
     $dbParts = parse_url($databaseUrl);
-    define('DB_HOST', $dbParts['host'] ?? 'localhost');
+    define('DB_HOST', $dbParts['host'] ?? '');
     define('DB_PORT', $dbParts['port'] ?? 5432);
     define('DB_USER', $dbParts['user'] ?? '');
     define('DB_PASS', $dbParts['pass'] ?? '');
-    define('DB_NAME', ltrim($dbParts['path'] ?? '/amar_recipe', '/'));
+    define('DB_NAME', ltrim($dbParts['path'] ?? '/postgres', '/'));
+    define('DB_TYPE', 'pgsql');
 } else {
-    // Local development defaults
+    define('DB_TYPE', $dbTypeEnv ?: 'mysql');
     define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-    define('DB_PORT', getenv('DB_PORT') ?: 3306);
-    define('DB_USER', getenv('DB_USER') ?: 'root');
+    define('DB_PORT', getenv('DB_PORT') ?: (DB_TYPE === 'pgsql' ? 5432 : 3306));
+    define('DB_USER', getenv('DB_USER') ?: (DB_TYPE === 'pgsql' ? 'postgres' : 'root'));
     define('DB_PASS', getenv('DB_PASS') ?: '');
-    define('DB_NAME', getenv('DB_NAME') ?: 'amar_recipe');
+    define('DB_NAME', getenv('DB_NAME') ?: (DB_TYPE === 'pgsql' ? 'postgres' : 'amar_recipe'));
 }
 
-define('DB_TYPE', $isRender ? 'pgsql' : 'mysql');
+$isProduction = getenv('RENDER') === 'true' || $databaseUrl || DB_TYPE === 'pgsql';
 
 // ==========================================
 // BASE URLs
 // ==========================================
-if ($isRender) {
-    // Render uses RENDER_EXTERNAL_URL or we can construct it
-    $renderUrl = getenv('RENDER_EXTERNAL_URL') ?: 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME');
-    define('BASE_URL', $renderUrl . '/');
+if ($isProduction) {
+    $renderUrl = getenv('RENDER_EXTERNAL_URL') ?: ('https://' . getenv('RENDER_EXTERNAL_HOSTNAME'));
+    define('BASE_URL', $renderUrl ? rtrim($renderUrl, '/') . '/' : '/');
 } else {
-    // Local development
     define('BASE_URL', 'http://localhost/Amar_Recipies_Live/Amar_Recipe/');
 }
 define('API_BASE_URL', BASE_URL . 'src/api/');
 
-// Database Connection Function — always returns PDO (works with both MySQL and PostgreSQL)
+/**
+ * Database Connection Function
+ */
 function getDbConnection() {
     try {
         if (DB_TYPE === 'pgsql') {
-            $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME;
+            if (!extension_loaded('pdo_pgsql')) {
+                throw new Exception("PHP extension 'pdo_pgsql' is not loaded on this server.");
+            }
+            $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";sslmode=require";
         } else {
             $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
         }
+        
         $pdo = new PDO($dsn, DB_USER, DB_PASS, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_CASE => PDO::CASE_LOWER,
-            PDO::ATTR_EMULATE_PREPARES => false
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_TIMEOUT => 5
         ]);
         return $pdo;
     } catch (Exception $e) {
+        error_log("Database connection failed: " . $e->getMessage());
+        
         http_response_code(500);
+        header('Content-Type: application/json');
         echo json_encode([
             'success' => false,
-            'message' => 'Database connection failed',
-            'error' => $e->getMessage()
+            'message' => 'Database connection failed. Check your environment variables.',
+            'error' => $e->getMessage(),
+            'debug_info' => [
+                'db_type' => defined('DB_TYPE') ? DB_TYPE : 'not defined',
+                'db_host' => defined('DB_HOST') ? DB_HOST : 'not defined',
+                'db_port' => defined('DB_PORT') ? DB_PORT : 'not defined',
+                'db_user' => defined('DB_USER') ? DB_USER : 'not defined',
+                'db_name' => defined('DB_NAME') ? DB_NAME : 'not defined',
+                'driver_loaded' => extension_loaded('pdo_pgsql') ? 'yes' : 'no'
+            ]
         ]);
         exit();
     }
