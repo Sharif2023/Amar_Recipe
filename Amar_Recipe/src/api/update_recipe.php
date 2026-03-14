@@ -68,7 +68,8 @@ try {
             $imgStmt->bindParam(':type', $fileType);
             $imgStmt->execute();
 
-            $image_url = (defined('API_BASE_URL') ? API_BASE_URL : '') . "get_image.php?id=" . $id . "&t=" . time();
+            $apiUrl = defined('API_BASE_URL') ? API_BASE_URL : (getenv('RENDER') === 'true' ? 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME') . '/src/api/' : 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/');
+            $image_url = $apiUrl . "get_image.php?id=" . $id . "&t=" . time();
         } catch (Exception $e) {
             error_log("Image update failed: " . $e->getMessage());
             http_response_code(500);

@@ -99,7 +99,8 @@ if (is_similar_description($conn, $description)) {
 
             // Update recipe with generic URL
             // Assuming API_BASE_URL is defined in config.php or elsewhere
-            $finalImageUrl = (defined('API_BASE_URL') ? API_BASE_URL : '') . "get_image.php?id=" . $recipeId . "&t=" . time();
+            $apiUrl = defined('API_BASE_URL') ? API_BASE_URL : (getenv('RENDER') === 'true' ? 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME') . '/src/api/' : 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/');
+            $finalImageUrl = $apiUrl . "get_image.php?id=" . $recipeId . "&t=" . time();
             $updateStmt = $conn->prepare("UPDATE recipes SET image_url = :url WHERE id = :id");
             $updateStmt->execute([':url' => $finalImageUrl, ':id' => $recipeId]);
         } catch (Exception $e) {

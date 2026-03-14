@@ -3,7 +3,7 @@ require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
 
-$baseUrl = defined('API_BASE_URL') ? API_BASE_URL : '';
+$baseUrl = defined('API_BASE_URL') ? API_BASE_URL : (getenv('RENDER') === 'true' ? 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME') . '/src/api/' : 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/');
 $recipes = [];
 $hasImageTable = false;
 

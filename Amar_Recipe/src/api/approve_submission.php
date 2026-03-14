@@ -101,7 +101,8 @@ try {
             $imgStmt->execute();
 
             // Update recipe url to point to DB image
-            $newUrl = (defined('API_BASE_URL') ? API_BASE_URL : '') . "get_image.php?id=" . $recipeId . "&t=" . time();
+            $apiUrl = defined('API_BASE_URL') ? API_BASE_URL : (getenv('RENDER') === 'true' ? 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME') . '/src/api/' : 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/');
+            $newUrl = $apiUrl . "get_image.php?id=" . $recipeId . "&t=" . time();
             $updateUrlStmt = $conn->prepare("UPDATE recipes SET image_url = :url WHERE id = :id");
             $updateUrlStmt->execute([':url' => $newUrl, ':id' => $recipeId]);
         }
