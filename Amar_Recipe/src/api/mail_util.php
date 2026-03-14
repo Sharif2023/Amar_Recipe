@@ -27,7 +27,15 @@ function sendEmail($to, $subject, $body) {
             };
         }
         $mail->isSMTP();
-        $mail->Host       = SMTP_HOST;
+        
+        // Render/Cloud Fix: Force IPv4 to avoid 'Network is unreachable' (ENETUNREACH)
+        // Some nodes have issues with IPv6 mail routing
+        $mail->Host = gethostbyname(SMTP_HOST); 
+        if ($mail->Host === SMTP_HOST) {
+            // If gethostbyname failed or returned the same, use default but it might fail
+            $mail->Host = SMTP_HOST;
+        }
+        
         $mail->SMTPAuth   = true;
         $mail->Username   = SMTP_USER;
         $mail->Password   = SMTP_PASS;
@@ -40,6 +48,15 @@ function sendEmail($to, $subject, $body) {
         }
         
         $mail->Port       = SMTP_PORT;
+
+        // SSL Options to bypass common local/cloud verification issues
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
 
         // Recipients
         $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
