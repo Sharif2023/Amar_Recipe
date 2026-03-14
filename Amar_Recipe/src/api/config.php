@@ -5,7 +5,16 @@
  */
 
 // Define allowed origins
-$envOrigin = rtrim(getenv('ALLOWED_ORIGIN') ?: '', '/');
+$allowedOrigins = [
+    'https://amar-recipe.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+
+$envOrigin = getenv('ALLOWED_ORIGIN');
+if ($envOrigin && $envOrigin !== '*') {
+    $allowedOrigins[] = rtrim($envOrigin, '/');
+}
 
 // Get the request origin
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
@@ -13,18 +22,10 @@ $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
 // Handle CORS
 if ($envOrigin === '*') {
     header("Access-Control-Allow-Origin: *");
+} else if (in_array($origin, $allowedOrigins)) {
+    header("Access-Control-Allow-Origin: $origin");
 } else {
-    $allowedOrigins = [
-        $envOrigin ?: 'https://amar-recipe.vercel.app',
-        'http://localhost:5173',
-        'http://localhost:3000'
-    ];
-
-    if (in_array($origin, $allowedOrigins)) {
-        header("Access-Control-Allow-Origin: $origin");
-    } else {
-        header("Access-Control-Allow-Origin: " . $allowedOrigins[0]);
-    }
+    header("Access-Control-Allow-Origin: https://amar-recipe.vercel.app");
 }
 
 // Handle OPTIONS preflight request immediately
@@ -40,9 +41,6 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
 header('Content-Type: application/json; charset=utf-8');
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
 
 // Error reporting
 error_reporting(E_ALL);
@@ -76,7 +74,7 @@ if ($databaseUrl) {
 // SMTP CONFIGURATION (Gmail App Password)
 // ==========================================
 define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_PORT', 587);
+define('SMTP_PORT', 465); // Switched to 465 for SSL (avoiding blocked 587)
 define('SMTP_USER', 'sharifislam0505@gmail.com');
 define('SMTP_PASS', 'imqr wbyr wytx lrnt');
 define('SMTP_FROM_EMAIL', 'admin@amarrecipe.com');

@@ -109,7 +109,10 @@ function is_similar_description($conn, $new_desc, $new_title)
 }
 
 try {
+    $conn->beginTransaction();
+    
     if (is_similar_description($conn, $description, $title)) {
+        $conn->rollback();
         echo json_encode(["success" => false, "message" => "A similar recipe already exists."]);
         exit;
     }
@@ -142,16 +145,21 @@ try {
     // Send verification email
     $mailResult = sendSubmissionVerification($organizerEmail, $title, $token);
     if ($mailResult === true) {
+        $conn->commit();
         echo json_encode(['success' => true, 'message' => 'Your recipe has been submitted! Please check your email to verify and send it to the admin block.']);
     } else {
+        $conn->rollback();
         echo json_encode([
-            'success' => true, 
-            'message' => 'The recipe was saved, but the verification email failed to send. Error: ' . (is_string($mailResult) ? $mailResult : 'Unknown SMTP Error'),
+            'success' => false, 
+            'message' => 'The recipe was NOT saved because the verification email failed to send. Error: ' . (is_string($mailResult) ? $mailResult : 'Unknown SMTP Error'),
             'debug_info' => $mailResult
         ]);
     }
 
 } catch (Throwable $e) {
+    if (isset($conn) && $conn->inTransaction()) {
+        $conn->rollback();
+    }
     error_log("Submission Error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'সার্ভার ত্রুটি: ' . $e->getMessage()]);
