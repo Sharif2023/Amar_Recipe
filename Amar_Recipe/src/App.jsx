@@ -8,6 +8,7 @@ import Footer from "./Components/Footer";
 // Pages
 import SubmitRecipe from "./Pages/SubmitRecipe";
 import About from "./Pages/About";
+import VerifyEmail from "./Pages/VerifyEmail";
 
 // Admin Panel
 import AdminHeader from "./Components/AdminHeader";
@@ -121,6 +122,8 @@ function App() {
             <Reports />
             <AdminFooter />
           </>} />
+          
+        <Route path="/verify-email" element={<VerifyEmail />} />
           
       </Routes>
     </BrowserRouter>
