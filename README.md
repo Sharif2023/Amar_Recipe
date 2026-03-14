@@ -18,6 +18,8 @@
 - ⭐ **Global Rating System**: Interactive 5-star rating mechanism to build community trust and highlight top recipes.
 - 📱 **Mobile-First Experience**: Fully responsive design using Tailwind CSS 4 for a premium look on any device.
 - 🌙 **Adaptive Theming**: Intelligent dark mode support for comfortable late-night browsing.
+- 🇧🇩 **Native Localization**: Fully localized in Bengali, custom-tailored for the Bangladeshi culinary community.
+- 🇧🇩 **Native Localization**: Fully localized in Bengali, optimized for the Bangladeshi culinary community.
 
 ### 🛡️ For Administrators (Admin Panel)
 - 📊 **Centralized Dashboard**: Comprehensive overview of community activity and recipe health.
@@ -110,7 +112,7 @@ npm run dev
 ---
 
 ## 🗺️ Development Roadmap
-- [ ] **Q1 2026**: Multi-language support (i18n).
+- [x] **Q1 2026**: Multi-language support (Bengali Localization Complete).
 - [ ] **Q2 2026**: Video tutorial integration for recipes.
 - [ ] **Q3 2026**: Personalized recipe recommendations using ML.
 - [ ] **Q4 2026**: Dedicated iOS and Android companion applications.
