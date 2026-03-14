@@ -20,6 +20,9 @@ function sendEmail($to, $subject, $body) {
 
     try {
         // Server settings
+        if (defined('SMTP_DEBUG') && SMTP_DEBUG) {
+            $mail->SMTPDebug = 2; 
+        }
         $mail->isSMTP();
         $mail->Host       = SMTP_HOST;
         $mail->SMTPAuth   = true;
@@ -29,7 +32,7 @@ function sendEmail($to, $subject, $body) {
         $mail->Port       = SMTP_PORT;
 
         // Recipients
-        $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+        $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
         $mail->addAddress($to);
         $mail->addReplyTo(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
 
@@ -40,9 +43,12 @@ function sendEmail($to, $subject, $body) {
         $mail->CharSet = 'UTF-8';
 
         $mail->send();
+        file_put_contents(__DIR__ . '/mail_debug.log', "[" . date('Y-m-d H:i:s') . "] Success: Email sent to $to\n", FILE_APPEND);
         return true;
     } catch (Exception $e) {
-        error_log("PHPMailer Error: " . $mail->ErrorInfo);
+        $errorMsg = "PHPMailer Error: " . $mail->ErrorInfo . " (Exception: " . $e->getMessage() . ")";
+        error_log($errorMsg);
+        file_put_contents(__DIR__ . '/mail_debug.log', "[" . date('Y-m-d H:i:s') . "] Error: $errorMsg\n", FILE_APPEND);
         return false;
     }
 }

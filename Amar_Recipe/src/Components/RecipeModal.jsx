@@ -142,7 +142,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                 const newCount = Number(ratingCount) + 1;
                 setAverageRating((newTotalRatings / newCount).toFixed(1));
                 setRatingCount(newCount);
-                alert('আপনার রেটিং সফলভাবে জমা হয়েছে!');
+                alert(json.message || 'আপনার রেটিং সফলভাবে জমা হয়েছে!');
             } else {
                 alert(json.message || 'রেটিং জমা দিতে ব্যর্থ হয়েছে');
             }
