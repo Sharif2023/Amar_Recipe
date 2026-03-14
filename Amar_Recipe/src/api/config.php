@@ -76,6 +76,7 @@ if ($databaseUrl) {
 define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: 're_8RwLWFts_BED5BCyFWLDsj5TBTKsnBMCX'); 
 define('SMTP_FROM_EMAIL', getenv('SMTP_FROM_EMAIL') ?: 'onboarding@resend.dev');
 define('SMTP_FROM_NAME', 'Amar Recipe');
+define('ADMIN_EMAIL', 'sharifislam0505@gmail.com');
 
 $isProduction = getenv('RENDER') === 'true' || $databaseUrl || DB_TYPE === 'pgsql';
 

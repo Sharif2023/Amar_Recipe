@@ -143,18 +143,30 @@ try {
         ':token' => $token
     ]);
 
-    // Send verification email
-    $mailResult = sendSubmissionVerification($organizerEmail, $title, $token);
-    if ($mailResult === true) {
-        $conn->commit();
-        echo json_encode(['success' => true, 'message' => 'Your recipe has been submitted! Please check your email to verify and send it to the admin block.']);
+    // Check if we should bypass verification (Option B)
+    $shouldVerify = ($organizerEmail === ADMIN_EMAIL);
+
+    if ($shouldVerify) {
+        // Send verification email
+        $mailResult = sendSubmissionVerification($organizerEmail, $title, $token);
+        if ($mailResult === true) {
+            $conn->commit();
+            echo json_encode(['success' => true, 'message' => 'Your recipe has been submitted! Please check your email to verify and send it to the admin block.']);
+        } else {
+            $conn->rollback();
+            echo json_encode([
+                'success' => false, 
+                'message' => 'The recipe was NOT saved because the verification email failed to send. Error: ' . (is_string($mailResult) ? $mailResult : 'Unknown SMTP Error'),
+                'debug_info' => $mailResult
+            ]);
+        }
     } else {
-        $conn->rollback();
-        echo json_encode([
-            'success' => false, 
-            'message' => 'The recipe was NOT saved because the verification email failed to send. Error: ' . (is_string($mailResult) ? $mailResult : 'Unknown SMTP Error'),
-            'debug_info' => $mailResult
-        ]);
+        // Bypass verification: Mark as verified immediately
+        $updateStmt = $conn->prepare("UPDATE submission_requests SET is_verified = TRUE, verification_token = NULL WHERE verification_token = :token");
+        $updateStmt->execute([':token' => $token]);
+        
+        $conn->commit();
+        echo json_encode(['success' => true, 'message' => 'Your recipe has been submitted successfully and is now pending admin approval!']);
     }
 
 } catch (Throwable $e) {
