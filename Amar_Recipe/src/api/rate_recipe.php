@@ -17,7 +17,8 @@ if (empty($recipe_id) || empty($user_email) || empty($rating)) {
 $conn = getDbConnection();
 
 try {
-    // Initial check outside transaction
+    $conn->beginTransaction();
+    // Initial check outside transaction (actually better inside now we started it)
     $stmt = $conn->prepare("SELECT id, is_verified FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
     $stmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
     $existing = $stmt->fetch();
