@@ -71,13 +71,14 @@ if ($databaseUrl) {
 }
 
 // ==========================================
-// EMAIL CONFIGURATION (Resend API)
+// EMAIL CONFIGURATION (PHPMailer + Gmail SMTP)
 // ==========================================
-// Get API key from environment or use placeholder
-define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: 're_123456789'); 
-define('SMTP_FROM_EMAIL', 'onboarding@resend.dev'); // Default for unverified domains
+define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.gmail.com');
+define('SMTP_PORT', getenv('SMTP_PORT') ?: 587);
+define('SMTP_USER', getenv('SMTP_USER') ?: ''); // Your Gmail address
+define('SMTP_PASS', getenv('SMTP_PASS') ?: ''); // Your Google App Password
+define('SMTP_FROM_EMAIL', getenv('SMTP_FROM_EMAIL') ?: SMTP_USER);
 define('SMTP_FROM_NAME', 'Amar Recipe');
-define('EMAIL_ENABLED', (RESEND_API_KEY !== 're_123456789' && !empty(RESEND_API_KEY)));
 
 $isProduction = getenv('RENDER') === 'true' || $databaseUrl || DB_TYPE === 'pgsql';
 

@@ -1,6 +1,7 @@
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
 
 require __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/config.php';
@@ -11,53 +12,42 @@ require_once __DIR__ . '/config.php';
  * @param string $to Recipient email
  * @param string $subject Email subject
  * @param string $body Email HTML body
- * @return bool True if success, False otherwise
+ * @return bool|string True if success, Error message string otherwise
  */
 function sendEmail($to, $subject, $body) {
     if (empty($to)) return "Recipient email is empty";
-    if (RESEND_API_KEY === 're_123456789' || empty(RESEND_API_KEY)) {
-        return "Resend API Key is not configured. Please add it to your environment variables or config.php.";
+    
+    if (empty(SMTP_USER) || empty(SMTP_PASS)) {
+        return "SMTP Credentials not configured. Please add SMTP_USER and SMTP_PASS to environment variables.";
     }
 
-    $url = 'https://api.resend.com/emails';
-    
-    $payload = [
-        'from' => SMTP_FROM_NAME . ' <' . SMTP_FROM_EMAIL . '>',
-        'to' => [$to],
-        'subject' => $subject,
-        'html' => $body,
-    ];
+    $mail = new PHPMailer(true);
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . RESEND_API_KEY,
-        'Content-Type: application/json',
-    ]);
-    
-    // SSL Verification - usually safe on Render
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    try {
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host       = SMTP_HOST;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = SMTP_USER;
+        $mail->Password   = SMTP_PASS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = SMTP_PORT;
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $error = curl_error($ch);
-    curl_close($ch);
+        // Recipients
+        $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+        $mail->addAddress($to);
 
-    if ($error) {
-        $errorMsg = "Curl Error: " . $error;
-        error_log($errorMsg);
-        return $errorMsg;
-    }
+        // Content
+        $mail->isHTML(true);
+        $mail->CharSet = 'UTF-8';
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
 
-    if ($httpCode >= 200 && $httpCode < 300) {
-        error_log("Email sent successfully to $to via Resend API");
+        $mail->send();
+        error_log("Email sent successfully to $to via SMTP");
         return true;
-    } else {
-        $errorMsg = "Resend API Error (HTTP $httpCode): " . $response;
+    } catch (Exception $e) {
+        $errorMsg = "PHPMailer Error: {$mail->ErrorInfo}";
         error_log($errorMsg);
         return $errorMsg;
     }
