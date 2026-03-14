@@ -114,9 +114,12 @@ try {
         exit;
     }
 
+    require_once __DIR__ . '/mail_util.php';
+    $token = bin2hex(random_bytes(16));
+
     $stmt = $conn->prepare("INSERT INTO submission_requests 
-        (title, category, description, image, location, organizerName, organizerEmail, organizerAddress, status, tags, reference, tutorialVideo, comment, source)
-        VALUES (:title, :category, :description, :image, :location, :organizerName, :organizerEmail, :organizerAddress, :status, :tags, :reference, :tutorialVideo, :comment, :source)");
+        (title, category, description, image, location, organizerName, organizerEmail, organizerAddress, status, tags, reference, tutorialVideo, comment, source, is_verified, verification_token)
+        VALUES (:title, :category, :description, :image, :location, :organizerName, :organizerEmail, :organizerAddress, :status, :tags, :reference, :tutorialVideo, :comment, :source, FALSE, :token)");
 
     $stmt->execute([
         ':title' => $title,
@@ -132,10 +135,17 @@ try {
         ':reference' => $reference,
         ':tutorialVideo' => $tutorialVideo,
         ':comment' => $comment,
-        ':source' => $source
+        ':source' => $source,
+        ':token' => $token
     ]);
 
-    echo json_encode(['success' => true]);
+    // Send verification email
+    if (sendSubmissionVerification($organizerEmail, $title, $token)) {
+        echo json_encode(['success' => true, 'message' => 'রেসিপি জমা হয়েছে। দয়া করে আপনার ইমেইল যাচাই করুন।']);
+    } else {
+        // Even if mail fails, we saved the request, but we notify user
+        echo json_encode(['success' => true, 'message' => 'রেসিপি জমা হয়েছে কিন্তু ইমেইল পাঠাতে সমস্যা হয়েছে। দয়া করে অ্যাডমিনের সাথে যোগাযোগ করুন।']);
+    }
 
 } catch (Throwable $e) {
     http_response_code(500);

@@ -109,6 +109,11 @@ try {
     }
 
     $conn->commit();
+    
+    // Send approval notification
+    require_once __DIR__ . '/mail_util.php';
+    sendRecipeApprovalNotification($submission['organizeremail'], $submission['title']);
+
     echo json_encode(['success' => true, 'message' => 'Submission approved and recipe added']);
 
 } catch (Exception $e) {

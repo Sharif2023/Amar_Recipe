@@ -141,6 +141,30 @@ try {
     $stmt = $conn->prepare($sql);
     $stmt->execute($params);
 
+    // Send edit notification
+    try {
+        require_once __DIR__ . '/mail_util.php';
+        // Get the current recipe details to find organizeremail and title
+        $recipeStmt = $conn->prepare("SELECT title, organizeremail FROM recipes WHERE id = :id");
+        $recipeStmt->execute([':id' => $id]);
+        $recipeData = $recipeStmt->fetch();
+
+        if ($recipeData && !empty($recipeData['organizeremail'])) {
+            $changedFields = [];
+            foreach ($mapping as $apiKey => $dbKey) {
+                if (isset($data[$apiKey]) || isset($data[str_replace(' ', '', ucwords(str_replace('_', ' ', $apiKey)))])) {
+                    $changedFields[] = $apiKey;
+                }
+            }
+            if ($image_url) $changedFields[] = "image";
+            
+            $msg = "অ্যাডমিন আপনার রেসিপিতে কিছু পরিবর্তন করেছেন। পরিবর্তিত বিষয়গুলো হলো: " . implode(', ', $changedFields);
+            sendRecipeEditNotification($recipeData['organizeremail'], $recipeData['title'], $msg);
+        }
+    } catch (Throwable $mailError) {
+        error_log("Failed to send edit notification: " . $mailError->getMessage());
+    }
+
     $response = ['success' => true, 'message' => 'Recipe updated successfully'];
     if ($image_url) {
         $response['image_url'] = $image_url;
