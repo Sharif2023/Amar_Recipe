@@ -129,3 +129,22 @@ function sendRecipeApprovalNotification($email, $recipeTitle) {
     ";
     return sendEmail($email, $subject, $body);
 }
+
+/**
+ * Send Notification Email for Recipe Rejection/Decline
+ */
+function sendRecipeDeclineNotification($email, $recipeTitle, $reason) {
+    $subject = "আপনার রেসিপি জমা দেওয়ার আবেদনটি গ্রহণ করা হয়নি - " . $recipeTitle;
+    $reason_text = !empty($reason) ? $reason : "দুঃখিত, আপনার রেসিপিটি আমাদের নীতিমালা অনুসরণ না করায় গ্রহণ করা সম্ভব হয়নি।";
+    $body = "
+        <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
+            <h2 style='color: #e11d48;'>Amar Recipe</h2>
+            <p>আপনার <strong>{$recipeTitle}</strong> রেসিপিটি আমাদের অ্যাডমিন রিভিউ করেছেন।</p>
+            <div style='background-color: #fef2f2; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #e11d48;'>
+                <p style='margin: 0; color: #991b1b;'><strong>কারন:</strong> {$reason_text}</p>
+            </div>
+            <p>আপনি আপনার রেসিপিটি সংশোধন করে পুনরায় জমা দিতে পারেন। ধন্যবাদ।</p>
+        </div>
+    ";
+    return sendEmail($email, $subject, $body);
+}

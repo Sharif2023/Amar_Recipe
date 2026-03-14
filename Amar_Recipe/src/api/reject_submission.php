@@ -13,14 +13,10 @@ if (empty($id)) {
 try {
     $conn = getDbConnection();
     $admin_name = $data['admin_name'] ?? 'Admin';
-    // Check for audit columns
-    $hasAuditCols = false;
-    try {
-        $checkStmt = $conn->query("SELECT action_date, admin_name FROM submission_requests LIMIT 0");
-        $hasAuditCols = true;
-    } catch (Throwable $e) {
-        $hasAuditCols = false;
-    }
+    // Fetch submission details for email before status change
+    $fetchStmt = $conn->prepare("SELECT organizeremail, title FROM submission_requests WHERE id = :id");
+    $fetchStmt->execute([':id' => $id]);
+    $submission = $fetchStmt->fetch();
 
     if ($hasAuditCols) {
         $stmt = $conn->prepare("UPDATE submission_requests SET status = 'Rejected', comment = :reason, action_date = NOW(), admin_name = :admin_name WHERE id = :id");
@@ -29,6 +25,12 @@ try {
         // Fallback: columns might be missing
         $stmt = $conn->prepare("UPDATE submission_requests SET status = 'Rejected', comment = :reason WHERE id = :id");
         $stmt->execute([':reason' => $reason, ':id' => $id]);
+    }
+
+    // Send Rejection Email
+    if ($submission && !empty($submission['organizeremail'])) {
+        require_once __DIR__ . '/mail_util.php';
+        sendRecipeDeclineNotification($submission['organizeremail'], $submission['title'], $reason);
     }
 
 
