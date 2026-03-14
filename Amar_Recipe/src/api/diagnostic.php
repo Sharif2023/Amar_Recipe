@@ -30,21 +30,29 @@ foreach ($tables as $table) {
     }
 }
 
-// 3. SMTP Connectivity Test
-echo "<h2>3. SMTP Connectivity Test</h2>";
-echo "<p>Testing connection to " . SMTP_HOST . " on port " . SMTP_PORT . "...</p>";
+// 3. Resend API Connectivity Test
+echo "<h2>3. Resend API Connectivity Test</h2>";
+echo "<p>Testing connection to api.resend.com on port 443 (HTTPS)...</p>";
 
-$fp = @fsockopen(SMTP_HOST, SMTP_PORT, $errno, $errstr, 10);
+$fp = @fsockopen('api.resend.com', 443, $errno, $errstr, 10);
 if (!$fp) {
-    echo "<p style='color:red;'>FAILED to connect to SMTP server: $errstr ($errno)</p>";
-    echo "<p>This usually means your hosting provider (Render) is blocking this port.</p>";
+    echo "<p style='color:red;'>FAILED to connect to Resend API: $errstr ($errno)</p>";
+    echo "<p>This is unusual as port 443 is typically open. Check your server's outbound firewall.</p>";
 } else {
-    echo "<p style='color:green;'>SUCCESS: Port " . SMTP_PORT . " is open and reachable.</p>";
+    echo "<p style='color:green;'>SUCCESS: api.resend.com is reachable on port 443.</p>";
     fclose($fp);
 }
 
-// 4. PHPMailer Test
-echo "<h2>4. PHPMailer Test</h2>";
+// 4. API Key Verification
+echo "<h2>4. API Key Verification</h2>";
+if (RESEND_API_KEY === 're_123456789' || empty(RESEND_API_KEY)) {
+    echo "<p style='color:red;'>FAILED: RESEND_API_KEY is not configured. Please add your key to config.php or environment variables.</p>";
+} else {
+    echo "<p style='color:green;'>SUCCESS: RESEND_API_KEY is configured (starts with " . substr(RESEND_API_KEY, 0, 5) . "...).</p>";
+}
+
+// 5. Resend API Test
+echo "<h2>5. Resend API Test</h2>";
 if (isset($_GET['test_mail'])) {
     $to = $_GET['test_mail'];
     echo "<p>Sending test email to $to...</p>";

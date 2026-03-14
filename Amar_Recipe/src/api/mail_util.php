@@ -14,69 +14,52 @@ require_once __DIR__ . '/config.php';
  * @return bool True if success, False otherwise
  */
 function sendEmail($to, $subject, $body) {
-    if (empty($to)) return false;
+    if (empty($to)) return "Recipient email is empty";
+    if (RESEND_API_KEY === 're_123456789' || empty(RESEND_API_KEY)) {
+        return "Resend API Key is not configured. Please add it to your environment variables or config.php.";
+    }
 
-    $mail = new PHPMailer(true);
+    $url = 'https://api.resend.com/emails';
+    
+    $payload = [
+        'from' => SMTP_FROM_NAME . ' <' . SMTP_FROM_EMAIL . '>',
+        'to' => [$to],
+        'subject' => $subject,
+        'html' => $body,
+    ];
 
-    try {
-        // Server settings
-        if (defined('SMTP_DEBUG') && SMTP_DEBUG) {
-            $mail->SMTPDebug = 2; 
-            $mail->Debugoutput = function($str, $level) {
-                error_log("SMTP DEBUG: $str");
-            };
-        }
-        $mail->isSMTP();
-        
-        // Render/Cloud Fix: Force IPv4 to avoid 'Network is unreachable' (ENETUNREACH)
-        // Some nodes have issues with IPv6 mail routing
-        $mail->Host = gethostbyname(SMTP_HOST); 
-        if ($mail->Host === SMTP_HOST) {
-            // If gethostbyname failed or returned the same, use default but it might fail
-            $mail->Host = SMTP_HOST;
-        }
-        
-        $mail->SMTPAuth   = true;
-        $mail->Username   = SMTP_USER;
-        $mail->Password   = SMTP_PASS;
-        $mail->Timeout    = 20; 
-        $mail->Hostname   = 'amar-recipe.vercel.app';
-        
-        // Use SMTPS (Implicit SSL) for port 465, STARTTLS for 587
-        if (SMTP_PORT == 465) {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        } else {
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        }
-        
-        $mail->Port       = SMTP_PORT;
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . RESEND_API_KEY,
+        'Content-Type: application/json',
+    ]);
+    
+    // SSL Verification - usually safe on Render
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
-            )
-        );
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
 
-        // Recipients
-        $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
-        $mail->addAddress($to);
-        $mail->addReplyTo(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
-
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body    = $body;
-        $mail->CharSet = 'UTF-8';
-
-        $mail->send();
-        error_log("Email sent successfully to $to");
-        return true;
-    } catch (Exception $e) {
-        $errorMsg = "PHPMailer Error: " . $mail->ErrorInfo . " (Exception: " . $e->getMessage() . ")";
+    if ($error) {
+        $errorMsg = "Curl Error: " . $error;
         error_log($errorMsg);
-        return $errorMsg; // Return the specific error for debugging
+        return $errorMsg;
+    }
+
+    if ($httpCode >= 200 && $httpCode < 300) {
+        error_log("Email sent successfully to $to via Resend API");
+        return true;
+    } else {
+        $errorMsg = "Resend API Error (HTTP $httpCode): " . $response;
+        error_log($errorMsg);
+        return $errorMsg;
     }
 }
 

@@ -71,13 +71,11 @@ if ($databaseUrl) {
 }
 
 // ==========================================
-// SMTP CONFIGURATION (Gmail App Password)
+// EMAIL CONFIGURATION (Resend API)
 // ==========================================
-define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_PORT', 465); // Switched to 465 for SSL (avoiding blocked 587)
-define('SMTP_USER', 'sharifislam0505@gmail.com');
-define('SMTP_PASS', 'imqr wbyr wytx lrnt');
-define('SMTP_FROM_EMAIL', 'admin@amarrecipe.com');
+// Get API key from environment or use placeholder
+define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: 're_123456789'); 
+define('SMTP_FROM_EMAIL', 'onboarding@resend.dev'); // Default for unverified domains
 define('SMTP_FROM_NAME', 'Amar Recipe');
 
 $isProduction = getenv('RENDER') === 'true' || $databaseUrl || DB_TYPE === 'pgsql';
