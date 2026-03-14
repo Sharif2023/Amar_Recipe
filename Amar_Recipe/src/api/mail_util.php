@@ -22,6 +22,9 @@ function sendEmail($to, $subject, $body) {
         // Server settings
         if (defined('SMTP_DEBUG') && SMTP_DEBUG) {
             $mail->SMTPDebug = 2; 
+            $mail->Debugoutput = function($str, $level) {
+                error_log("SMTP DEBUG: $str");
+            };
         }
         $mail->isSMTP();
         $mail->Host       = SMTP_HOST;
@@ -43,13 +46,12 @@ function sendEmail($to, $subject, $body) {
         $mail->CharSet = 'UTF-8';
 
         $mail->send();
-        file_put_contents(__DIR__ . '/mail_debug.log', "[" . date('Y-m-d H:i:s') . "] Success: Email sent to $to\n", FILE_APPEND);
+        error_log("Email sent successfully to $to");
         return true;
     } catch (Exception $e) {
         $errorMsg = "PHPMailer Error: " . $mail->ErrorInfo . " (Exception: " . $e->getMessage() . ")";
         error_log($errorMsg);
-        file_put_contents(__DIR__ . '/mail_debug.log', "[" . date('Y-m-d H:i:s') . "] Error: $errorMsg\n", FILE_APPEND);
-        return false;
+        return $errorMsg; // Return the specific error for debugging
     }
 }
 

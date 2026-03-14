@@ -110,31 +110,41 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             return;
         }
 
-        const checkRating = await fetch(API_BASE_URL + 'check_user_rating.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ recipeId: recipe.id, email: email }),
-        });
-
-        const checkData = await checkRating.json();
-
-        if (checkData.success && checkData.exists) {
-            alert('আপনি ইতিমধ্যে এই রেসিপিটিকে রেটিং দিয়েছেন!');
-            return;
-        }
-
-        const ratingData = {
-            recipeId: recipe.id,
-            email,
-            rating,
-        };
-
         try {
+            const checkRating = await fetch(API_BASE_URL + 'check_user_rating.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recipeId: recipe.id, email: email }),
+            });
+
+            if (!checkRating.ok) {
+                throw new Error('Rating check failed on server');
+            }
+
+            const checkData = await checkRating.json();
+
+            if (checkData.success && checkData.exists) {
+                alert('আপনি ইতিমধ্যে এই রেসিপিটিকে রেটিং দিয়েছেন!');
+                return;
+            }
+
+            const ratingData = {
+                recipeId: recipe.id,
+                email,
+                rating,
+            };
+
             const res = await fetch(API_BASE_URL + 'rate_recipe.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(ratingData),
             });
+            
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || 'Server error occurred');
+            }
+
             const json = await res.json();
 
             if (json.success) {
@@ -147,7 +157,8 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                 alert(json.message || 'রেটিং জমা দিতে ব্যর্থ হয়েছে');
             }
         } catch (error) {
-            alert('রেটিং জমা দিতে সমস্যা হয়েছে');
+            console.error('Rating error:', error);
+            alert('রেটিং জমা দিতে সমস্যা হয়েছে: ' + error.message);
         }
     };
 
