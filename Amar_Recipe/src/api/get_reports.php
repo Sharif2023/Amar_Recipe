@@ -7,12 +7,16 @@ try {
     $query = "SELECT 
                 r.*, 
                 rec.title, 
+                rec.category,
                 rec.image_url, 
                 rec.description, 
                 rec.comment, 
                 rec.location, 
-                rec.organizerName, 
-                rec.organizerEmail 
+                rec.tags,
+                rec.reference,
+                rec.tutorialVideo as tutorialvideo,
+                rec.organizerName as organizername, 
+                rec.organizerEmail as organizeremail 
               FROM reports r 
               LEFT JOIN recipes rec ON r.recipe_id = rec.id 
               ORDER BY r.created_at DESC";

@@ -63,10 +63,14 @@ const Reports = () => {
     const recipe = {
       id: matchedReport.recipe_id,
       title: matchedReport.title,
+      category: matchedReport.category,
       image_url: matchedReport.image_url,
       description: matchedReport.description,
       comment: matchedReport.comment,
       location: matchedReport.location,
+      tags: matchedReport.tags,
+      reference: matchedReport.reference,
+      tutorialvideo: matchedReport.tutorialvideo,
       organizername: matchedReport.organizername,
       organizeremail: matchedReport.organizeremail,
     };
