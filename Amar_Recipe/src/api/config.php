@@ -77,6 +77,7 @@ if ($databaseUrl) {
 define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: 're_123456789'); 
 define('SMTP_FROM_EMAIL', 'onboarding@resend.dev'); // Default for unverified domains
 define('SMTP_FROM_NAME', 'Amar Recipe');
+define('EMAIL_ENABLED', (RESEND_API_KEY !== 're_123456789' && !empty(RESEND_API_KEY)));
 
 $isProduction = getenv('RENDER') === 'true' || $databaseUrl || DB_TYPE === 'pgsql';
 
