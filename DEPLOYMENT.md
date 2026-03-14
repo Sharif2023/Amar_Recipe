@@ -95,19 +95,18 @@ Visit your Vercel URL and verify:
 - ✅ No CORS errors (F12 → Console)
 - ✅ Results are coming from Supabase
 
-### Step 6: Set Up Email Service (Gmail SMTP)
-*Verification emails are mandatory for this project.*
+### Step 6: Set Up Email Service (Resend API)
+*Verification emails are mandatory for this project and only API services like Resend work on Render Free.*
 
-1. **Enable 2-Step Verification:** Go to your Google Account Security settings and enable it.
-2. **Generate App Password:**
-   - Search for **"App Passwords"** in your Google Account settings.
-   - Choose **"Other (Custom Name)"** and name it `Amar Recipe`.
-   - Copy the 16-character password generated.
+1. **Sign up:** Go to https://resend.com and create a free account.
+2. **Get API Key:**
+   - Go to **API Keys** in the dashboard.
+   - Click **Create API Key**.
+   - Copy the key (it starts with `re_`).
 3. **Configure Render:**
    - Go to your Render dashboard → **Environment**.
-   - Add new variable: `SMTP_USER` = `your-email@gmail.com`.
-   - Add new variable: `SMTP_PASS` = `your-16-character-app-password`.
-   - Add new variable: `SMTP_FROM_EMAIL` = `your-email@gmail.com`.
+   - Add new variable: `RESEND_API_KEY` = `your-api-key-here`.
+   - Add new variable: `SMTP_FROM_EMAIL` = `onboarding@resend.dev` (or your verified domain).
 4. **Save Changes:** Render will auto-redeploy.
 
 ---

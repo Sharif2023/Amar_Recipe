@@ -71,13 +71,10 @@ if ($databaseUrl) {
 }
 
 // ==========================================
-// EMAIL CONFIGURATION (PHPMailer + Gmail SMTP)
+// EMAIL CONFIGURATION (Resend API)
 // ==========================================
-define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.gmail.com');
-define('SMTP_PORT', getenv('SMTP_PORT') ?: 587);
-define('SMTP_USER', getenv('SMTP_USER') ?: ''); // Your Gmail address (SET IN RENDER)
-define('SMTP_PASS', getenv('SMTP_PASS') ?: ''); // Your Google App Password (SET IN RENDER)
-define('SMTP_FROM_EMAIL', getenv('SMTP_FROM_EMAIL') ?: SMTP_USER);
+define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: 're_8RwLWFts_BED5BCyFWLDsj5TBTKsnBMCX'); 
+define('SMTP_FROM_EMAIL', getenv('SMTP_FROM_EMAIL') ?: 'onboarding@resend.dev');
 define('SMTP_FROM_NAME', 'Amar Recipe');
 
 $isProduction = getenv('RENDER') === 'true' || $databaseUrl || DB_TYPE === 'pgsql';
