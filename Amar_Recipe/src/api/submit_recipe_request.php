@@ -82,41 +82,42 @@ $comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';
 function is_similar_description($conn, $new_desc, $new_title)
 {
     // Fast check: Exact title match in submission_requests or recipes
-    try {
-        $stmt = $conn->prepare("SELECT COUNT(*) FROM recipes WHERE title = ?");
-        $stmt->execute([$new_title]);
-        if ($stmt->fetchColumn() > 0) return true;
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM recipes WHERE title = ?");
+    $stmt->execute([$new_title]);
+    if ($stmt->fetchColumn() > 0) return true;
 
-        $stmt = $conn->prepare("SELECT COUNT(*) FROM submission_requests WHERE title = ? AND status != 'Rejected' AND is_verified = TRUE");
-        $stmt->execute([$new_title]);
-        if ($stmt->fetchColumn() > 0) return true;
-    } catch (Exception $e) {}
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM submission_requests WHERE title = ? AND status != 'Rejected' AND is_verified = TRUE");
+    $stmt->execute([$new_title]);
+    if ($stmt->fetchColumn() > 0) return true;
 
     // Slower check: Compare description with recent recipes only
-    $threshold = 95; // Increased threshold for performance/strictness
-    try {
-        // Limit to last 10 recipes to keep O(N^3) within bounds
-        $stmt = $conn->query("SELECT description FROM recipes ORDER BY id DESC LIMIT 10");
-        while ($row = $stmt->fetch()) {
-            $db_desc = $row['description'] ?? '';
-            similar_text(strip_tags($new_desc), strip_tags($db_desc), $percent);
-            if ($percent >= $threshold) return true;
-        }
-    } catch (Exception $e) {
-        return false; 
+    $threshold = 90; 
+    // Limit to last 5 recipes for performance
+    $stmt = $conn->query("SELECT description FROM recipes ORDER BY id DESC LIMIT 5");
+    while ($row = $stmt->fetch()) {
+        $db_desc = $row['description'] ?? '';
+        if (empty($db_desc)) continue;
+        
+        // Only run similar_text if lengths are somewhat close to save CPU
+        $newLen = strlen($new_desc);
+        $dbLen = strlen($db_desc);
+        if (abs($newLen - $dbLen) > ($newLen * 0.2)) continue;
+
+        similar_text(strip_tags($new_desc), strip_tags($db_desc), $percent);
+        if ($percent >= $threshold) return true;
     }
     return false;
+}
+
+// Check for similar descriptions BEFORE transaction to avoid poisoning
+if (is_similar_description($conn, $description, $title)) {
+    echo json_encode(["success" => false, "message" => "A similar recipe already exists."]);
+    exit;
 }
 
 try {
     $conn->beginTransaction();
     
-    if (is_similar_description($conn, $description, $title)) {
-        $conn->rollback();
-        echo json_encode(["success" => false, "message" => "A similar recipe already exists."]);
-        exit;
-    }
-
     require_once __DIR__ . '/mail_util.php';
     $token = bin2hex(random_bytes(16));
 

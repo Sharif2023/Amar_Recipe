@@ -17,19 +17,18 @@ if (empty($recipe_id) || empty($user_email) || empty($rating)) {
 $conn = getDbConnection();
 
 try {
-    $conn->beginTransaction();
-    
+    // Initial check outside transaction
     $stmt = $conn->prepare("SELECT id, is_verified FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
     $stmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
     $existing = $stmt->fetch();
 
-    require_once __DIR__ . '/mail_util.php';
-
     if ($existing && $existing['is_verified']) {
-        $conn->rollback();
         echo json_encode(['success' => false, 'message' => 'আপনি ইতিমধ্যে এই রেসিপিটিকে রেটিং দিয়েছেন।']);
         exit;
     } 
+
+    $conn->beginTransaction();
+    require_once __DIR__ . '/mail_util.php';
 
     // Generate token
     $token = bin2hex(random_bytes(16));
