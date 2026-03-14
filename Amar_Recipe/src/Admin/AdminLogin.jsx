@@ -35,11 +35,11 @@ const AdminLogin = () => {
                 localStorage.setItem("admin", JSON.stringify(adminWithFullImage));
                 navigate("/adminpanel");
             } else {
-                alert(data.message || "Login failed.");
+                alert(data.message || "লগইন ব্যর্থ হয়েছে।");
             }
         } catch (error) {
             console.error("Login error:", error);
-            alert("Network error during login.");
+            alert("লগইন করার সময় নেটওয়ার্কে সমস্যা হয়েছে।");
         }
     };
 
@@ -47,7 +47,7 @@ const AdminLogin = () => {
         <div className="flex justify-center items-center w-screen h-screen p-5 bg-cover" style={{ backgroundImage: "url('https://t4.ftcdn.net/jpg/02/92/20/37/360_F_292203735_CSsyqyS6A4Z9Czd4Msf7qZEhoxjpzZl1.webp')" }}>
             <div className="bg-white shadow-md dark:shadow-gray-600 rounded px-8 pt-6 pb-8 mb-4 flex flex-col w-full md:w-1/3 dark:bg-gray-800">
                 <h1 className="text-2xl font-semibold mb-4 text-center text-gray-900 dark:text-gray-200">
-                    Admin Login
+                    অ্যাডমিন লগইন
                 </h1>
                 <form onSubmit={e => e.preventDefault()}>
                     <div className="mb-4">

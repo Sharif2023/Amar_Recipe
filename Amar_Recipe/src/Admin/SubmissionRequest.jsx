@@ -181,7 +181,7 @@ const SubmissionRequest = () => {
                       }`}
                   >
                     {req?.status === "Pending"
-                      ? "Pending"
+                      ? "অপেক্ষমান"
                       : req?.status === "Approved"
                         ? "অনুমোদিত"
                         : "প্রত্যাখ্যাত"}

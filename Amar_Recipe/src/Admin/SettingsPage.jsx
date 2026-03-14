@@ -15,7 +15,7 @@ const SettingsPage = () => {
 
     const handlePasswordChange = async () => {
         if (newPassword !== confirmPassword) {
-            setError('Passwords do not match!');
+            setError('পাসওয়ার্ড মিলছে না!');
             return;
         }
 

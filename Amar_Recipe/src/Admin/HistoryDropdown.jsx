@@ -61,10 +61,10 @@ const HistoryDropdown = () => {
 
           setRequests(combined);
         } else {
-          alert("Failed to fetch data.");
+          alert("তথ্য লোড করতে ব্যর্থ হয়েছে।");
         }
       } catch (err) {
-        alert("Error: " + err.message);
+        alert("ত্রুটি: " + err.message);
       }
 
       setLoading(false);
@@ -109,7 +109,7 @@ const HistoryDropdown = () => {
                     <p className="text-sm mt-1">
                       স্ট্যাটাসঃ
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${req.status.toLowerCase() === "approved" ? "bg-green-700 text-green-300" : "bg-red-700 text-red-300"}`}>
-                        {req.status}
+                        {req.status === "approved" ? "অনুমোদিত" : "প্রত্যাখ্যাত"}
                       </span>
                     </p>
                     {req.status === "rejected" && req.comment && (
@@ -128,13 +128,13 @@ const HistoryDropdown = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">অ্যাডমিনের ইমেইলঃ {req.email}</p>
                   <p className="text-sm mt-1">
                     স্ট্যাটাসঃ
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${req.status === "approved" ? "bg-green-700 text-green-300" : "bg-red-700 text-red-300"}`}>{req.status}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${req.status === "approved" ? "bg-green-700 text-green-300" : "bg-red-700 text-red-300"}`}>{req.status === "approved" ? "অনুমোদিত" : "প্রত্যাখ্যাত"}</span>
                   </p>
                   {req.status === "rejected" && req.rejection_reason && (
                     <p className="text-sm mt-1 text-red-400 italic">কারণঃ {req.rejection_reason}</p>
                   )}
                   <p className="text-xs text-gray-400 mt-1">অ্যাকশনের সময়ঃ {req.action_date}</p>
-                  <p className="text-xs font-medium text-indigo-500 mt-1">ধরণঃ {req.type === "recipe" ? "Recipe" : "Admin"}</p>
+                  <p className="text-xs font-medium text-indigo-500 mt-1">ধরণঃ {req.type === "recipe" ? "রেসিপি" : "অ্যাডমিন"}</p>
 
                   <p className="text-xs text-gray-400 mt-1">
                     {new Date(req.activity_time).toLocaleString()}

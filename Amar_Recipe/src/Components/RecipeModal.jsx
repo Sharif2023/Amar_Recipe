@@ -122,7 +122,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             });
 
             if (!checkRating.ok) {
-                throw new Error('Rating check failed on server');
+                throw new Error('সার্ভারে রেটিং যাচাই করতে ব্যর্থ হয়েছে');
             }
 
             const checkData = await checkRating.json();
@@ -146,7 +146,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             
             if (!res.ok) {
                 const errorText = await res.text();
-                throw new Error(errorText || 'Server error occurred');
+                throw new Error(errorText || 'সার্ভারে সমস্যা হয়েছে');
             }
 
             const json = await res.json();
@@ -197,7 +197,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                 <img
                                     src={recipe.image_url
                                         ? (recipe.image_url.startsWith('http') ? recipe.image_url : backendBaseUrl + recipe.image_url)
-                                        : 'https://via.placeholder.com/600x400?text=Premium+Recipe'}
+                                        : 'https://via.placeholder.com/600x400?text=Amar+Recipe'}
                                     alt={recipe.title}
                                     className="w-full aspect-[4/3] object-cover sm:rounded-2xl shadow-lg group-hover:scale-[1.02] transition-transform duration-500"
                                 />

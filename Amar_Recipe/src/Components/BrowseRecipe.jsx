@@ -44,7 +44,7 @@ const BrowseRecipe = () => {
 
       try {
         const res = await fetch(API_BASE_URL + 'get_recipes.php');
-        if (!res.ok) throw new Error('Failed to fetch recipes');
+        if (!res.ok) throw new Error('রেসিপিগুলো লোড করতে ব্যর্থ হয়েছে');
         const data = await res.json();
 
         // Filter recipes based on category and search term
@@ -271,7 +271,7 @@ const BrowseRecipe = () => {
               disabled={currentPage === 1}
               className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Previous
+              পূর্ববর্তী
             </button>
           </li>
 
@@ -283,7 +283,7 @@ const BrowseRecipe = () => {
               disabled={currentPage === totalPages}
               className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Next
+              পরবর্তী
             </button>
           </li>
         </ul>

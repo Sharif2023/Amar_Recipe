@@ -81,7 +81,7 @@ const AdminManagement = () => {
         alert(data.message);
         fetchRequests(); // Refresh data after update
       } else {
-        alert("স্ট্যাটাস আপডেট করা যায়নি: " + (data.message || 'Unknown error'));
+        alert("স্ট্যাটাস আপডেট করা যায়নি: " + (data.message || 'অজানা সমস্যা হয়েছে।'));
       }
     } catch (error) {
       console.error("আপডেটের সময় নেটওয়ার্ক বা সার্ভার ত্রুটি হয়েছে:", error);
@@ -254,7 +254,7 @@ const AdminManagement = () => {
               <li><strong>ইমেইল:</strong> {selectedAdmin.email}</li>
               <li><strong>মোবাইল:</strong> {selectedAdmin.phone}</li>
               <li><strong>দক্ষতা:</strong> {selectedAdmin.specialty}</li>
-              <li><strong>অভিজ্ঞতা:</strong> {selectedAdmin.experience} years</li>
+              <li><strong>অভিজ্ঞতা:</strong> {selectedAdmin.experience} বছর</li>
               <li><strong>সার্টিফিকেশন তথ্য:</strong> {formatCertification(selectedAdmin.certification)}</li>
               <li><strong>শহর:</strong> {selectedAdmin.city}</li>
               <li><strong>তারিখ:</strong> {selectedAdmin.date}</li>
@@ -264,7 +264,7 @@ const AdminManagement = () => {
                 onClick={() => setSelectedAdmin(null)}
                 className="bg-rose-700 text-white px-4 py-2 rounded hover:bg-rose-900"
               >
-                Close
+                বন্ধ করুন
               </button>
             </div>
           </div>

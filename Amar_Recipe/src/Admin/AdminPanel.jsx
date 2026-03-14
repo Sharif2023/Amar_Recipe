@@ -23,7 +23,7 @@ const AdminPanel = () => {
     const fetchRecipes = async () => {
       try {
         const res = await fetch(API_BASE_URL + 'get_recipes.php');
-        if (!res.ok) throw new Error('Failed to fetch recipes');
+        if (!res.ok) throw new Error('রেসিপিগুলো লোড হতে ব্যর্থ হয়েছে');
         const data = await res.json();
         setRecipes(data.recipes || []);
       } catch (err) {
@@ -286,7 +286,7 @@ const AdminPanel = () => {
                     onClick={() => handleViewRecipe(item)}
                     className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
                     aria-label={`বিস্তারিত দেখুন ${item.title}`}
-                    title="View Details"
+                    title="বিস্তারিত দেখুন"
                     type="button"
                   >
                     <IoEyeOutline className="w-6 h-6 text-blue-600" />
@@ -324,7 +324,7 @@ const AdminPanel = () => {
                 disabled={currentPage === 1}
                 className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Previous
+                পূর্ববর্তী
               </button>
             </li>
 
@@ -336,7 +336,7 @@ const AdminPanel = () => {
                 disabled={currentPage === totalPages}
                 className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next
+                পরবর্তী
               </button>
             </li>
           </ul>

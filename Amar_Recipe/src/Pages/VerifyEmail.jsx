@@ -53,7 +53,7 @@ const VerifyEmail = () => {
             <main className="flex-grow flex items-center justify-center py-20 px-4">
                 <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-sm border border-gray-100 text-center">
                     <div className="mb-8">
-                        <span className="text-2xl font-extrabold text-[#e11d48]">Amar Recipe</span>
+                        <span className="text-2xl font-extrabold text-[#e11d48]">আমার রেসিপি</span>
                     </div>
 
                     <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${

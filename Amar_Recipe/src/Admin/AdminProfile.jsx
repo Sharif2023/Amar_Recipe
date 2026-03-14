@@ -128,7 +128,7 @@ const AdminProfile = () => {
       }
 
       if (result.success) {
-        alert("Profile updated successfully!");
+        alert("প্রোফাইল সফলভাবে আপডেট করা হয়েছে!");
         setIsEditing(false);
 
         const rawProfileImage = result.profileImage ?? result.admin?.profile_image ?? profileImage;

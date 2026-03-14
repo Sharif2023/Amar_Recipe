@@ -29,7 +29,7 @@ const AdminSignup = () => {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match");
+            alert("পাসওয়ার্ড মিলছে না");
             return;
         }
 
@@ -65,7 +65,7 @@ const AdminSignup = () => {
                 }
             } catch (err) {
                 console.error("Non-JSON response:", text);
-                alert("সার্ভার ত্রুটি: response was not JSON. See console.");
+                alert("সার্ভার ত্রুটি: ডাটাবেজ থেকে সঠিক উত্তর আসেনি। দয়া করে এডমিনের সাথে যোগাযোগ করুন।");
             }
         } catch (error) {
             console.error("সাইনআপ ব্যার্থ হয়েছে:", error);

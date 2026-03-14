@@ -139,7 +139,7 @@ export default function SubmitRecipe() {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Server responded with ${response.status}: ${errorText.substring(0, 100)}`);
+                throw new Error(`সার্ভারে সমস্যা হয়েছে (Status: ${response.status}): ${errorText.substring(0, 100)}`);
             }
 
             const result = await response.json();
@@ -297,7 +297,7 @@ export default function SubmitRecipe() {
                                                 <span className="bg-[#8c0327] hover:bg-[#6b0220] text-white rounded-xl py-2 px-6 font-bold shadow-lg transition-all mb-3">
                                                     ছবি আপলোড করুন
                                                 </span>
-                                                <p className="text-gray-400 text-xs font-medium uppercase tracking-widest">PNG, JPG, JPEG (Max 10MB)</p>
+                                                <p className="text-gray-400 text-xs font-medium uppercase tracking-widest">PNG, JPG, JPEG (সর্বোচ্চ ১০ এমবি)</p>
                                             </div>
                                         )}
                                         <input
