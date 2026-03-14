@@ -55,6 +55,7 @@ const AdminManagement = () => {
   }, []);
 
   const formatCertification = (certificationText) => {
+    if (!certificationText) return 'নাই';
     return certificationText.split('\n').map((line, index) => (
       <p key={index}>{line}</p>
     ));
