@@ -4,9 +4,20 @@ require_once __DIR__ . '/config.php';
 echo "<h1>Network Diagnostic</h1>";
 
 $hosts = [
+    'google.com' => [80],
     'smtp.gmail.com' => [587, 465, 25],
-    'db.iseehucuytvgtpdqupzp.supabase.co' => [5432]
+    'db.iseehucuytvgtpdqupzp.supabase.co' => [5432],
+    'aws-1-ap-southeast-2.pooler.supabase.com' => [6543]
 ];
+
+// Try to resolve Gmail SMTP to IP
+$gmailIp = gethostbyname('smtp.gmail.com');
+if ($gmailIp !== 'smtp.gmail.com') {
+    $hosts[$gmailIp] = [587, 465];
+    echo "<p>Resolved smtp.gmail.com to <strong>$gmailIp</strong></p>";
+} else {
+    echo "<p style='color:red;'>FAILED to resolve smtp.gmail.com via DNS</p>";
+}
 
 foreach ($hosts as $host => $ports) {
     echo "<h3>Testing Host: $host</h3>";
