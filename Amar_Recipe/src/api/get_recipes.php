@@ -8,16 +8,17 @@ $recipes = [];
 $hasImageTable = false;
 
 // Try query with LEFT JOIN recipe_images (derive image_url when null); fall back if table missing
+// Simplified query with EXISTS for better performance and to avoid duplicate rows
 try {
-    $sql = "SELECT r.*, (ri.recipe_id IS NOT NULL) AS has_image
+    $sql = "SELECT r.*, 
+            EXISTS (SELECT 1 FROM recipe_images ri WHERE ri.recipe_id = r.id) AS has_image
             FROM recipes r
-            LEFT JOIN recipe_images ri ON r.id = ri.recipe_id
             ORDER BY r.created_at DESC";
     $stmt = $conn->query($sql);
     $recipes = $stmt->fetchAll();
     $hasImageTable = true;
 } catch (Exception $e) {
-    // recipe_images may not exist on this environment; use simple query
+    // If the above fails (e.g. table doesn't exist yet), fall back to simple query
     $sql = "SELECT * FROM recipes ORDER BY created_at DESC";
     $stmt = $conn->query($sql);
     $recipes = $stmt->fetchAll();
