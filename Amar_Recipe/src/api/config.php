@@ -89,6 +89,7 @@ if ($isProduction) {
     define('BASE_URL', 'http://localhost/Amar_Recipies_Live/Amar_Recipe/');
 }
 define('API_BASE_URL', BASE_URL . 'src/api/');
+define('FRONTEND_URL', $isProduction ? 'https://amar-recipe.vercel.app/' : 'http://localhost:5173/');
 
 /**
  * Database Connection Function

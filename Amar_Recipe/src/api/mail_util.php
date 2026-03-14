@@ -63,7 +63,7 @@ function sendEmail($to, $subject, $body) {
  * Send Verification Email for Rating
  */
 function sendRatingVerification($email, $recipeTitle, $token) {
-    $verifyUrl = API_BASE_URL . "verify_email.php?type=rating&token=" . urlencode($token);
+    $verifyUrl = FRONTEND_URL . "verify-email?type=rating&token=" . urlencode($token);
     $subject = "রেসিপি রেটিং যাচাই করুন - " . $recipeTitle;
     $body = "
         <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
@@ -82,7 +82,7 @@ function sendRatingVerification($email, $recipeTitle, $token) {
  * Send Verification Email for Recipe Submission
  */
 function sendSubmissionVerification($email, $recipeTitle, $token) {
-    $verifyUrl = API_BASE_URL . "verify_email.php?type=submission&token=" . urlencode($token);
+    $verifyUrl = FRONTEND_URL . "verify-email?type=submission&token=" . urlencode($token);
     $subject = "রেসিপি জমা যাচাই করুন - " . $recipeTitle;
     $body = "
         <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
