@@ -41,7 +41,7 @@ const HistoryDropdown = () => {
         if (subJson.success && adminJson.success) {
           const combined = [];
 
-          for (const item of subJson.data) {
+          for (const item of subJson.history) {
             combined.push({
               ...item,
               type: "recipe",
@@ -49,7 +49,7 @@ const HistoryDropdown = () => {
             });
           }
 
-          for (const item of adminJson.data) {
+          for (const item of adminJson.history) {
             combined.push({
               ...item,
               type: "admin",

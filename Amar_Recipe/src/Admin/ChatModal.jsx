@@ -17,7 +17,7 @@ const ChatModal = ({ isOpen, onClose, senderId }) => {
       fetch(API_BASE_URL + 'admin_requests.php')
         .then(response => response.json())
         .then(data => {
-          const approvedAdmins = data.filter(admin => admin.status === 'approved');
+          const approvedAdmins = data.requests.filter(admin => admin.status === 'approved');
           setAdmins(approvedAdmins);
           setFilteredAdmins(approvedAdmins); // Set filtered admins to be the approved ones
         })
