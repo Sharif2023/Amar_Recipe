@@ -75,8 +75,8 @@ if ($databaseUrl) {
 // ==========================================
 define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.gmail.com');
 define('SMTP_PORT', getenv('SMTP_PORT') ?: 587);
-define('SMTP_USER', getenv('SMTP_USER') ?: ''); // Your Gmail address
-define('SMTP_PASS', getenv('SMTP_PASS') ?: ''); // Your Google App Password
+define('SMTP_USER', getenv('SMTP_USER') ?: 'sharifislam0505@gmail.com'); // Your Gmail address
+define('SMTP_PASS', getenv('SMTP_PASS') ?: 'cidn afhe hocw tcoq'); // Your Google App Password
 define('SMTP_FROM_EMAIL', getenv('SMTP_FROM_EMAIL') ?: SMTP_USER);
 define('SMTP_FROM_NAME', 'Amar Recipe');
 
