@@ -144,7 +144,7 @@ export default function SubmitRecipe() {
             const result = await response.json();
 
             if (result.success) {
-                setSubmissionStatus({ message: 'আপনার রেসিপিটি সফলভাবে জমা দেওয়া হয়েছে! এডমিন প্যানেল থেকে যাচাই করার পর এটি প্রকাশিত হবে।', type: 'success' });
+                setSubmissionStatus({ message: result.message || 'আপনার রেসিপিটি সফলভাবে জমা দেওয়া হয়েছে!', type: 'success' });
                 // Reset form and related states
                 setFormData({
                     title: '',

@@ -69,5 +69,6 @@ try {
     exit;
 
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    file_put_contents(__DIR__ . '/api_debug.log', "[" . date('Y-m-d H:i:s') . "] Rating Error: " . $e->getMessage() . "\n", FILE_APPEND);
+    echo json_encode(['success' => false, 'message' => 'সার্ভার ত্রুটি: ' . $e->getMessage()]);
 }
