@@ -72,6 +72,16 @@ if ($databaseUrl) {
     define('DB_NAME', getenv('DB_NAME') ?: (DB_TYPE === 'pgsql' ? 'postgres' : 'amar_recipe'));
 }
 
+// ==========================================
+// SMTP CONFIGURATION (Gmail App Password)
+// ==========================================
+define('SMTP_HOST', 'smtp.gmail.com');
+define('SMTP_PORT', 587);
+define('SMTP_USER', 'sharifislam0505@gmail.com');
+define('SMTP_PASS', 'imqr wbyr wytx lrnt');
+define('SMTP_FROM_EMAIL', 'admin@amarrecipe.com');
+define('SMTP_FROM_NAME', 'Amar Recipe');
+
 $isProduction = getenv('RENDER') === 'true' || $databaseUrl || DB_TYPE === 'pgsql';
 
 // ==========================================
