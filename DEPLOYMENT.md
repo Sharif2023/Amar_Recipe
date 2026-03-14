@@ -156,12 +156,6 @@ To ensure Bengali characters are stored and displayed correctly:
 - PHP headers are configured for `charset=utf-8`.
 - Ensure your terminal/IDE uses UTF-8 when editing files.
 
-### 🔠 Bengali Support (UTF-8)
-To ensure Bengali characters are stored and displayed correctly:
-- The database schema uses `UTF-8` (PostgreSQL) or `utf8mb4` (MySQL).
-- PHP headers are configured for `charset=utf-8`.
-- Ensure your terminal/IDE uses UTF-8 when editing files.
-
 ---
 
 ## 🐛 Troubleshooting
