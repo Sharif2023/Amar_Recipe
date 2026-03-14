@@ -87,7 +87,7 @@ function is_similar_description($conn, $new_desc, $new_title)
         $stmt->execute([$new_title]);
         if ($stmt->fetchColumn() > 0) return true;
 
-        $stmt = $conn->prepare("SELECT COUNT(*) FROM submission_requests WHERE title = ? AND status != 'Rejected'");
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM submission_requests WHERE title = ? AND status != 'Rejected' AND is_verified = TRUE");
         $stmt->execute([$new_title]);
         if ($stmt->fetchColumn() > 0) return true;
     } catch (Exception $e) {}

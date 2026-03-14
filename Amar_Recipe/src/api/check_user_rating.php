@@ -15,17 +15,27 @@ if (empty($recipe_id) || empty($user_email)) {
 $conn = getDbConnection();
 
 try {
-    $stmt = $conn->prepare("SELECT rating FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
+    $stmt = $conn->prepare("SELECT rating, is_verified FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
     $stmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
     $rating = $stmt->fetch();
 
     if ($rating) {
-        echo json_encode([
-            'success' => true, 
-            'exists' => true, 
-            'hasRated' => true, 
-            'rating' => $rating['rating']
-        ]);
+        if ($rating['is_verified']) {
+            echo json_encode([
+                'success' => true, 
+                'exists' => true, 
+                'hasRated' => true, 
+                'rating' => $rating['rating']
+            ]);
+        } else {
+            // Exists but not verified - allow rating again to re-trigger email
+            echo json_encode([
+                'success' => true, 
+                'exists' => false, 
+                'hasRated' => false,
+                'unverified_exists' => true
+            ]);
+        }
     } else {
         echo json_encode([
             'success' => true, 
