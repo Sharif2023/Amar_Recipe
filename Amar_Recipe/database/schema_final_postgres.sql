@@ -17,18 +17,18 @@ DROP TABLE IF EXISTS admin_requests CASCADE;
 -- =============================================
 CREATE TABLE recipes (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    category VARCHAR(100) NOT NULL,
+    title TEXT NOT NULL,
+    category TEXT NOT NULL,
     description TEXT NOT NULL,
     image_url TEXT DEFAULT NULL,
-    location VARCHAR(255) NOT NULL,
-    organizerName VARCHAR(255) NOT NULL,
-    organizerEmail VARCHAR(255) NOT NULL,
-    organizerAddress VARCHAR(255) NOT NULL,
-    source VARCHAR(100),
-    tags VARCHAR(255),
-    reference VARCHAR(255),
-    tutorialVideo VARCHAR(255),
+    location TEXT NOT NULL,
+    organizerName TEXT NOT NULL,
+    organizerEmail TEXT NOT NULL,
+    organizerAddress TEXT NOT NULL,
+    source TEXT,
+    tags TEXT,
+    reference TEXT,
+    tutorialVideo TEXT,
     comment TEXT,
     rating DECIMAL(3, 1) DEFAULT 0.0,
     ratingCount INT DEFAULT 0,
@@ -70,27 +70,27 @@ CREATE INDEX idx_admin_images_id ON admin_images(admin_id);
 -- =============================================
 CREATE TABLE submission_requests (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    category VARCHAR(100),
+    title TEXT NOT NULL,
+    category TEXT,
     description TEXT,
     image TEXT, -- Stores file path or base64
-    location VARCHAR(255),
-    organizerName VARCHAR(255),
-    organizerEmail VARCHAR(255),
-    organizerAddress VARCHAR(255),
+    location TEXT,
+    organizerName TEXT,
+    organizerEmail TEXT,
+    organizerAddress TEXT,
     status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
     tags TEXT,
-    reference VARCHAR(255),
-    tutorialVideo VARCHAR(255),
+    reference TEXT,
+    tutorialVideo TEXT,
     comment TEXT,
-    source VARCHAR(100),
+    source TEXT,
     is_verified BOOLEAN DEFAULT FALSE,
     verification_token VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     submission_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- Alias for code compatibility
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     action_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-    admin_name VARCHAR(100) DEFAULT NULL
+    admin_name TEXT DEFAULT NULL
 );
 
 CREATE INDEX idx_submission_status ON submission_requests(status);
