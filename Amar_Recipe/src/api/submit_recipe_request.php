@@ -140,14 +140,19 @@ try {
     ]);
 
     // Send verification email
-    if (sendSubmissionVerification($organizerEmail, $title, $token)) {
-        echo json_encode(['success' => true, 'message' => 'রেসিপি জমা হয়েছে। দয়া করে আপনার ইমেইল যাচাই করুন।']);
+    $mailResult = sendSubmissionVerification($organizerEmail, $title, $token);
+    if ($mailResult === true) {
+        echo json_encode(['success' => true, 'message' => 'Your recipe has been submitted! Please check your email to verify and send it to the admin block.']);
     } else {
-        echo json_encode(['success' => true, 'message' => 'রেসিপি জমা হয়েছে কিন্তু ইমেইল পাঠাতে সমস্যা হয়েছে। দয়া করে অ্যাডমিনের সাথে যোগাযোগ করুন।']);
+        echo json_encode([
+            'success' => true, 
+            'message' => 'The recipe was saved, but the verification email failed to send. Error: ' . (is_string($mailResult) ? $mailResult : 'Unknown SMTP Error'),
+            'debug_info' => $mailResult
+        ]);
     }
 
 } catch (Throwable $e) {
-    file_put_contents(__DIR__ . '/api_debug.log', "[" . date('Y-m-d H:i:s') . "] Submission Error: " . $e->getMessage() . "\n", FILE_APPEND);
+    error_log("Submission Error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'সার্ভার ত্রুটি: ' . $e->getMessage()]);
     exit;

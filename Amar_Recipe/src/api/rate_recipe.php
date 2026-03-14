@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/config.php';
-file_put_contents(__DIR__ . '/request_debug.log', "[" . date('Y-m-d H:i:s') . "] Request received for rate_recipe.php\n", FILE_APPEND);
+error_log("Request received for rate_recipe.php");
 
 $data = json_decode(file_get_contents('php://input'), true);
 
@@ -48,7 +48,8 @@ try {
     $recipeTitle = $titleStmt->fetchColumn();
 
     // Send verification email
-    if (sendRatingVerification($user_email, $recipeTitle, $token)) {
+    $mailResult = sendRatingVerification($user_email, $recipeTitle, $token);
+    if ($mailResult === true) {
         echo json_encode([
             'success' => true, 
             'message' => 'আপনার রেটিংটি যাচাই করতে আপনার ইমেইল চেক করুন। আমরা ভেরিফিকেশন লিঙ্ক পাঠিয়েছি।',
@@ -57,10 +58,11 @@ try {
     } else {
         echo json_encode([
             'success' => false, 
-            'message' => 'ইমেইল পাঠাতে ব্যর্থ হয়েছে, দয়া করে পরে আবার চেষ্টা করুন।'
+            'message' => 'ইমেইল পাঠাতে ব্যর্থ হয়েছে। ত্রুটি: ' . (is_string($mailResult) ? $mailResult : 'অজানা ত্রুটি (SMTP Connection Issues)'),
+            'debug_info' => $mailResult
         ]);
     }
 } catch (Exception $e) {
-    file_put_contents(__DIR__ . '/api_debug.log', "[" . date('Y-m-d H:i:s') . "] Rating Error: " . $e->getMessage() . "\n", FILE_APPEND);
+    error_log("Rating Error: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'সার্ভার ত্রুটি: ' . $e->getMessage()]);
 }
