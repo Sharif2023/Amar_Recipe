@@ -57,16 +57,6 @@ try {
             'message' => 'আপনার রেটিংটি যাচাই করতে আপনার ইমেইল চেক করুন। আমরা ভেরিফিকেশন লিঙ্ক পাঠিয়েছি।',
             'verification_required' => true
         ]);
-    } else if ($mailResult === "DISABLED") {
-        // Auto-verify if email service is not configured
-        $stmt = $conn->prepare("UPDATE ratings SET is_verified = TRUE WHERE verification_token = :token");
-        $stmt->execute([':token' => $token]);
-        $conn->commit();
-        echo json_encode([
-            'success' => true, 
-            'message' => 'আপনার রেটিংটি সফলভাবে জমা হয়েছে। (ইমেইল যাচাইকরণ বর্তমানে নিষ্ক্রিয়)',
-            'verification_required' => false
-        ]);
     } else {
         $conn->rollback();
         echo json_encode([

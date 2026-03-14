@@ -95,6 +95,20 @@ Visit your Vercel URL and verify:
 - ✅ No CORS errors (F12 → Console)
 - ✅ Results are coming from Supabase
 
+### Step 6: Set Up Email Service (Resend)
+*Verification emails are mandatory for this project.*
+
+1. **Sign up:** Go to https://resend.com and create a free account.
+2. **Get API Key:**
+   - Go to **API Keys** in the dashboard.
+   - Click **Create API Key**.
+   - Copy the key (it starts with `re_`).
+3. **Configure Render:**
+   - Go to your Render dashboard → **Environment**.
+   - Add new variable: `RESEND_API_KEY` = `your-api-key-here`.
+   - Add new variable: `SMTP_FROM_EMAIL` = `onboarding@resend.dev` (or your own domain if configured).
+4. **Save Changes:** Render will auto-redeploy.
+
 ---
 
 ## 🎉 Done!

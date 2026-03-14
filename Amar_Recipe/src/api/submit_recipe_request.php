@@ -148,12 +148,6 @@ try {
     if ($mailResult === true) {
         $conn->commit();
         echo json_encode(['success' => true, 'message' => 'Your recipe has been submitted! Please check your email to verify and send it to the admin block.']);
-    } else if ($mailResult === "DISABLED") {
-        // Auto-verify if email service is not configured
-        $stmt = $conn->prepare("UPDATE submission_requests SET is_verified = TRUE WHERE verification_token = :token");
-        $stmt->execute([':token' => $token]);
-        $conn->commit();
-        echo json_encode(['success' => true, 'message' => 'Your recipe has been submitted successfully and is now pending admin review. (Email verification skipped)']);
     } else {
         $conn->rollback();
         echo json_encode([

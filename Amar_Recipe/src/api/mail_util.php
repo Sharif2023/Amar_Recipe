@@ -15,10 +15,8 @@ require_once __DIR__ . '/config.php';
  */
 function sendEmail($to, $subject, $body) {
     if (empty($to)) return "Recipient email is empty";
-    
-    if (!defined('EMAIL_ENABLED') || !EMAIL_ENABLED) {
-        error_log("Email sending skipped: RESEND_API_KEY is not configured.");
-        return "DISABLED";
+    if (RESEND_API_KEY === 're_123456789' || empty(RESEND_API_KEY)) {
+        return "Resend API Key is not configured. Please add it to your environment variables or config.php.";
     }
 
     $url = 'https://api.resend.com/emails';
