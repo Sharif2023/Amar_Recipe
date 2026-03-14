@@ -30,46 +30,61 @@ try {
     }
 
     // Handle profile image upload
-    $profile_image = null;
+    $profile_image_url = null;
     if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/uploads/';
-        if (!is_dir($uploadDir)) {
-            if (!mkdir($uploadDir, 0755, true)) {
-                http_response_code(500);
-                echo json_encode(['success' => false, 'message' => 'Failed to create upload directory']);
-                ob_end_flush();
-                exit;
-            }
-        }
-
-        // Delete old image if exists
-        $oldStmt = $conn->prepare("SELECT profile_image FROM admin_requests WHERE id = :id");
-        $oldStmt->execute([':id' => $admin_id]);
-        $oldRow = $oldStmt->fetch();
-        if ($oldRow && $oldRow['profile_image']) {
-            $oldPath = __DIR__ . '/' . $oldRow['profile_image'];
-            if (file_exists($oldPath)) {
-                unlink($oldPath);
-            }
-        }
-
         $fileTmpPath = $_FILES['profile_image']['tmp_name'];
-        $fileName = basename($_FILES['profile_image']['name']);
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedExts = ['png', 'jpg', 'jpeg', 'gif'];
-        if (!in_array($fileExt, $allowedExts)) {
+        $fileType = $_FILES['profile_image']['type'];
+
+        if (!is_uploaded_file($fileTmpPath) || !filesize($fileTmpPath)) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Invalid image format']);
+            echo json_encode(['success' => false, 'message' => 'Image upload failed: invalid or empty file']);
             ob_end_flush();
             exit;
         }
-        $newFileName = uniqid('profile_', true) . '.' . $fileExt;
-        $destPath = $uploadDir . $newFileName;
-        if (move_uploaded_file($fileTmpPath, $destPath)) {
-            $profile_image = "uploads/" . $newFileName;
-        } else {
+
+        $imageData = file_get_contents($fileTmpPath);
+        if ($imageData === false || strlen($imageData) === 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Image upload failed: invalid or empty file']);
+            ob_end_flush();
+            exit;
+        }
+
+        try {
+            // Ensure admin_images table exists
+            if (defined('DB_TYPE') && DB_TYPE === 'pgsql') {
+                $conn->exec("
+                    CREATE TABLE IF NOT EXISTS admin_images (
+                        admin_id INT PRIMARY KEY REFERENCES admin_requests(id) ON DELETE CASCADE,
+                        image_data BYTEA,
+                        file_type VARCHAR(50),
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                    )
+                ");
+            }
+
+            // Save image to DB
+            $checkStmt = $conn->prepare("SELECT 1 FROM admin_images WHERE admin_id = :id");
+            $checkStmt->execute([':id' => $admin_id]);
+
+            if ($checkStmt->fetch()) {
+                $imgSql = "UPDATE admin_images SET image_data = :data, file_type = :type WHERE admin_id = :id";
+            } else {
+                $imgSql = "INSERT INTO admin_images (admin_id, image_data, file_type) VALUES (:id, :data, :type)";
+            }
+
+            $imgStmt = $conn->prepare($imgSql);
+            $imgStmt->bindParam(':id', $admin_id);
+            $imgStmt->bindParam(':data', $imageData, PDO::PARAM_LOB);
+            $imgStmt->bindParam(':type', $fileType);
+            $imgStmt->execute();
+
+            $apiUrl = defined('API_BASE_URL') ? API_BASE_URL : (getenv('RENDER') === 'true' ? 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME') . '/src/api/' : 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/');
+            $profile_image_url = $apiUrl . "get_admin_image.php?id=" . $admin_id . "&t=" . time();
+        } catch (Exception $e) {
+            error_log("Admin image update failed: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Failed to upload image']);
+            echo json_encode(['success' => false, 'message' => 'Image update failed: ' . $e->getMessage()]);
             ob_end_flush();
             exit;
         }
@@ -111,9 +126,9 @@ try {
         $fields[] = "certification = :certification";
         $params[':certification'] = trim($_POST['certification']);
     }
-    if ($profile_image) {
+    if ($profile_image_url) {
         $fields[] = "profile_image = :profile_image";
-        $params[':profile_image'] = $profile_image;
+        $params[':profile_image'] = $profile_image_url;
     }
 
     if (empty($fields)) {
