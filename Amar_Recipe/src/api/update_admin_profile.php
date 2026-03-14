@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/config.php';
 
+// Ensure JSON response
+header('Content-Type: application/json; charset=utf-8');
+
 $conn = getDbConnection();
 
 // Frontend sends "id"; accept both "id" and "admin_id"
@@ -16,7 +19,10 @@ $profile_image = null;
 if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
     $uploadDir = __DIR__ . '/uploads/';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
+        if (!mkdir($uploadDir, 0755, true)) {
+            echo json_encode(['success' => false, 'message' => 'Failed to create upload directory']);
+            exit;
+        }
     }
 
     // Delete old image if exists
@@ -42,6 +48,9 @@ if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPL
     $destPath = $uploadDir . $newFileName;
     if (move_uploaded_file($fileTmpPath, $destPath)) {
         $profile_image = "uploads/" . $newFileName;
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to upload image']);
+        exit;
     }
 }
 
@@ -103,19 +112,27 @@ if (empty($fields)) {
     exit;
 }
 
-$sql = "UPDATE admin_requests SET " . implode(', ', $fields) . " WHERE id = :id";
-$stmt = $conn->prepare($sql);
-$stmt->execute($params);
+try {
+    $sql = "UPDATE admin_requests SET " . implode(', ', $fields) . " WHERE id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute($params);
 
-// Fetch updated admin data (PDO::CASE_LOWER so keys are lowercase)
-$fetchStmt = $conn->prepare("SELECT * FROM admin_requests WHERE id = :id");
-$fetchStmt->execute([':id' => $admin_id]);
-$admin = $fetchStmt->fetch();
+    // Fetch updated admin data (PDO::CASE_LOWER so keys are lowercase)
+    $fetchStmt = $conn->prepare("SELECT * FROM admin_requests WHERE id = :id");
+    $fetchStmt->execute([':id' => $admin_id]);
+    $admin = $fetchStmt->fetch();
 
-$profileImage = $admin['profile_image'] ?? null;
-echo json_encode([
-    'success' => true,
-    'admin' => $admin,
-    'profileImage' => $profileImage,
-    'message' => 'Profile updated successfully'
-]);
+    $profileImage = $admin['profile_image'] ?? null;
+    echo json_encode([
+        'success' => true,
+        'admin' => $admin,
+        'profileImage' => $profileImage,
+        'message' => 'Profile updated successfully'
+    ]);
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database error: ' . $e->getMessage()
+    ]);
+}
