@@ -17,6 +17,8 @@ if (empty($recipe_id) || empty($user_email) || empty($rating)) {
 $conn = getDbConnection();
 
 try {
+    $conn->beginTransaction();
+    
     $stmt = $conn->prepare("SELECT id, is_verified FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
     $stmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
     $existing = $stmt->fetch();
@@ -24,7 +26,7 @@ try {
     require_once __DIR__ . '/mail_util.php';
 
     if ($existing && $existing['is_verified']) {
-        // Prevent update - One time rating only
+        $conn->rollback();
         echo json_encode(['success' => false, 'message' => 'আপনি ইতিমধ্যে এই রেসিপিটিকে রেটিং দিয়েছেন।']);
         exit;
     } 
@@ -50,19 +52,24 @@ try {
     // Send verification email
     $mailResult = sendRatingVerification($user_email, $recipeTitle, $token);
     if ($mailResult === true) {
+        $conn->commit();
         echo json_encode([
             'success' => true, 
             'message' => 'আপনার রেটিংটি যাচাই করতে আপনার ইমেইল চেক করুন। আমরা ভেরিফিকেশন লিঙ্ক পাঠিয়েছি।',
             'verification_required' => true
         ]);
     } else {
+        $conn->rollback();
         echo json_encode([
             'success' => false, 
-            'message' => 'ইমেইল পাঠাতে ব্যর্থ হয়েছে। ত্রুটি: ' . (is_string($mailResult) ? $mailResult : 'অজানা ত্রুটি (SMTP Connection Issues)'),
+            'message' => 'The rating was NOT saved because the verification email failed to send. Error: ' . (is_string($mailResult) ? $mailResult : 'SMTP Connection Issues'),
             'debug_info' => $mailResult
         ]);
     }
 } catch (Exception $e) {
+    if (isset($conn) && $conn->inTransaction()) {
+        $conn->rollback();
+    }
     error_log("Rating Error: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'সার্ভার ত্রুটি: ' . $e->getMessage()]);
 }
