@@ -57,27 +57,19 @@ const Reports = () => {
   };
 
   const handleViewRecipe = (report) => {
-    const recipeId = report.recipe_id;
-    const matchedReport = reports.find((r) => r.recipe_id === recipeId);
+    if (!report) return;
 
-    const recipe = {
-      id: matchedReport.recipe_id,
-      title: matchedReport.title,
-      category: matchedReport.category,
-      image_url: matchedReport.image_url,
-      description: matchedReport.description,
-      comment: matchedReport.comment,
-      location: matchedReport.location,
-      tags: matchedReport.tags,
-      reference: matchedReport.reference,
-      tutorialvideo: matchedReport.tutorialvideo,
-      organizername: matchedReport.organizername,
-      organizeremail: matchedReport.organizeremail,
+    // Use the report object directly, which already contains the joined recipe fields.
+    // We map 'recipe_id' to 'id' so the modal and update API use the correct identifier.
+    const recipeData = {
+      ...report,
+      id: report.recipe_id, // Primary key for update_recipe.php
     };
 
-    setSelectedRecipe(recipe);
+    setSelectedRecipe(recipeData);
     setShowEditModal(true);
   };
+
 
   const handleSaveRecipe = async (updatedRecipe, imageFile) => {
     try {

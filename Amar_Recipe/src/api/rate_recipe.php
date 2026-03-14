@@ -27,20 +27,31 @@ try {
         exit;
     } 
 
-    $conn->beginTransaction();
     require_once __DIR__ . '/mail_util.php';
 
-    // Generate token
-    $token = bin2hex(random_bytes(16));
+    // Check if we should bypass verification (Option B)
+    $shouldVerify = ($user_email === ADMIN_EMAIL);
+    $token = $shouldVerify ? bin2hex(random_bytes(16)) : null;
     
-    if ($existing && !$existing['is_verified']) {
-        // Update unverified rating
-        $updateStmt = $conn->prepare("UPDATE ratings SET rating = :rating, verification_token = :token, created_at = NOW() WHERE id = :id");
-        $updateStmt->execute([':rating' => $rating, ':token' => $token, ':id' => $existing['id']]);
+    // Perform the save operation (Insert or Update)
+    if ($existing) {
+        $updateStmt = $conn->prepare("UPDATE ratings SET rating = :rating, verification_token = :token, is_verified = :is_verified, created_at = NOW() WHERE id = :id");
+        $updateStmt->execute([
+            ':rating' => $rating, 
+            ':token' => $token, 
+            ':is_verified' => $shouldVerify ? 0 : 1, // Store as bool-compatible int
+            ':id' => $existing['id']
+        ]);
     } else {
-        // Insert new unverified rating
-        $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, email, rating, is_verified, verification_token) VALUES (:recipe_id, :user_email, :email, :rating, FALSE, :token)");
-        $insertStmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':email' => $user_email, ':rating' => $rating, ':token' => $token]);
+        $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, email, rating, is_verified, verification_token) VALUES (:recipe_id, :user_email, :email, :rating, :is_verified, :token)");
+        $insertStmt->execute([
+            ':recipe_id' => $recipe_id, 
+            ':user_email' => $user_email, 
+            ':email' => $user_email, 
+            ':rating' => $rating, 
+            ':is_verified' => $shouldVerify ? 0 : 1, 
+            ':token' => $token
+        ]);
     }
 
     // Get recipe title for email
@@ -48,9 +59,6 @@ try {
     $titleStmt->execute([':id' => $recipe_id]);
     $recipeTitle = $titleStmt->fetchColumn();
 
-    // Check if we should bypass verification (Option B)
-    $shouldVerify = ($user_email === ADMIN_EMAIL);
-    
     if ($shouldVerify) {
         // Send verification email
         $mailResult = sendRatingVerification($user_email, $recipeTitle, $token);
@@ -70,19 +78,10 @@ try {
             ]);
         }
     } else {
-        // Bypass verification: Mark as verified immediately
-        if ($existing) {
-            $updateVerified = $conn->prepare("UPDATE ratings SET rating = :rating, is_verified = TRUE, verification_token = NULL, created_at = NOW() WHERE id = :id");
-            $updateVerified->execute([':rating' => $rating, ':id' => $existing['id']]);
-        } else {
-            $insertVerified = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, email, rating, is_verified, verification_token) VALUES (:recipe_id, :user_email, :email, :rating, TRUE, NULL)");
-            $insertVerified->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email, ':email' => $user_email, ':rating' => $rating]);
-        }
-        
-        // Re-calculate average and count immediately
+        // Bypass verification: Update recipe statistics immediately
         $statsStmt = $conn->prepare("SELECT AVG(rating) as avg_rating, COUNT(*) as rating_count FROM ratings WHERE recipe_id = :recipe_id AND is_verified = TRUE");
         $statsStmt->execute([':recipe_id' => $recipe_id]);
-        $stats = $statsStmt->fetch();
+        $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         
         $avg_rating = round($stats['avg_rating'] ?? 0, 1);
         $rating_count = $stats['rating_count'] ?? 0;

@@ -26,6 +26,6 @@ try {
     exit;
 }
 
-$reports = $stmt->fetchAll();
+$reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo json_encode(['success' => true, 'reports' => $reports]);

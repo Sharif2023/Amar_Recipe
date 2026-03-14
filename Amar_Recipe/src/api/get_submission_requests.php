@@ -9,7 +9,7 @@ try {
     } catch (Throwable $e) {
         $stmt = $conn->query("SELECT * FROM submission_requests WHERE status = 'Pending' AND is_verified = TRUE ORDER BY created_at DESC");
     }
-    $requests = $stmt->fetchAll();
+    $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode(['success' => true, 'requests' => $requests]);
 } catch (Throwable $e) {

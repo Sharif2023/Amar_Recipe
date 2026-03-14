@@ -17,7 +17,7 @@ $conn = getDbConnection();
 try {
     $stmt = $conn->prepare("SELECT rating, is_verified FROM ratings WHERE recipe_id = :recipe_id AND user_email = :user_email");
     $stmt->execute([':recipe_id' => $recipe_id, ':user_email' => $user_email]);
-    $rating = $stmt->fetch();
+    $rating = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($rating) {
         if ($rating['is_verified']) {

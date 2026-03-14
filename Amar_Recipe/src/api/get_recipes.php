@@ -15,13 +15,13 @@ try {
             FROM recipes r
             ORDER BY r.created_at DESC";
     $stmt = $conn->query($sql);
-    $recipes = $stmt->fetchAll();
+    $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $hasImageTable = true;
 } catch (Exception $e) {
     // If the above fails (e.g. table doesn't exist yet), fall back to simple query
     $sql = "SELECT * FROM recipes ORDER BY created_at DESC";
     $stmt = $conn->query($sql);
-    $recipes = $stmt->fetchAll();
+    $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 foreach ($recipes as &$recipe) {

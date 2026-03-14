@@ -10,7 +10,7 @@ try {
         // Fallback to created_at
         $stmt = $conn->query("SELECT * FROM submission_requests WHERE status != 'Pending' ORDER BY created_at DESC");
     }
-    $history = $stmt->fetchAll();
+    $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode(['success' => true, 'history' => $history]);
 } catch (Throwable $e) {
