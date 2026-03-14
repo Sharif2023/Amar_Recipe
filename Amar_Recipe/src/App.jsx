@@ -122,6 +122,8 @@ function App() {
             <Reports />
             <AdminFooter />
           </>} />
+
+        <Route path="/verify-email" element={<VerifyEmail />} />
           
         <Route path="/verify-email" element={<VerifyEmail />} />
           
