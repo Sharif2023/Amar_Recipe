@@ -24,11 +24,12 @@ try {
     }
 
     $conn = getDbConnection();
-    $stmt = $conn->prepare("INSERT INTO reports (recipe_id, reporter_email, reason) VALUES (:recipe_id, :reporter_email, :reason)");
+    $stmt = $conn->prepare("INSERT INTO reports (recipe_id, reporter_email, reasons, other_reason) VALUES (:recipe_id, :reporter_email, :reasons, :other_reason)");
     $stmt->execute([
         ':recipe_id' => $recipe_id,
         ':reporter_email' => $reporter_email,
-        ':reason' => $fullReason
+        ':reasons' => json_encode($selectedReasons),
+        ':other_reason' => $otherReason
     ]);
 
     echo json_encode(['success' => true, 'message' => 'Report submitted']);

@@ -3,11 +3,23 @@ require_once __DIR__ . '/config.php';
 
 $conn = getDbConnection();
 try {
-    // Try with reported_at
-    $stmt = $conn->query("SELECT r.*, rec.title as recipe_title FROM reports r LEFT JOIN recipes rec ON r.recipe_id = rec.id ORDER BY r.reported_at DESC");
+    // Join with recipes to get all necessary details for the Admin Reports view
+    $query = "SELECT 
+                r.*, 
+                rec.title, 
+                rec.image_url, 
+                rec.description, 
+                rec.comment, 
+                rec.location, 
+                rec.organizerName, 
+                rec.organizerEmail 
+              FROM reports r 
+              LEFT JOIN recipes rec ON r.recipe_id = rec.id 
+              ORDER BY r.created_at DESC";
+    $stmt = $conn->query($query);
 } catch (Throwable $e) {
-    // Fallback to created_at
-    $stmt = $conn->query("SELECT r.*, rec.title as recipe_title FROM reports r LEFT JOIN recipes rec ON r.recipe_id = rec.id ORDER BY r.created_at DESC");
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    exit;
 }
 
 $reports = $stmt->fetchAll();

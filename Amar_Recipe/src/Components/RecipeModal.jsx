@@ -72,8 +72,13 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             reasons: selectedReasons,
             otherReason: otherReason.trim(),
             reportedAt: new Date().toISOString(),
-            reporterEmail: recipe.organizeremail
+            reporterEmail: email || '' // Use user's input email
         };
+
+        if (!reportData.reporterEmail) {
+            const confirmAnon = window.confirm('আপনার ইমেইল প্রদান করেননি। ইমেইল ছাড়াই কি রিপোর্ট জমা দিতে চান? (ইমেইল দিলে আমাদের যোগাযোগ করতে সুবিধা হবে)');
+            if (!confirmAnon) return;
+        }
 
         try {
             const res = await fetch(API_BASE_URL + 'report_recipe.php', {
