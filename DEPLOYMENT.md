@@ -24,7 +24,7 @@ Complete guide for deploying Amar Recipe to production.
 3. **Import Schema:**
    - In Supabase, go to the **SQL Editor**.
    - Click **"New query"**.
-   - Copy contents of `Amar_Recipe/database/schema_postgres.sql` from your local files.
+   - Copy contents of `Amar_Recipe/database/schema_final_postgres.sql` from your local files.
    - Paste into the editor and click **Run**.
 
 ### Step 2: Deploy Backend to Render
