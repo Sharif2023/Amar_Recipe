@@ -34,7 +34,7 @@ try {
             $avg_rating = round($stats['avg_rating'] ?? 0, 1);
             $rating_count = $stats['rating_count'] ?? 0;
 
-            $updateRecipe = $conn->prepare("UPDATE recipes SET average_rating = :avg_rating, ratingcount = :rating_count WHERE id = :recipe_id");
+            $updateRecipe = $conn->prepare("UPDATE recipes SET rating = :avg_rating, ratingCount = :rating_count WHERE id = :recipe_id");
             $updateRecipe->execute([':avg_rating' => $avg_rating, ':rating_count' => $rating_count, ':recipe_id' => $rating['recipe_id']]);
 
             echo json_encode(['success' => true, 'message' => 'ধন্যবাদ! আপনার রেসিপি রেটিং সফলভাবে যাচাই করা হয়েছে।']);

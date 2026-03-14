@@ -125,15 +125,10 @@ function App() {
 
         <Route path="/verify-email" element={<VerifyEmail />} />
           
-        <Route path="/verify-email" element={<VerifyEmail />} />
-          
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
-
-
-//npm install react-router-dom
 

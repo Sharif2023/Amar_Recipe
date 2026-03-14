@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 import Header from '../Components/Header';
 import Footer from '../Components/Footer';
 
@@ -23,9 +24,7 @@ const VerifyEmail = () => {
             }
 
             try {
-                // Determine API URL based on environment or global config if available
-                const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://amar-recipe-backend.onrender.com/src/api/';
-                const response = await axios.get(`${API_URL}verify_email.php?type=${type}&token=${token}`);
+                const response = await axios.get(`${API_BASE_URL}verify_email.php?type=${type}&token=${token}`);
                 
                 if (response.data.success) {
                     setStatus('success');
