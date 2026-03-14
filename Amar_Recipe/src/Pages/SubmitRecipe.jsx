@@ -114,6 +114,7 @@ export default function SubmitRecipe() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
 
         setIsSubmitting(true);
 

@@ -50,9 +50,10 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
     const [selectedReasons, setSelectedReasons] = useState([]);
     const [otherReason, setOtherReason] = useState('');
     const [submitStatus, setSubmitStatus] = useState(null);
+    const [isSubmittingRating, setIsSubmittingRating] = useState(false);
     const [rating, setRating] = useState(0);
     const [email, setEmail] = useState('');
-    const [averageRating, setAverageRating] = useState(recipe.average_rating || 0);
+    const [averageRating, setAverageRating] = useState(recipe.rating || 0);
     const [ratingCount, setRatingCount] = useState(recipe.ratingcount || 0);
 
     const toggleReason = (id) => {
@@ -110,7 +111,10 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             return;
         }
 
+        if (isSubmittingRating) return;
+
         try {
+            setIsSubmittingRating(true);
             const checkRating = await fetch(API_BASE_URL + 'check_user_rating.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -159,6 +163,8 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
         } catch (error) {
             console.error('Rating error:', error);
             alert('রেটিং জমা দিতে সমস্যা হয়েছে: ' + error.message);
+        } finally {
+            setIsSubmittingRating(false);
         }
     };
 
@@ -320,10 +326,17 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                         />
                                         <button
                                             onClick={handleSubmitRating}
-                                            className="absolute right-2 top-2 bottom-2 px-6 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-600/20 flex items-center gap-2 transition-transform active:scale-95"
+                                            disabled={isSubmittingRating}
+                                            className="absolute right-2 top-2 bottom-2 px-6 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-600/20 flex items-center gap-2 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            <IoSend />
-                                            জমা দিন
+                                            {isSubmittingRating ? (
+                                                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            ) : (
+                                                <>
+                                                    <IoSend />
+                                                    জমা দিন
+                                                </>
+                                            )}
                                         </button>
                                     </div>
                                 </div>

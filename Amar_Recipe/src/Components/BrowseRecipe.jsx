@@ -246,7 +246,7 @@ const BrowseRecipe = () => {
                   <h3 className="text-lg font-semibold dark:text-white tracking-tighter" title={item.title}>{item.title}</h3>
                   <div className="flex items-center text-yellow-500 text-sm select-none">
                     <IoStar />
-                    <span className="ml-1 text-black dark:text-white">{item.average_rating ? Number(item.average_rating).toFixed(1) : '৪.৫'}</span>
+                    <span className="ml-1 text-black dark:text-white">{item.rating ? Number(item.rating).toFixed(1) : '০.০'}</span>
                   </div>
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3 tracking-tight" title={item.description}>

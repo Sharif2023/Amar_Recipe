@@ -54,6 +54,9 @@ function sendEmail($to, $subject, $body) {
         return true;
     } else {
         $errorMsg = "Resend API Error (HTTP $httpCode): " . $response;
+        if ($httpCode == 403 && strpos($response, 'validation_error') !== false) {
+            $errorMsg = "Resend API Error (403): You can only send emails to your own email address because your domain is not verified. To send to other emails, please verify your domain at Resend.com.";
+        }
         error_log($errorMsg);
         return $errorMsg;
     }
