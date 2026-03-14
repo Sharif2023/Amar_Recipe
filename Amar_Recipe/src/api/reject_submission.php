@@ -12,6 +12,16 @@ if (empty($id)) {
 
 try {
     $conn = getDbConnection();
+
+    // Check if audit columns exist
+    $hasAuditCols = false;
+    try {
+        $conn->query("SELECT action_date, admin_name FROM submission_requests LIMIT 0");
+        $hasAuditCols = true;
+    } catch (Throwable $e) {
+        $hasAuditCols = false;
+    }
+
     $admin_name = $data['admin_name'] ?? 'Admin';
     // Fetch submission details for email before status change
     $fetchStmt = $conn->prepare("SELECT organizeremail, title FROM submission_requests WHERE id = :id");
