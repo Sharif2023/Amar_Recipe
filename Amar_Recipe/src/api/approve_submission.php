@@ -72,40 +72,32 @@ try {
 
     $recipeId = $conn->lastInsertId();
 
-    // Handle Image Persistence (Move from uploads/ to DB)
-    $imagePath = $submission['image'] ?? '';
-    // Remove potential 'uploads/' prefix duplicate or absolute path issues if necessary, 
-    // but assuming $submission['image'] stores relative path like 'uploads/img_....jpg'
-    
-    if ($imagePath && strpos($imagePath, 'uploads/') !== false) {
-        $fullPath = __DIR__ . '/' . $imagePath;
-        if (file_exists($fullPath)) {
-            $imageData = file_get_contents($fullPath);
-            $fileType = mime_content_type($fullPath) ?: 'image/jpeg';
-            
-            // Insert into recipe_images
-            // First check if an orphan exists (unlikely for new ID, but good for safety)
-            $checkStmt = $conn->prepare("SELECT 1 FROM recipe_images WHERE recipe_id = :id");
-            $checkStmt->execute([':id' => $recipeId]);
-            
-            if ($checkStmt->fetch()) {
-                $imgSql = "UPDATE recipe_images SET image_data = :data, file_type = :type WHERE recipe_id = :id";
-            } else {
-                $imgSql = "INSERT INTO recipe_images (recipe_id, image_data, file_type) VALUES (:id, :data, :type)";
-            }
-            
-            $imgStmt = $conn->prepare($imgSql);
-            $imgStmt->bindParam(':id', $recipeId);
-            $imgStmt->bindParam(':data', $imageData, PDO::PARAM_LOB);
-            $imgStmt->bindParam(':type', $fileType);
-            $imgStmt->execute();
+    // Handle Image Persistence (Move from submission_images to recipe_images table)
+    $fetchImgStmt = $conn->prepare("SELECT image_data, file_type FROM submission_images WHERE submission_id = :id");
+    $fetchImgStmt->execute([':id' => $id]);
+    $subImage = $fetchImgStmt->fetch();
 
-            // Update recipe url to point to DB image
-            $apiUrl = defined('API_BASE_URL') ? API_BASE_URL : (getenv('RENDER') === 'true' ? 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME') . '/src/api/' : 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/');
-            $newUrl = $apiUrl . "get_image.php?id=" . $recipeId . "&t=" . time();
-            $updateUrlStmt = $conn->prepare("UPDATE recipes SET image_url = :url WHERE id = :id");
-            $updateUrlStmt->execute([':url' => $newUrl, ':id' => $recipeId]);
-        }
+    if ($subImage && $subImage['image_data']) {
+        $imageData = $subImage['image_data'];
+        $fileType = $subImage['file_type'] ?: 'image/jpeg';
+        
+        // Insert into recipe_images
+        $imgSql = "INSERT INTO recipe_images (recipe_id, image_data, file_type) VALUES (:id, :data, :type)";
+        $imgStmt = $conn->prepare($imgSql);
+        $imgStmt->bindParam(':id', $recipeId);
+        $imgStmt->bindParam(':data', $imageData, PDO::PARAM_LOB);
+        $imgStmt->bindParam(':type', $fileType);
+        $imgStmt->execute();
+
+        // Update recipe url to point to persistent DB image
+        $apiUrl = API_BASE_URL; // Using constant from config.php
+        $newUrl = $apiUrl . "get_image.php?id=" . $recipeId . "&t=" . time();
+        $updateUrlStmt = $conn->prepare("UPDATE recipes SET image_url = :url WHERE id = :id");
+        $updateUrlStmt->execute([':url' => $newUrl, ':id' => $recipeId]);
+
+        // Clean up temporary submission image
+        $cleanupStmt = $conn->prepare("DELETE FROM submission_images WHERE submission_id = :id");
+        $cleanupStmt->execute([':id' => $id]);
     }
 
     $conn->commit();
