@@ -236,8 +236,10 @@ const BrowseRecipe = () => {
                 <img
                   src={item.image_url
                     ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
-                    : 'https://via.placeholder.com/300x200?text=No+Image'}
+                    : 'https://placehold.co/300x200?text=No+Image'}
                   alt={item.title}
+                  loading="lazy"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x200?text=No+Image'; }}
                   className="w-full h-full object-cover sm:group-hover:brightness-90 transition-all duration-300"
                 />
               </div>

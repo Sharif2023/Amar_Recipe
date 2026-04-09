@@ -25,6 +25,24 @@ try {
             $data = $image['image_data'];
         }
 
+        // Generate ETag from image data for cache validation
+        $etag = '"' . md5($data) . '"';
+        $lastModified = gmdate('D, d M Y H:i:s T');
+
+        // Send cache headers — browser caches for 7 days
+        header("Cache-Control: public, max-age=604800, immutable");
+        header("ETag: $etag");
+        header("Last-Modified: $lastModified");
+
+        // Serve 304 Not Modified if client already has this version
+        if (
+            (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag) ||
+            isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
+        ) {
+            http_response_code(304);
+            exit;
+        }
+
         // Output headers
         header("Content-Type: $contentType");
         header("Content-Length: " . strlen($data));
