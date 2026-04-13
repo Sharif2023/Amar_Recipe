@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import { useNavigate } from "react-router-dom";
+import { useModal } from '../context/ModalContext';
 import Loader from "../Components/Loader";
 
 const AdminManagement = () => {
   const navigate = useNavigate();
+  const { showAlert, showConfirm, showPrompt } = useModal();
   const [pendingRequests, setPendingRequests] = useState([]);
   const [approvedAdmins, setApprovedAdmins] = useState([]);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
@@ -78,18 +80,19 @@ const AdminManagement = () => {
       console.log('Response JSON:', data);
 
       if (res.ok && data.message) {
-        alert(data.message);
+        await showAlert(data.message);
         fetchRequests(); // Refresh data after update
       } else {
-        alert("স্ট্যাটাস আপডেট করা যায়নি: " + (data.message || 'অজানা সমস্যা হয়েছে।'));
+        await showAlert("স্ট্যাটাস আপডেট করা যায়নি: " + (data.message || 'অজানা সমস্যা হয়েছে।'));
       }
     } catch (error) {
       console.error("আপডেটের সময় নেটওয়ার্ক বা সার্ভার ত্রুটি হয়েছে:", error);
-      alert("আপডেট করার সময় নেটওয়ার্ক ত্রুটি হয়েছে");
+      await showAlert("আপডেট করার সময় নেটওয়ার্ক ত্রুটি হয়েছে");
     }
   };
   const handleDeleteAdmin = async (adminId) => {
-    if (window.confirm("আপনি কি নিশ্চিত যে আপনি এই অ্যাডমিনকে মুছে ফেলতে চান?")) {
+    const isConfirmed = await showConfirm("আপনি কি নিশ্চিত যে আপনি এই অ্যাডমিনকে মুছে ফেলতে চান?");
+    if (isConfirmed) {
       const loggedInAdmin = JSON.parse(localStorage.getItem("admin"));
 
       try {
@@ -104,14 +107,14 @@ const AdminManagement = () => {
 
         const data = await res.json();
         if (data.success) {
-          alert("অ্যাডমিন সফলভাবে মুছে ফেলা হয়েছে");
+          await showAlert("অ্যাডমিন সফলভাবে মুছে ফেলা হয়েছে");
           fetchRequests();
         } else {
-          alert(data.message || "অ্যাডমিন মুছে ফেলা যায়নি।");
+          await showAlert(data.message || "অ্যাডমিন মুছে ফেলা যায়নি।");
         }
       } catch (error) {
         console.error("Delete error:", error);
-        alert("অ্যাডমিন মুছে ফেলার সময় ত্রুটি ঘটেছে ⚠️");
+        await showAlert("অ্যাডমিন মুছে ফেলার সময় ত্রুটি ঘটেছে ⚠️");
       }
     }
   };
@@ -161,8 +164,9 @@ const AdminManagement = () => {
                     <button
                       onClick={async () => {
                         const requestId = admin.id;
-                        const reason = prompt("আবেদন বাতিলের কারণ:");
-                        if (!reason) return alert("আবেদন বাতিলের কারণ জানানো জরুরি।");
+                        const reason = await showPrompt("আবেদন বাতিলের কারণ:");
+                        if (reason === null) return; // user cancelled
+                        if (!reason) return await showAlert("আবেদন বাতিলের কারণ জানানো জরুরি।");
                         const currentAdmin = JSON.parse(localStorage.getItem("admin"));
 
                         try {
@@ -181,15 +185,15 @@ const AdminManagement = () => {
                             data = JSON.parse(text);
                           } catch (parseErr) {
                             console.error("❌ JSON parse error:", parseErr);
-                            alert("❌ সার্ভারের প্রতিক্রিয়াটি বৈধ JSON নয়। কনসোলটি পরীক্ষা করুন।");
+                            await showAlert("❌ সার্ভারের প্রতিক্রিয়াটি বৈধ JSON নয়। কনসোলটি পরীক্ষা করুন।");
                             return;
                           }
 
-                          alert(data.success ? "✅ আবেদন বাতিল সফল হয়েছে" : data.message || "⚠️ অজানা ত্রুটি");
+                          await showAlert(data.success ? "✅ আবেদন বাতিল সফল হয়েছে" : data.message || "⚠️ অজানা ত্রুটি");
                           fetchRequests();
                         } catch (err) {
                           console.error("❌ Network error during fetch:", err);
-                          alert("❌ নেটওয়ার্ক অনুরোধ ব্যর্থ হয়েছে।");
+                          await showAlert("❌ নেটওয়ার্ক অনুরোধ ব্যর্থ হয়েছে।");
                         }
                       }}
                       className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"

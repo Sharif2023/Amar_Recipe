@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import { useNavigate } from 'react-router-dom';
+import { useModal } from '../context/ModalContext';
 import Loader from '../Components/Loader';
 
 const SettingsPage = () => {
@@ -10,6 +11,7 @@ const SettingsPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [activeSection, setActiveSection] = useState('password'); // Default section is password
+    const { showAlert, showConfirm } = useModal();
 
     const navigate = useNavigate();
 
@@ -33,7 +35,7 @@ const SettingsPage = () => {
 
             const result = await response.json();
             if (result.success) {
-                alert('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!');
+                await showAlert('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!');
                 navigate('/adminpanel');
             } else {
                 setError(result.message);
@@ -46,7 +48,7 @@ const SettingsPage = () => {
     };
 
     const handleAccountDelete = async () => {
-        const confirmation = window.confirm('আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্টটি মুছে ফেলতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।');
+        const confirmation = await showConfirm('আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্টটি মুছে ফেলতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।');
         if (confirmation) {
             setLoading(true);
             const admin = JSON.parse(localStorage.getItem("admin"));  // Get the logged-in admin's info
@@ -61,7 +63,7 @@ const SettingsPage = () => {
 
                 const result = await response.json();
                 if (result.success) {
-                    alert('অ্যাকাউন্ট সফলভাবে মুছে ফেলা হয়েছে!');
+                    await showAlert('অ্যাকাউন্ট সফলভাবে মুছে ফেলা হয়েছে!');
                     navigate('/adminlogin');
                 } else {
                     setError(result.message);

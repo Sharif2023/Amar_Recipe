@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import { useModal } from '../context/ModalContext';
 import Loader from "../Components/Loader";
 
 const AdminProfile = () => {
@@ -21,6 +22,7 @@ const AdminProfile = () => {
     certification: admin?.certification || ""
   });
   const [loading, setLoading] = useState(false);
+  const { showAlert } = useModal();
 
   // Handle file input change
   const handleImageChange = (event) => {
@@ -123,12 +125,12 @@ const AdminProfile = () => {
       try {
         result = await res.json();
       } catch {
-        alert("প্রোফাইল আপডেটে একটি সমস্যা হয়েছে। সার্ভার থেকে সঠিক উত্তর আসেনি।");
+        await showAlert("প্রোফাইল আপডেটে একটি সমস্যা হয়েছে। সার্ভার থেকে সঠিক উত্তর আসেনি।");
         return;
       }
 
       if (result.success) {
-        alert("প্রোফাইল সফলভাবে আপডেট করা হয়েছে!");
+        await showAlert("প্রোফাইল সফলভাবে আপডেট করা হয়েছে!");
         setIsEditing(false);
 
         const rawProfileImage = result.profileImage ?? result.admin?.profile_image ?? profileImage;
@@ -149,11 +151,11 @@ const AdminProfile = () => {
         setProfileImage(fullProfileImagePath);
         setSelectedImageFile(null);
       } else {
-        alert("প্রোফাইল আপডেট করার সময় ত্রুটি হয়েছে ⚠️");
+        await showAlert("প্রোফাইল আপডেট করার সময় ত্রুটি হয়েছে ⚠️");
       }
     } catch (error) {
       console.error("Error in fetching or parsing the response:", error);
-      alert("প্রোফাইল আপডেটে একটি সমস্যা হয়েছে।");
+      await showAlert("প্রোফাইল আপডেটে একটি সমস্যা হয়েছে।");
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import { useModal } from '../context/ModalContext';
 import Loader from "../Components/Loader";
 
 const SubmissionRequest = () => {
@@ -9,6 +10,7 @@ const SubmissionRequest = () => {
   const [rejectingId, setRejectingId] = useState(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const { showAlert, showConfirm } = useModal();
 
   const categoryBanglaMap = {
     Meat: 'মাংস',
@@ -53,10 +55,10 @@ const SubmissionRequest = () => {
       if (json.success) {
         setRequests(json.requests || []);
       } else {
-        alert("রিকুয়েষ্ট লোড করতে ব্যর্থ হয়েছে।");
+        showAlert("রিকুয়েষ্ট লোড করতে ব্যর্থ হয়েছে।");
       }
     } catch (err) {
-      alert("ত্রুটি: " + err.message);
+      showAlert("ত্রুটি: " + err.message);
     }
     setLoading(false);
   };
@@ -67,7 +69,8 @@ const SubmissionRequest = () => {
 
   const approveRequest = async (id) => {
     const admin = JSON.parse(localStorage.getItem("admin"));
-    if (!window.confirm("আপনি কি নিশ্চিত এই সাবমিশন এপ্রুভ করতে চান?")) return;
+    const isConfirmed = await showConfirm("আপনি কি নিশ্চিত এই সাবমিশন এপ্রুভ করতে চান?");
+    if (!isConfirmed) return;
     try {
       const res = await fetch(
         API_BASE_URL + "approve_submission.php",
@@ -82,13 +85,13 @@ const SubmissionRequest = () => {
       );
       const json = await res.json();
       if (json.success) {
-        alert("সাবমিশন এপ্রুভ হয়েছে এবং 'আমার রেসিপি'তে যুক্ত করা হয়েছে।");
+        await showAlert("সাবমিশন এপ্রুভ হয়েছে এবং 'আমার রেসিপি'তে যুক্ত করা হয়েছে।");
         setRequests((prev) => prev.filter((req) => req.id !== id));
       } else {
-        alert("ব্যর্থ হয়েছে: " + json.message);
+        showAlert("ব্যর্থ হয়েছে: " + json.message);
       }
     } catch (err) {
-      alert("ত্রুটি: " + err.message);
+      showAlert("ত্রুটি: " + err.message);
     }
   };
 
@@ -101,7 +104,7 @@ const SubmissionRequest = () => {
   const submitReject = async () => {
     const admin = JSON.parse(localStorage.getItem("admin"));
     if (!rejectReason.trim()) {
-      alert("অনুগ্রহ করে প্রত্যাখ্যানের কারণ লিখুন।");
+      showAlert("অনুগ্রহ করে প্রত্যাখ্যানের কারণ লিখুন।");
       return;
     }
     try {
@@ -119,15 +122,15 @@ const SubmissionRequest = () => {
       );
       const json = await res.json();
       if (json.success) {
-        alert("সাবমিশন বাতিল হয়েছে।");
+        await showAlert("সাবমিশন বাতিল হয়েছে।");
         setRequests((prev) => prev.filter((req) => req.id !== rejectingId));
         setRejectingId(null);
         setRejectReason("");
       } else {
-        alert("ব্যর্থ হয়েছে: " + json.message);
+        showAlert("ব্যর্থ হয়েছে: " + json.message);
       }
     } catch (err) {
-      alert("ত্রুটি: " + err.message);
+      showAlert("ত্রুটি: " + err.message);
     }
   };
 

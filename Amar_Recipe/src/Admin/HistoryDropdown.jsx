@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import { useModal } from '../context/ModalContext';
 import Loader from "../Components/Loader";
 
 const categoryBanglaMap = {
@@ -26,6 +27,7 @@ const categoryBanglaMap = {
 const HistoryDropdown = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showAlert } = useModal();
 
   useEffect(() => {
     const fetchAllHistories = async () => {
@@ -61,10 +63,10 @@ const HistoryDropdown = () => {
 
           setRequests(combined);
         } else {
-          alert("তথ্য লোড করতে ব্যর্থ হয়েছে।");
+          await showAlert("তথ্য লোড করতে ব্যর্থ হয়েছে।");
         }
       } catch (err) {
-        alert("ত্রুটি: " + err.message);
+        await showAlert("ত্রুটি: " + err.message);
       }
 
       setLoading(false);

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import { Link } from "react-router-dom";
+import { useModal } from '../context/ModalContext';
 
 const AdminSignup = () => {
+    const { showAlert } = useModal();
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
@@ -29,7 +31,7 @@ const AdminSignup = () => {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            alert("পাসওয়ার্ড মিলছে না");
+            await showAlert("পাসওয়ার্ড মিলছে না");
             return;
         }
 
@@ -43,7 +45,7 @@ const AdminSignup = () => {
             const text = await res.text();
             try {
                 const data = JSON.parse(text);
-                alert(data.message);
+                await showAlert(data.message);
 
                 if (data.message === "আপনার সাইনআপ ফর্মটি অ্যাডমিনের পর্যালোচনার জন্য জমা হয়েছে।") {
                     setFormData({
@@ -65,11 +67,11 @@ const AdminSignup = () => {
                 }
             } catch (err) {
                 console.error("Non-JSON response:", text);
-                alert("সার্ভার ত্রুটি: ডাটাবেজ থেকে সঠিক উত্তর আসেনি। দয়া করে এডমিনের সাথে যোগাযোগ করুন।");
+                await showAlert("সার্ভার ত্রুটি: ডাটাবেজ থেকে সঠিক উত্তর আসেনি। দয়া করে এডমিনের সাথে যোগাযোগ করুন।");
             }
         } catch (error) {
             console.error("সাইনআপ ব্যার্থ হয়েছে:", error);
-            alert("সাইনআপ ব্যার্থ হয়েছে: নেটওয়ার্ক সমস্যা অথবা সার্ভার ত্রুটি। দয়া করে পরে আবার চেষ্টা করুন।");
+            await showAlert("সাইনআপ ব্যার্থ হয়েছে: নেটওয়ার্ক সমস্যা অথবা সার্ভার ত্রুটি। দয়া করে পরে আবার চেষ্টা করুন।");
         }
     };
 

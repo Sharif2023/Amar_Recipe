@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../config/api';
+import { useModal } from '../context/ModalContext';
 import {
     IoClose,
     IoStar,
@@ -44,6 +45,7 @@ const reportReasons = [
 ];
 
 const RecipeModal = ({ isOpen, onClose, recipe }) => {
+    const { showAlert, showConfirm } = useModal();
     if (!isOpen || !recipe) return null;
 
     const [reportOpen, setReportOpen] = useState(false);
@@ -64,7 +66,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
 
     const handleReportSubmit = async () => {
         if (selectedReasons.length === 0 && otherReason.trim() === '') {
-            alert('কমপক্ষে একটি কারণ নির্বাচন করুন বা অন্যান্য কারণ লিখুন।');
+            await showAlert('কমপক্ষে একটি কারণ নির্বাচন করুন বা অন্যান্য কারণ লিখুন।');
             return;
         }
 
@@ -77,7 +79,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
         };
 
         if (!reportData.reporterEmail) {
-            const confirmAnon = window.confirm('আপনার ইমেইল প্রদান করেননি। ইমেইল ছাড়াই কি রিপোর্ট জমা দিতে চান? (ইমেইল দিলে আমাদের যোগাযোগ করতে সুবিধা হবে)');
+            const confirmAnon = await showConfirm('আপনার ইমেইল প্রদান করেননি। ইমেইল ছাড়াই কি রিপোর্ট জমা দিতে চান? (ইমেইল দিলে আমাদের যোগাযোগ করতে সুবিধা হবে)');
             if (!confirmAnon) return;
         }
 
@@ -107,7 +109,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
 
     const handleSubmitRating = async () => {
         if (!email || rating === 0) {
-            alert('দয়া করে আপনার ইমেইল এবং রেটিং প্রদান করুন');
+            await showAlert('দয়া করে আপনার ইমেইল এবং রেটিং প্রদান করুন');
             return;
         }
 
@@ -128,7 +130,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             const checkData = await checkRating.json();
 
             if (checkData.success && checkData.exists) {
-                alert('আপনি ইতিমধ্যে এই রেসিপিটিকে রেটিং দিয়েছেন!');
+                await showAlert('আপনি ইতিমধ্যে এই রেসিপিটিকে রেটিং দিয়েছেন!');
                 return;
             }
 
@@ -156,13 +158,13 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                 const newCount = Number(ratingCount) + 1;
                 setAverageRating((newTotalRatings / newCount).toFixed(1));
                 setRatingCount(newCount);
-                alert(json.message || 'আপনার রেটিং সফলভাবে জমা হয়েছে!');
+                await showAlert(json.message || 'আপনার রেটিং সফলভাবে জমা হয়েছে!');
             } else {
-                alert(json.message || 'রেটিং জমা দিতে ব্যর্থ হয়েছে');
+                await showAlert(json.message || 'রেটিং জমা দিতে ব্যর্থ হয়েছে');
             }
         } catch (error) {
             console.error('Rating error:', error);
-            alert('রেটিং জমা দিতে সমস্যা হয়েছে: ' + error.message);
+            await showAlert('রেটিং জমা দিতে সমস্যা হয়েছে: ' + error.message);
         } finally {
             setIsSubmittingRating(false);
         }

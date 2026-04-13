@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
 import AdminViewRecipeModal from './AdminViewRecipeModal';
+import { useModal } from '../context/ModalContext';
 import Loader from '../Components/Loader';
 
 const backendBaseUrl = API_BASE_URL;
 
 const Reports = () => {
+  const { showAlert, showConfirm } = useModal();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -31,7 +33,8 @@ const Reports = () => {
 
   const markasDone = async (id) => {
     console.log("Attempting to delete report with ID:", id);
-    if (!window.confirm('আপনি কি নিশ্চিত এই রিপোর্ট সমাধান হয়েছে?')) return;
+    const isConfirmed = await showConfirm('আপনি কি নিশ্চিত এই রিপোর্ট সমাধান হয়েছে?');
+    if (!isConfirmed) return;
 
     try {
       const res = await fetch(`${backendBaseUrl}delete_report.php`, {
@@ -46,13 +49,13 @@ const Reports = () => {
 
       if (json.success) {
         setReports((prev) => prev.filter((r) => r.id !== id));
-        alert('রিপোর্টটি সফলভাবে সম্পন্ন হয়েছে হিসেবে চিহ্নিত করা হয়েছে।');
+        await showAlert('রিপোর্টটি সফলভাবে সম্পন্ন হয়েছে হিসেবে চিহ্নিত করা হয়েছে।');
       } else {
-        alert('রিপোর্টটি সম্পন্ন হিসেবে চিহ্নিত করা যায়নি: ' + json.message);
+        await showAlert('রিপোর্টটি সম্পন্ন হিসেবে চিহ্নিত করা যায়নি: ' + json.message);
       }
     } catch (error) {
       console.error("Error deleting report:", error);
-      alert('রিপোর্টটি সম্পন্ন হিসেবে চিহ্নিত করার সময় একটি ত্রুটি ঘটেছে: ' + error.message);
+      await showAlert('রিপোর্টটি সম্পন্ন হিসেবে চিহ্নিত করার সময় একটি ত্রুটি ঘটেছে: ' + error.message);
     }
   };
 
@@ -106,21 +109,21 @@ const Reports = () => {
             report.recipe_id === finalRecipe.id ? { ...report, ...finalRecipe } : report
           )
         );
-        alert('রেসিপি সফলভাবে আপডেট করা হয়েছে।');
+        await showAlert('রেসিপি সফলভাবে আপডেট করা হয়েছে।');
         setShowEditModal(false);
       } else {
-        alert('রেসিপি আপডেট করা যায়নি: ' + json.message);
+        await showAlert('রেসিপি আপডেট করা যায়নি: ' + json.message);
         throw new Error(json.message);
       }
     } catch (error) {
       console.error(error);
-      alert('ত্রুটি: ' + error.message);
+      await showAlert('ত্রুটি: ' + error.message);
       throw error;
     }
   };
 
   const deleteRecipe = async (recipeId) => {
-    const confirmDelete = window.confirm(`আপনি কি নিশ্চিত যে আপনি রেসিপিটি মুছে ফেলতে চান? আইডিঃ ${recipeId}`);
+    const confirmDelete = await showConfirm(`আপনি কি নিশ্চিত যে আপনি রেসিপিটি মুছে ফেলতে চান? আইডিঃ ${recipeId}`);
     if (!confirmDelete) return;
 
     try {
@@ -135,18 +138,18 @@ const Reports = () => {
       const json = await res.json();
       if (json.success) {
         setReports((prev) => prev.filter((r) => r.recipe_id !== recipeId));
-        alert('রেসিপিটি সফলভাবে মুছে ফেলা হয়েছে');
+        await showAlert('রেসিপিটি সফলভাবে মুছে ফেলা হয়েছে');
       } else {
-        alert('রেসিপি মুছে ফেলা যায়নি: ' + json.message);
+        await showAlert('রেসিপি মুছে ফেলা যায়নি: ' + json.message);
       }
     } catch (error) {
-      alert('রেসিপি মুছে ফেলা যায়নি। ত্রুটি: ' + error.message);
+      await showAlert('রেসিপি মুছে ফেলা যায়নি। ত্রুটি: ' + error.message);
     }
   };
 
   const sendMail = async (report) => {
     // Simulate sending mail (or integrate your mail backend)
-    alert(`মেইল পাঠান: ${report.reporter_email} কে রিপোর্ট সম্পর্কে। #${report.id}`);
+    await showAlert(`মেইল পাঠান: ${report.reporter_email} কে রিপোর্ট সম্পর্কে। #${report.id}`);
   };
 
   if (loading) return <Loader />;
