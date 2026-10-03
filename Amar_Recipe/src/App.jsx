@@ -9,6 +9,7 @@ import Footer from "./Components/Footer";
 import SubmitRecipe from "./Pages/SubmitRecipe";
 import About from "./Pages/About";
 import VerifyEmail from "./Pages/VerifyEmail";
+import NotFound from "./Pages/NotFound";
 
 // Admin Panel
 import AdminHeader from "./Components/AdminHeader";
@@ -124,6 +125,7 @@ function App() {
           </>} />
 
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="*" element={<NotFound />} />
           
       </Routes>
     </BrowserRouter>

@@ -25,6 +25,11 @@ try {
             $data = $image['image_data'];
         }
 
+        // CRITICAL: Close DB connection BEFORE sending data over the network
+        // This prevents connection pool exhaustion when serving many images concurrently.
+        $stmt = null;
+        $conn = null;
+
         // Generate ETag from image data for cache validation
         $etag = '"' . md5($data) . '"';
         $lastModified = gmdate('D, d M Y H:i:s T');

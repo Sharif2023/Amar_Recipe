@@ -5,6 +5,7 @@ import AdminFooter from '../Components/AdminFooter';
 import { IoStar, IoTrashBinOutline, IoPencilOutline, IoEyeOutline } from 'react-icons/io5';
 import AdminViewRecipeModal from './AdminViewRecipeModal';
 import Loader from '../Components/Loader';
+import { useModal } from '../context/ModalContext';
 
 const AdminPanel = () => {
   const [recipes, setRecipes] = useState([]);
@@ -13,6 +14,7 @@ const AdminPanel = () => {
   const [modalMode, setModalMode] = useState('view'); // 'view' or 'edit'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { showAlert, showConfirm } = useModal();
   const baseImageUrl = API_BASE_URL;
 
 
@@ -97,20 +99,20 @@ const AdminPanel = () => {
             r.id === finalRecipe.id ? finalRecipe : r
           )
         );
-        alert('রেসিপি সফলভাবে আপডেট করা হয়েছে।');
+        await showAlert('রেসিপি সফলভাবে আপডেট করা হয়েছে।');
         setShowModal(false);
       } else {
-        alert('রেসিপি আপডেট করা যায়নি: ' + json.message);
+        await showAlert('রেসিপি আপডেট করা যায়নি: ' + json.message);
         throw new Error(json.message);
       }
     } catch (error) {
-      alert('রেসিপি আপডেট করার সময় ত্রুটি: ' + error.message);
+      await showAlert('রেসিপি আপডেট করার সময় ত্রুটি: ' + error.message);
       throw error;
     }
   };
   // ... rest of the component handlers ...
   const handleDelete = async (recipe) => {
-    const confirmDelete = window.confirm(`আপনি কি নিশ্চিত যে রেসিপি মুছে ফেলতে চান "${recipe.title}"?`);
+    const confirmDelete = await showConfirm(`আপনি কি নিশ্চিত যে রেসিপি মুছে ফেলতে চান "${recipe.title}"?`);
     if (!confirmDelete) return;
 
     try {
@@ -125,12 +127,12 @@ const AdminPanel = () => {
       const json = await res.json();
       if (json.success) {
         setRecipes((prev) => prev.filter((r) => r.id !== recipe.id));
-        alert('রেসিপিটি সফলভাবে মুছে ফেলা হয়েছে।');
+        await showAlert('রেসিপিটি সফলভাবে মুছে ফেলা হয়েছে।');
       } else {
-        alert('রেসিপি মুছে ফেলা যায়নি: ' + json.message);
+        await showAlert('রেসিপি মুছে ফেলা যায়নি: ' + json.message);
       }
     } catch (error) {
-      alert('রেসিপি মুছে ফেলার সময় ত্রুটি: ' + error.message);
+      await showAlert('রেসিপি মুছে ফেলার সময় ত্রুটি: ' + error.message);
     }
   };
 

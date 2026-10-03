@@ -19,6 +19,9 @@ if (empty($id)) {
 
 try {
     $conn = getDbConnection();
+    
+    // Start transaction for ACID compliance
+    $conn->beginTransaction();
 
     // Handle image upload: store binary in recipe_images (BYTEA); fail request if image save fails
     $image_url = null;
@@ -34,6 +37,7 @@ try {
 
         $imageData = file_get_contents($fileTmpPath);
         if ($imageData === false || strlen($imageData) === 0) {
+            $conn->rollBack();
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Image update failed: invalid or empty file']);
             exit;
@@ -71,6 +75,7 @@ try {
             $apiUrl = defined('API_BASE_URL') ? API_BASE_URL : (getenv('RENDER') === 'true' ? 'https://' . getenv('RENDER_EXTERNAL_HOSTNAME') . '/src/api/' : 'http://localhost/Amar_Recipies_Live/Amar_Recipe/src/api/');
             $image_url = $apiUrl . "get_image.php?id=" . $id . "&t=" . time();
         } catch (Exception $e) {
+            $conn->rollBack();
             error_log("Image update failed: " . $e->getMessage());
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Image update failed: ' . $e->getMessage()]);
@@ -141,6 +146,8 @@ try {
     $stmt = $conn->prepare($sql);
     $stmt->execute($params);
 
+    $conn->commit();
+
     // Send edit notification
     try {
         require_once __DIR__ . '/mail_util.php';
@@ -171,6 +178,9 @@ try {
     }
     echo json_encode($response);
 } catch (Throwable $e) {
+    if (isset($conn) && $conn->inTransaction()) {
+        $conn->rollBack();
+    }
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server Error: ' . $e->getMessage()]);
 }
