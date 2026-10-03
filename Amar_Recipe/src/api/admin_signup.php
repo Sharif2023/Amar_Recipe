@@ -34,25 +34,20 @@ $stmt = $conn->prepare("SELECT id FROM admin_requests WHERE email = :email");
 $stmt->execute([':email' => $email]);
 if ($stmt->fetch()) {
     echo json_encode(['success' => false, 'message' => 'Email already registered']);
-    exit;
+    exit;si
 }
 
 try {
-    // admin_requests.id has no SERIAL/default on production; get next id
-    $idStmt = $conn->query("SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM admin_requests");
-    $nextId = (int) $idStmt->fetch()['next_id'];
-
     $sql = "INSERT INTO admin_requests (
-        id, name, email, password, phone, date, area, city, state, postcode,
+        name, email, password, phone, date, area, city, state, postcode,
         experience, specialty, portfolio, certification, status
     ) VALUES (
-        :id, :name, :email, :password, :phone, :date, :area, :city, :state, :postcode,
+        :name, :email, :password, :phone, :date, :area, :city, :state, :postcode,
         :experience, :specialty, :portfolio, :certification, 'pending'
     )";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute([
-        ':id' => $nextId,
         ':name' => $name,
         ':email' => $email,
         ':password' => $password,

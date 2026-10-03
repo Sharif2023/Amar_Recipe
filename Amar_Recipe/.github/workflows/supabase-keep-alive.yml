@@ -1,0 +1,72 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Run once daily at 12:00 PM UTC
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  keep-alive:
+    name: Database Keep-Alive
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Execute Keep-Alive Operations
+        env:
+          # The Supabase connection string must be stored in GitHub Secrets
+          # e.g., postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Error: SUPABASE_DB_URL secret is not set in GitHub repository secrets."
+            echo "Please go to Settings > Secrets and variables > Actions > New repository secret, and add your Supabase connection string."
+            exit 1
+          fi
+
+          echo "Starting Supabase keep-alive sequence at $(date -u)"
+
+          # Execute the SQL operations in a safe DO block using psql.
+          # psql is pre-installed on the ubuntu-latest runner.
+          # We use ON_ERROR_STOP=1 so psql exits with a non-zero status if any SQL fails.
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 << 'EOF'
+          
+          -- Ensure the dedicated keep-alive table exists. 
+          -- We avoid modifying or depending on application tables.
+          CREATE TABLE IF NOT EXISTS _supabase_keep_alive (
+              id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+              executed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+              note TEXT
+          );
+
+          DO $$ 
+          DECLARE 
+              v_id UUID;
+              v_count INT;
+          BEGIN
+              -- 1. Insert a uniquely identifiable temporary record
+              INSERT INTO _supabase_keep_alive (note) 
+              VALUES ('Keep-alive execution ' || clock_timestamp()::text) 
+              RETURNING id INTO v_id;
+              
+              -- 2. Verify that the insertion succeeded
+              SELECT count(*) INTO v_count FROM _supabase_keep_alive WHERE id = v_id;
+              IF v_count != 1 THEN
+                  RAISE EXCEPTION 'Verification failed: Inserted record not found (ID: %)', v_id;
+              END IF;
+              
+              -- 3. Delete only the temporary record created by this execution
+              DELETE FROM _supabase_keep_alive WHERE id = v_id;
+              
+              -- 4. Verify that the deletion succeeded
+              SELECT count(*) INTO v_count FROM _supabase_keep_alive WHERE id = v_id;
+              IF v_count != 0 THEN
+                  RAISE EXCEPTION 'Verification failed: Record was not deleted (ID: %)', v_id;
+              END IF;
+              
+              -- 5. Log the execution status safely
+              RAISE NOTICE 'Keep-alive operation completed successfully for ID %', v_id;
+          END $$;
+          EOF
+          
+          echo "Keep-alive sequence finished successfully at $(date -u)"

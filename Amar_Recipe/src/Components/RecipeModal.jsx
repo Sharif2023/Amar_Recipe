@@ -57,6 +57,29 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
     const [email, setEmail] = useState('');
     const [averageRating, setAverageRating] = useState(recipe.rating || 0);
     const [ratingCount, setRatingCount] = useState(recipe.ratingcount || 0);
+    const [reviewImage, setReviewImage] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
+    const [cooksnaps, setCooksnaps] = useState([]);
+
+    React.useEffect(() => {
+        if (isOpen && recipe) {
+            fetch(`${API_BASE_URL}get_cooksnaps.php?recipe_id=${recipe.id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        setCooksnaps(data.data);
+                    }
+                })
+                .catch(err => console.error('Failed to load cooksnaps', err));
+        }
+    }, [isOpen, recipe]);
+
+    const getYoutubeVideoId = (url) => {
+        if (!url) return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    };
 
     const toggleReason = (id) => {
         setSelectedReasons((prev) =>
@@ -134,16 +157,17 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                 return;
             }
 
-            const ratingData = {
-                recipeId: recipe.id,
-                email,
-                rating,
-            };
+            const formData = new FormData();
+            formData.append('recipeId', recipe.id);
+            formData.append('email', email);
+            formData.append('rating', rating);
+            if (reviewImage) {
+                formData.append('image', reviewImage);
+            }
 
             const res = await fetch(API_BASE_URL + 'rate_recipe.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(ratingData),
+                body: formData,
             });
             
             if (!res.ok) {
@@ -158,6 +182,8 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                 const newCount = Number(ratingCount) + 1;
                 setAverageRating((newTotalRatings / newCount).toFixed(1));
                 setRatingCount(newCount);
+                setReviewImage(null);
+                setPreviewImage(null);
                 await showAlert(json.message || 'আপনার রেটিং সফলভাবে জমা হয়েছে!');
             } else {
                 await showAlert(json.message || 'রেটিং জমা দিতে ব্যর্থ হয়েছে');
@@ -252,12 +278,30 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                         <IoLinkOutline size={20} />
                                         <span className="truncate">রেফারেন্স লিংক</span>
                                     </a>
-                                    {recipe.tutorialvideo && (
-                                        <a href={recipe.tutorialvideo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 text-sm text-green-600 dark:text-green-400 bg-green-50/50 dark:bg-green-900/10 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors">
-                                            <IoPlayCircleOutline size={20} />
-                                            <span className="truncate">ভিডিও টিউটোরিয়াল</span>
-                                        </a>
-                                    )}
+                                    {recipe.tutorialvideo && (() => {
+                                        const videoId = getYoutubeVideoId(recipe.tutorialvideo);
+                                        if (videoId) {
+                                            return (
+                                                <div className="w-full aspect-video rounded-xl overflow-hidden shadow-sm mt-4">
+                                                    <iframe
+                                                        width="100%"
+                                                        height="100%"
+                                                        src={`https://www.youtube.com/embed/${videoId}`}
+                                                        title="YouTube video player"
+                                                        frameBorder="0"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                        allowFullScreen
+                                                    ></iframe>
+                                                </div>
+                                            );
+                                        }
+                                        return (
+                                            <a href={recipe.tutorialvideo} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 text-sm text-green-600 dark:text-green-400 bg-green-50/50 dark:bg-green-900/10 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors mt-4">
+                                                <IoPlayCircleOutline size={20} />
+                                                <span className="truncate">ভিডিও টিউটোরিয়াল</span>
+                                            </a>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         </div>
@@ -319,6 +363,26 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                     </div>
 
                                     <div className="relative">
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">আপনার রান্নার ছবি (কুকস্ন্যাপ) দিন - অপশনাল</label>
+                                            <div className="flex items-center gap-4">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files[0];
+                                                        if (file) {
+                                                            setReviewImage(file);
+                                                            setPreviewImage(URL.createObjectURL(file));
+                                                        }
+                                                    }}
+                                                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 dark:file:bg-rose-900/20 dark:file:text-rose-400"
+                                                />
+                                                {previewImage && (
+                                                    <img src={previewImage} alt="Preview" className="w-16 h-16 object-cover rounded-xl shadow-sm" />
+                                                )}
+                                            </div>
+                                        </div>
                                         <input
                                             type="email"
                                             className="w-full px-6 py-4 bg-white dark:bg-[#262525] border border-gray-200 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all dark:text-white"
@@ -329,7 +393,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                         <button
                                             onClick={handleSubmitRating}
                                             disabled={isSubmittingRating}
-                                            className="absolute right-2 top-2 bottom-2 px-6 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-600/20 flex items-center gap-2 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="mt-4 w-full sm:w-auto px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-600/20 flex items-center justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {isSubmittingRating ? (
                                                 <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -341,10 +405,31 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                             )}
                                         </button>
                                     </div>
+                                    <p className="text-[10px] text-gray-400 mt-4 text-center dark:text-gray-600 flex items-center justify-center gap-1 font-bold">
+                                        <IoAlertCircleOutline /> এক ইমেইল থেকে একবারই রেটিং দেওয়া যাবে
+                                    </p>
                                 </div>
-                                <p className="text-[10px] text-gray-400 mt-4 text-center dark:text-gray-600 flex items-center justify-center gap-1 font-bold">
-                                    <IoAlertCircleOutline /> এক ইমেইল থেকে একবারই রেটিং দেওয়া যাবে
-                                </p>
+                                
+                                {cooksnaps.length > 0 && (
+                                    <div className="mt-8 pt-8 border-t dark:border-gray-800">
+                                        <h3 className="text-lg font-black dark:text-white mb-6">কুকস্ন্যাপস (Cooksnaps)</h3>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                            {cooksnaps.map((snap, index) => (
+                                                <div key={index} className="bg-gray-50 dark:bg-[#1b1b1b] rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
+                                                    <img src={`${API_BASE_URL}${snap.image_url}`} alt="Cooksnap" className="w-full h-32 object-cover" />
+                                                    <div className="p-3">
+                                                        <div className="flex items-center text-amber-400 text-xs mb-1">
+                                                            {[...Array(5)].map((_, i) => (
+                                                                <IoStar key={i} className={i < snap.rating ? 'fill-current' : 'opacity-30'} />
+                                                            ))}
+                                                        </div>
+                                                        <p className="text-[10px] text-gray-500 truncate">{snap.user_email}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Action Row */}

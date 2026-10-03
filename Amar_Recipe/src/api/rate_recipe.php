@@ -2,12 +2,34 @@
 require_once __DIR__ . '/config.php';
 error_log("Request received for rate_recipe.php");
 
-$data = json_decode(file_get_contents('php://input'), true);
+$is_json = false;
+$data = [];
+if (strpos($_SERVER["CONTENT_TYPE"] ?? '', 'application/json') !== false) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $is_json = true;
+}
 
 // Support both naming conventions for compatibility
-$recipe_id = $data['recipe_id'] ?? $data['recipeId'] ?? '';
-$user_email = $data['user_email'] ?? $data['email'] ?? '';
-$rating = $data['rating'] ?? '';
+$recipe_id = $_POST['recipe_id'] ?? $_POST['recipeId'] ?? ($data['recipe_id'] ?? ($data['recipeId'] ?? ''));
+$user_email = $_POST['user_email'] ?? $_POST['email'] ?? ($data['user_email'] ?? ($data['email'] ?? ''));
+$rating = $_POST['rating'] ?? ($data['rating'] ?? '');
+
+$image_url = null;
+if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    $uploadDir = __DIR__ . '/uploads/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+    $fileExt = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+    $allowedExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    if (in_array($fileExt, $allowedExt)) {
+        $fileName = 'rating_' . time() . '_' . uniqid() . '.' . $fileExt;
+        $destPath = $uploadDir . $fileName;
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $destPath)) {
+            $image_url = 'uploads/' . $fileName;
+        }
+    }
+}
 
 if (empty($recipe_id) || empty($user_email) || empty($rating)) {
     echo json_encode(['success' => false, 'message' => 'Missing fields']);
@@ -36,23 +58,45 @@ try {
     
     // Perform the save operation (Insert or Update)
     if ($existing) {
-        $updateStmt = $conn->prepare("UPDATE ratings SET rating = :rating, verification_token = :token, is_verified = :is_verified, created_at = NOW() WHERE id = :id");
-        $updateStmt->execute([
+        $query = "UPDATE ratings SET rating = :rating, verification_token = :token, is_verified = :is_verified, created_at = NOW()";
+        if ($image_url) {
+            $query .= ", image_url = :image_url";
+        }
+        $query .= " WHERE id = :id";
+        $updateStmt = $conn->prepare($query);
+        $params = [
             ':rating' => $rating, 
             ':token' => $token, 
-            ':is_verified' => $shouldVerify ? 0 : 1, // Store as bool-compatible int
+            ':is_verified' => $shouldVerify ? 0 : 1,
             ':id' => $existing['id']
-        ]);
+        ];
+        if ($image_url) {
+            $params[':image_url'] = $image_url;
+        }
+        $updateStmt->execute($params);
     } else {
-        $insertStmt = $conn->prepare("INSERT INTO ratings (recipe_id, user_email, email, rating, is_verified, verification_token) VALUES (:recipe_id, :user_email, :email, :rating, :is_verified, :token)");
-        $insertStmt->execute([
+        $query = "INSERT INTO ratings (recipe_id, user_email, email, rating, is_verified, verification_token";
+        if ($image_url) {
+            $query .= ", image_url";
+        }
+        $query .= ") VALUES (:recipe_id, :user_email, :email, :rating, :is_verified, :token";
+        if ($image_url) {
+            $query .= ", :image_url";
+        }
+        $query .= ")";
+        $insertStmt = $conn->prepare($query);
+        $params = [
             ':recipe_id' => $recipe_id, 
             ':user_email' => $user_email, 
             ':email' => $user_email, 
             ':rating' => $rating, 
             ':is_verified' => $shouldVerify ? 0 : 1, 
             ':token' => $token
-        ]);
+        ];
+        if ($image_url) {
+            $params[':image_url'] = $image_url;
+        }
+        $insertStmt->execute($params);
     }
 
     // Get recipe title for email

@@ -20,7 +20,7 @@ try {
     }
     
     // Check status
-    if ($admin['status'] !== 'approved') {
+    if (strtolower($admin['status']) !== 'approved') {
         echo json_encode(['success' => false, 'message' => 'Invalid credentials', 'debug' => 'Status is ' . $admin['status']]);
         exit();
     }

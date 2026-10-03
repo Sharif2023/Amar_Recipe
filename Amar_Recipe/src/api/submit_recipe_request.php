@@ -138,8 +138,7 @@ try {
     // So if ($organizerEmail === ADMIN_EMAIL) is TRUE, then $shouldVerify is TRUE, and it goes to verification.
     // This means ADMIN has to verify, but OTHERS don't? That's definitely weird.
     // But I'll keep it exactly as it was.
-    
-    $shouldVerify = ($organizerEmail === ADMIN_EMAIL);
+    $shouldVerify = ($organizerEmail !== ADMIN_EMAIL);
 
     if ($shouldVerify) {
         $mailResult = sendSubmissionVerification($organizerEmail, $title, $token);
