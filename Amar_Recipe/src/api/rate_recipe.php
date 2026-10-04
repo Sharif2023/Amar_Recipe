@@ -16,17 +16,17 @@ $rating = $_POST['rating'] ?? ($data['rating'] ?? '');
 
 $image_url = null;
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/uploads/';
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-    }
-    $fileExt = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+    $fileTmpPath = $_FILES['image']['tmp_name'];
+    $fileType = $_FILES['image']['type'];
+    
     $allowedExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    $fileExt = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+    
     if (in_array($fileExt, $allowedExt)) {
-        $fileName = 'rating_' . time() . '_' . uniqid() . '.' . $fileExt;
-        $destPath = $uploadDir . $fileName;
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $destPath)) {
-            $image_url = 'uploads/' . $fileName;
+        $imageData = file_get_contents($fileTmpPath);
+        if ($imageData !== false) {
+            $base64 = base64_encode($imageData);
+            $image_url = 'data:' . $fileType . ';base64,' . $base64;
         }
     }
 }

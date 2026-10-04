@@ -76,9 +76,9 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
 
     const getYoutubeVideoId = (url) => {
         if (!url) return null;
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const regExp = /^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
         const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
+        return (match && match[1].length === 11) ? match[1] : null;
     };
 
     const toggleReason = (id) => {
@@ -416,7 +416,11 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                             {cooksnaps.map((snap, index) => (
                                                 <div key={index} className="bg-gray-50 dark:bg-[#1b1b1b] rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
-                                                    <img src={`${API_BASE_URL}${snap.image_url}`} alt="Cooksnap" className="w-full h-32 object-cover" />
+                                                    <img 
+                                                        src={snap.image_url?.startsWith('data:') ? snap.image_url : `${API_BASE_URL}${snap.image_url}`} 
+                                                        alt="Cooksnap" 
+                                                        className="w-full h-32 object-cover" 
+                                                    />
                                                     <div className="p-3">
                                                         <div className="flex items-center text-amber-400 text-xs mb-1">
                                                             {[...Array(5)].map((_, i) => (
