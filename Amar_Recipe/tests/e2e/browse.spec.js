@@ -7,7 +7,7 @@ test.describe('Browse Recipes', () => {
 
   test('should display the home page and header correctly', async ({ page }) => {
     // Assert title or header visibility
-    await expect(page.locator('header')).toBeVisible();
+    await expect(page.locator('nav')).toBeVisible();
     await expect(page).toHaveTitle(/আমার রেসিপি/);
   });
 
