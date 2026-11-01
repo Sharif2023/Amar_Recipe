@@ -48,6 +48,9 @@ $tags = isset($_POST['tags']) ? trim($_POST['tags']) : '';
 $reference = isset($_POST['reference']) ? trim($_POST['reference']) : '';
 $tutorialVideo = isset($_POST['tutorialVideo']) ? trim($_POST['tutorialVideo']) : '';
 $comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';
+$authUser = getAuthenticatedUser($conn, false);
+$userId = $authUser['id'] ?? null;
+$loggedInVerified = $authUser && !empty($authUser['is_verified']);
 
 // Check for similar descriptions
 function is_similar_description($conn, $new_desc, $new_title)
@@ -89,8 +92,8 @@ try {
 
     // Initially insert without the final image URL, using 'pending' as placeholder
     $stmt = $conn->prepare("INSERT INTO submission_requests 
-        (title, category, description, image, location, organizerName, organizerEmail, organizerAddress, status, tags, reference, tutorialVideo, comment, source, is_verified, verification_token)
-        VALUES (:title, :category, :description, 'pending', :location, :organizerName, :organizerEmail, :organizerAddress, :status, :tags, :reference, :tutorialVideo, :comment, :source, FALSE, :token)");
+        (title, category, description, image, location, organizerName, organizerEmail, organizerAddress, status, tags, reference, tutorialVideo, comment, source, is_verified, verification_token, user_id)
+        VALUES (:title, :category, :description, 'pending', :location, :organizerName, :organizerEmail, :organizerAddress, :status, :tags, :reference, :tutorialVideo, :comment, :source, FALSE, :token, :user_id)");
 
     $stmt->execute([
         ':title' => $title,
@@ -106,7 +109,8 @@ try {
         ':tutorialVideo' => $tutorialVideo,
         ':comment' => $comment,
         ':source' => $source,
-        ':token' => $token
+        ':token' => $token,
+        ':user_id' => $userId
     ]);
 
     $submissionId = $conn->lastInsertId();
@@ -138,7 +142,8 @@ try {
     // So if ($organizerEmail === ADMIN_EMAIL) is TRUE, then $shouldVerify is TRUE, and it goes to verification.
     // This means ADMIN has to verify, but OTHERS don't? That's definitely weird.
     // But I'll keep it exactly as it was.
-    $shouldVerify = ($organizerEmail !== ADMIN_EMAIL);
+    // Guests must verify email. Logged-in verified users skip this and can track from profile.
+    $shouldVerify = !$loggedInVerified && ($organizerEmail !== ADMIN_EMAIL);
 
     if ($shouldVerify) {
         $mailResult = sendSubmissionVerification($organizerEmail, $title, $token);

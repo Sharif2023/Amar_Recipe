@@ -1,6 +1,15 @@
 # API Directory Configuration
 # CORS is handled in config.php - DO NOT add CORS headers here (causes duplicates)
 
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+SetEnvIf X-Auth-Token "(.*)" HTTP_X_AUTH_TOKEN=$1
+
 # PHP Settings
 <IfModule mod_php.c>
     # Error handling

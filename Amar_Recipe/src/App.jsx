@@ -10,6 +10,9 @@ import SubmitRecipe from "./Pages/SubmitRecipe";
 import About from "./Pages/About";
 import VerifyEmail from "./Pages/VerifyEmail";
 import NotFound from "./Pages/NotFound";
+import UserLogin from "./Pages/UserLogin";
+import UserSignup from "./Pages/UserSignup";
+import UserProfile from "./Pages/UserProfile";
 
 // Admin Panel
 import AdminHeader from "./Components/AdminHeader";
@@ -124,6 +127,9 @@ function App() {
             <AdminFooter />
           </>} />
 
+        <Route path="/login" element={<UserLogin />} />
+        <Route path="/signup" element={<UserSignup />} />
+        <Route path="/profile" element={<UserProfile />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="*" element={<NotFound />} />
           

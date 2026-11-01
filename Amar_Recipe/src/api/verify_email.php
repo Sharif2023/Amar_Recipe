@@ -55,6 +55,19 @@ try {
         } else {
             echo json_encode(['success' => false, 'message' => 'যাচাইকরন টোকেনটি পাওয়া যায়নি বা ইতিমধ্য ব্যবহার করা হয়েছে।']);
         }
+    }
+    elseif ($type === 'user') {
+        $stmt = $conn->prepare("SELECT id FROM users WHERE verification_token = :token");
+        $stmt->execute([':token' => $token]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $update = $conn->prepare("UPDATE users SET is_verified = TRUE, verification_token = NULL, updated_at = NOW() WHERE id = :id");
+            $update->execute([':id' => $user['id']]);
+            echo json_encode(['success' => true, 'message' => 'ধন্যবাদ! আপনার অ্যাকাউন্ট যাচাই হয়েছে। এখন লগইন করতে পারেন।']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'যাচাইকরন টোকেনটি পাওয়া যায়নি বা ইতিমধ্য ব্যবহার করা হয়েছে।']);
+        }
     } else {
         echo json_encode(['success' => false, 'message' => 'অজানা ধরনের যাচাইকরন অনুরোধ।']);
     }

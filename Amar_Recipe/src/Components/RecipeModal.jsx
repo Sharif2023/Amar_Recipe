@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, getUserAuthHeaders } from '../config/api';
 import { useModal } from '../context/ModalContext';
+import { useUserAuth } from '../context/UserAuthContext';
 import {
     IoClose,
     IoStar,
@@ -46,6 +47,7 @@ const reportReasons = [
 
 const RecipeModal = ({ isOpen, onClose, recipe }) => {
     const { showAlert, showConfirm } = useModal();
+    const { isLoggedIn, user } = useUserAuth() || {};
     if (!isOpen || !recipe) return null;
 
     const [reportOpen, setReportOpen] = useState(false);
@@ -54,12 +56,18 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
     const [submitStatus, setSubmitStatus] = useState(null);
     const [isSubmittingRating, setIsSubmittingRating] = useState(false);
     const [rating, setRating] = useState(0);
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(user?.email || '');
     const [averageRating, setAverageRating] = useState(recipe.rating || 0);
     const [ratingCount, setRatingCount] = useState(recipe.ratingcount || 0);
     const [reviewImage, setReviewImage] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
     const [cooksnaps, setCooksnaps] = useState([]);
+
+    React.useEffect(() => {
+        if (user?.email) {
+            setEmail(user.email);
+        }
+    }, [user]);
 
     React.useEffect(() => {
         if (isOpen && recipe) {
@@ -142,7 +150,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
             setIsSubmittingRating(true);
             const checkRating = await fetch(API_BASE_URL + 'check_user_rating.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getUserAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ recipeId: recipe.id, email: email }),
             });
 
@@ -167,6 +175,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
 
             const res = await fetch(API_BASE_URL + 'rate_recipe.php', {
                 method: 'POST',
+                headers: getUserAuthHeaders(),
                 body: formData,
             });
             
@@ -388,6 +397,7 @@ const RecipeModal = ({ isOpen, onClose, recipe }) => {
                                             className="w-full px-6 py-4 bg-white dark:bg-[#262525] border border-gray-200 dark:border-gray-800 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all dark:text-white"
                                             placeholder="আপনার ইমেইল দিন..."
                                             value={email}
+                                            readOnly={Boolean(isLoggedIn && user?.email)}
                                             onChange={(e) => setEmail(e.target.value)}
                                         />
                                         <button

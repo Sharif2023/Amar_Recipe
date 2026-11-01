@@ -51,8 +51,8 @@ try {
     // recipes columns: title, category, description, image_url, location, organizername, organizeremail, organizeraddress, tags, reference, tutorialvideo, comment, source, created_at
     
     $insertStmt = $conn->prepare("INSERT INTO recipes 
-        (title, category, description, image_url, location, organizername, organizeremail, organizeraddress, tags, reference, tutorialvideo, comment, source, created_at)
-        VALUES (:title, :category, :description, :image_url, :location, :organizername, :organizeremail, :organizeraddress, :tags, :reference, :tutorialvideo, :comment, :source, NOW())");
+        (title, category, description, image_url, location, organizername, organizeremail, organizeraddress, tags, reference, tutorialvideo, comment, source, created_at, user_id)
+        VALUES (:title, :category, :description, :image_url, :location, :organizername, :organizeremail, :organizeraddress, :tags, :reference, :tutorialvideo, :comment, :source, NOW(), :user_id)");
     
     $insertStmt->execute([
         ':title' => $submission['title'] ?? '',
@@ -67,7 +67,8 @@ try {
         ':reference' => $submission['reference'] ?? '',
         ':tutorialvideo' => $submission['tutorialvideo'] ?? '',
         ':comment' => $submission['comment'] ?? '',
-        ':source' => $submission['source'] ?? ''
+        ':source' => $submission['source'] ?? '',
+        ':user_id' => $submission['user_id'] ?? null
     ]);
 
     $recipeId = $conn->lastInsertId();
