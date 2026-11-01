@@ -25,39 +25,26 @@ try {
             $data = $image['image_data'];
         }
 
-        // CRITICAL: Close DB connection BEFORE sending data over the network
-        // This prevents connection pool exhaustion when serving many images concurrently.
-        $stmt = null;
-        $conn = null;
+        if ($data === false || strlen($data) === 0) {
+            http_response_code(404);
+            echo 'Image not found';
+            exit;
+        }
 
-        // Generate ETag from image data for cache validation
         $etag = '"' . md5($data) . '"';
-        $lastModified = gmdate('D, d M Y H:i:s T');
-
-        // Send cache headers — browser caches for 7 days
         header("Cache-Control: public, max-age=604800, immutable");
         header("ETag: $etag");
-        header("Last-Modified: $lastModified");
+        header("Content-Type: $contentType");
+        header("Content-Length: " . strlen($data));
 
-        // Serve 304 Not Modified if client already has this version
-        if (
-            (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $etag) ||
-            isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
-        ) {
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
             http_response_code(304);
             exit;
         }
 
-        // Output headers
-        header("Content-Type: $contentType");
-        header("Content-Length: " . strlen($data));
-        
-        echo $data; 
+        echo $data;
     } else {
-        // Serve a default placeholder or 404
         http_response_code(404);
-        // Optional: Redirect to a default image
-        // header("Location: ../assets/default-recipe.png"); 
         echo 'Image not found';
     }
 } catch (Exception $e) {

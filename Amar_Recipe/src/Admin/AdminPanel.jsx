@@ -253,13 +253,28 @@ const AdminPanel = () => {
                 key={item.id}
                 className="flex items-center gap-4 py-4 px-2 bg-white dark:bg-[#262525] rounded-md shadow hover:shadow-lg transition cursor-default"
               >
-                <img
-                  src={item.image_url
-                    ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
-                    : 'https://via.placeholder.com/80x60?text=No+Image'}
-                  alt={item.title}
-                  className="w-20 h-16 object-cover rounded-md flex-shrink-0"
-                />
+                <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden rounded-md bg-gray-100 dark:bg-gray-800">
+                  <img
+                    src={item.image_url
+                      ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
+                      : 'https://via.placeholder.com/80x60?text=No+Image'}
+                    alt={item.title}
+                    className="w-full h-full object-cover rounded-md"
+                    loading="lazy"
+                    onLoad={(e) => {
+                      e.target.style.opacity = '1';
+                      e.target.parentElement.querySelector('.img-shimmer')?.classList.add('hidden');
+                    }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/80x60?text=No+Image';
+                      e.target.style.opacity = '1';
+                      e.target.parentElement.querySelector('.img-shimmer')?.classList.add('hidden');
+                    }}
+                    style={{ opacity: 0, transition: 'opacity 200ms ease' }}
+                  />
+                  <div className="img-shimmer absolute inset-0" />
+                </div>
                 <div className="flex-grow min-w-0">
                   <h3
                     className="text-lg font-semibold dark:text-white truncate"

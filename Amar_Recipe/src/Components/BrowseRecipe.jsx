@@ -233,17 +233,25 @@ const BrowseRecipe = () => {
               onClick={() => handleViewRecipe(item)}
             >
               <div className="relative overflow-hidden h-[300px] sm:h-[200px] bg-gray-100 dark:bg-gray-800">
-                <div className="absolute inset-0 img-shimmer" />
                 <img
                   src={item.image_url
                     ? (item.image_url.startsWith('http') ? item.image_url : baseImageUrl + item.image_url)
                     : 'https://placehold.co/300x200?text=No+Image'}
                   alt={item.title}
                   loading="lazy"
-                  onLoad={(e) => { e.target.style.opacity = 1; }}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x200?text=No+Image'; e.target.style.opacity = 1; }}
+                  onLoad={(e) => {
+                    e.target.style.opacity = '1';
+                    e.target.parentElement.querySelector('.img-shimmer')?.classList.add('hidden');
+                  }}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://placehold.co/300x200?text=No+Image';
+                    e.target.style.opacity = '1';
+                    e.target.parentElement.querySelector('.img-shimmer')?.classList.add('hidden');
+                  }}
                   className="w-full h-full object-cover sm:group-hover:brightness-90 transition-all duration-300 opacity-0"
                 />
+                <div className="img-shimmer absolute inset-0" />
               </div>
               <div className="p-5">
                 <div className="flex justify-between items-center mb-3">
