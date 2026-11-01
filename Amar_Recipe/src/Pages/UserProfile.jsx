@@ -249,28 +249,30 @@ export default function UserProfile() {
                 
                 {/* ── 1. Profile Hero Card ── */}
                 <div className="bg-white dark:bg-[#1a1a1a] rounded-3xl border border-gray-100 dark:border-gray-800/80 shadow-sm overflow-hidden mb-6 sm:mb-8 transition-all">
-                    {/* Top Decorative Banner */}
-                    <div className="h-36 sm:h-48 bg-gradient-to-r from-[#8c0327] via-rose-600 to-orange-500 relative overflow-hidden flex items-start p-4 sm:p-6">
-                        <div className="absolute -right-8 -top-8 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-                        <div className="absolute left-1/3 bottom-0 w-32 h-32 rounded-full bg-orange-400/20 blur-xl pointer-events-none" />
+                    {/* Top Decorative Banner (Shorter and more elegant) */}
+                    <div className="h-32 sm:h-40 bg-gradient-to-r from-[#8c0327] via-rose-600 to-orange-500 relative overflow-hidden flex items-end p-4 sm:p-6">
+                        <div className="absolute -right-8 -top-8 w-64 h-64 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+                        <div className="absolute left-1/4 bottom-0 w-48 h-48 rounded-full bg-orange-400/20 blur-2xl pointer-events-none" />
+                        <div className="absolute left-1/2 top-1/2 w-32 h-32 rounded-full bg-rose-500/20 blur-xl pointer-events-none" />
                         
                         <div className="relative z-10 hidden sm:flex items-center gap-2 text-white/90 text-[11px] font-bold bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-sm">
                             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                            আমার রেসিপি মেম্বার
+                            আমার রেসিপি মেম্বার প্রোফাইল
                         </div>
                     </div>
 
                     {/* Profile Information Row */}
                     <div className="px-5 sm:px-8 pb-6 sm:pb-8">
-                        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 -mt-14 sm:-mt-20">
+                        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 -mt-12 sm:-mt-16">
                             
                             {/* Avatar & Details */}
-                            <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5">
-                                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br from-[#8c0327] via-rose-600 to-orange-500 ring-4 ring-white dark:ring-[#1a1a1a] shadow-xl flex items-center justify-center text-white text-4xl sm:text-5xl font-black shrink-0 select-none z-10">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+                                {/* Avatar with a visible ring in dark mode */}
+                                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-[#8c0327] via-rose-600 to-orange-500 ring-4 ring-white dark:ring-[#2a2a2a] shadow-xl flex items-center justify-center text-white text-3xl sm:text-4xl font-black shrink-0 select-none z-10">
                                     {(user?.name || 'U').charAt(0).toUpperCase()}
                                 </div>
 
-                                <div className="space-y-1.5 pb-1">
+                                <div className="space-y-1 pb-1">
                                     <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                                         <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
                                             {user?.name || 'ব্যবহারকারী'}
@@ -283,7 +285,7 @@ export default function UserProfile() {
                                         </span>
                                     </div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center sm:justify-start gap-1.5 font-medium">
-                                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
                                         {user?.email}
