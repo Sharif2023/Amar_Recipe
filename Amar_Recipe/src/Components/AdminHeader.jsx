@@ -294,13 +294,17 @@ const AdminHeader = () => {
                     src={profileImage}
                     alt="Admin Profile"
                     className="h-full w-full rounded-full object-cover transition-opacity duration-300"
-                    onLoad={(e) => e.target.style.opacity = 1}
+                    onLoad={(e) => {
+                      e.target.style.opacity = '1';
+                      e.target.parentElement.querySelector('.img-shimmer')?.classList.add('hidden');
+                    }}
                     onError={(e) => {
-                      e.target.style.opacity = 1;
+                      e.target.style.opacity = '1';
+                      e.target.parentElement.querySelector('.img-shimmer')?.classList.add('hidden');
                     }}
                     style={{ opacity: 0 }}
                   />
-                  <div className="absolute inset-0 img-shimmer opacity-100" />
+                  <div className="img-shimmer absolute inset-0 opacity-100" />
                 </div>
               </button>
               {secondDropdownOpen && (
