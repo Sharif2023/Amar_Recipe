@@ -53,8 +53,9 @@ export function UserAuthProvider({ children }) {
                 if (data.success && data.user) {
                     persist(data.user, currentToken);
                 } else if (data.success === false) {
-                    // Session invalid or expired on backend
-                    persist(null, null);
+                    // Keep the current local session unless the user explicitly logged out.
+                    // This prevents false "Session expired" modal loops on otherwise valid sessions.
+                    console.warn('User session refresh rejected by backend:', data.message || 'No session');
                 }
             })
             .catch((err) => {
