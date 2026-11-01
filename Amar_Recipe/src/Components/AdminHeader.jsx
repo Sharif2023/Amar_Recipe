@@ -13,6 +13,7 @@ const AdminHeader = () => {
   const [profileImage, setProfileImage] = useState(
     "https://static.vecteezy.com/system/resources/previews/032/176/191/non_2x/business-avatar-profile-black-icon-man-of-user-symbol-in-trendy-flat-style-isolated-on-male-profile-people-diverse-face-for-social-network-or-web-vector.jpg"
   );
+  const [imageStatus, setImageStatus] = useState('loading');
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const firstDropdownRef = useRef(null);
@@ -36,7 +37,25 @@ const AdminHeader = () => {
         setProfileImage(fullPath);
       }
     }
+    setImageStatus('loading');
   }, []);
+
+  useEffect(() => {
+    if (!profileImage) {
+      setImageStatus('error');
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => setImageStatus('loaded');
+    img.onerror = () => setImageStatus('error');
+    img.src = profileImage;
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [profileImage]);
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -293,18 +312,13 @@ const AdminHeader = () => {
                   <img
                     src={profileImage}
                     alt="Admin Profile"
-                    className="h-full w-full rounded-full object-cover transition-opacity duration-300"
-                    onLoad={(e) => {
-                      e.target.style.opacity = '1';
-                      e.target.parentElement.querySelector('.img-shimmer')?.classList.add('hidden');
-                    }}
-                    onError={(e) => {
-                      e.target.style.opacity = '1';
-                      e.target.parentElement.querySelector('.img-shimmer')?.classList.add('hidden');
-                    }}
-                    style={{ opacity: 0 }}
+                    className={`h-full w-full rounded-full object-cover transition-opacity duration-300 ${imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'}`}
+                    onLoad={() => setImageStatus('loaded')}
+                    onError={() => setImageStatus('error')}
                   />
-                  <div className="img-shimmer absolute inset-0 opacity-100" />
+                  {imageStatus !== 'loaded' && (
+                    <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#f4f4f5] via-white to-[#f4f4f5] dark:from-[#2b2b2b] dark:via-[#1f1f1f] dark:to-[#2b2b2b] bg-[length:200%_100%] animate-image-shimmer" />
+                  )}
                 </div>
               </button>
               {secondDropdownOpen && (
