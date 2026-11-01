@@ -254,11 +254,6 @@ export default function UserProfile() {
                         <div className="absolute -right-8 -top-8 w-64 h-64 rounded-full bg-white/10 blur-3xl pointer-events-none" />
                         <div className="absolute left-1/4 bottom-0 w-48 h-48 rounded-full bg-orange-400/20 blur-2xl pointer-events-none" />
                         <div className="absolute left-1/2 top-1/2 w-32 h-32 rounded-full bg-rose-500/20 blur-xl pointer-events-none" />
-                        
-                        <div className="relative z-10 hidden sm:flex items-center gap-2 text-white/90 text-[11px] font-bold bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-sm">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                            আমার রেসিপি মেম্বার প্রোফাইল
-                        </div>
                     </div>
 
                     {/* Profile Information Row */}
