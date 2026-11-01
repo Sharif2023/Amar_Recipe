@@ -75,6 +75,7 @@ body {
 
 @theme {
     --animate-seesaw: seesaw 0.8s ease-in-out infinite;
+    --animate-image-shimmer: image-shimmer 1.4s ease-in-out infinite;
 
     @keyframes seesaw {
 
@@ -99,6 +100,16 @@ body {
             transform: translateY(0) scale(1);
         }
     }
+
+    @keyframes image-shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
 }
 
 .animate-seesaw {
@@ -107,6 +118,17 @@ body {
 
 .animate-reveal {
     animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.img-shimmer {
+    background: linear-gradient(90deg, rgba(244, 244, 245, 0.8) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(244, 244, 245, 0.8) 100%);
+    background-size: 200% 100%;
+    animation: image-shimmer 1.4s ease-in-out infinite;
+}
+
+.dark .img-shimmer {
+    background: linear-gradient(90deg, rgba(43, 43, 43, 0.8) 0%, rgba(31, 31, 31, 0.95) 50%, rgba(43, 43, 43, 0.8) 100%);
+    background-size: 200% 100%;
 }
 
 /* Premium Reveal Effect - Mobile Only */

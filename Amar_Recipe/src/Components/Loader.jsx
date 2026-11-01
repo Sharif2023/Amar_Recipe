@@ -1,7 +1,7 @@
 import React from 'react';
 import './Loader.css';
 
-const Loader = ({ message = "আপনার খাবার লোড হচ্ছে, অপেক্ষা করুন..." }) => {
+const Loader = ({ message = "আপনার খাবার তৈরী হচ্ছে, অপেক্ষা করুন..." }) => {
     return (
         <div className="loader-container">
             <h1>{message}</h1>

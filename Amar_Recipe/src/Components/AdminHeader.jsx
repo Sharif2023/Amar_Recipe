@@ -137,7 +137,7 @@ const AdminHeader = () => {
           <div className="flex items-center text-white font-bold text-2xl mb-4 lg:mb-0 cursor-pointer gap-2">
             <img
               src={logo}
-              className="w-8 h-8"
+              className="w-8 h-8 -mt-0.5"
               alt="Amar Recipe Header Logo"
             />
             আমার রেসিপি <small> (Admin Panel) </small>
@@ -289,11 +289,19 @@ const AdminHeader = () => {
                 aria-controls="dropdownMenu2"
                 aria-label="User menu"
               >
-                <img
-                  src={profileImage}
-                  alt="Admin Profile"
-                  className="h-8 w-8 rounded-full border-2 border-rose-600 shadow-md"
-                />
+                <div className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-rose-600 shadow-md bg-gray-200 dark:bg-gray-800">
+                  <img
+                    src={profileImage}
+                    alt="Admin Profile"
+                    className="h-full w-full rounded-full object-cover transition-opacity duration-300"
+                    onLoad={(e) => e.target.style.opacity = 1}
+                    onError={(e) => {
+                      e.target.style.opacity = 1;
+                    }}
+                    style={{ opacity: 0 }}
+                  />
+                  <div className="absolute inset-0 img-shimmer opacity-100" />
+                </div>
               </button>
               {secondDropdownOpen && (
                 <ul
