@@ -71,8 +71,10 @@ if ($databaseUrl) {
 }
 
 // ==========================================
-// EMAIL CONFIGURATION (Resend API)
+// EMAIL CONFIGURATION (Brevo / Resend API)
 // ==========================================
+define('BREVO_API_KEY', getenv('BREVO_API_KEY') ?: '');
+define('BREVO_SENDER_EMAIL', getenv('BREVO_SENDER_EMAIL') ?: 'sharifislam0505@gmail.com');
 define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: ''); 
 define('SMTP_FROM_EMAIL', getenv('SMTP_FROM_EMAIL') ?: 'onboarding@resend.dev');
 define('SMTP_FROM_NAME', 'Amar Recipe');

@@ -21,6 +21,8 @@ build
 .env.production
 .env.development
 *.local
+.env.*
+!.env.example
 
 # Upload directories (user-generated content)
 src/api/uploads/

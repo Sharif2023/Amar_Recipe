@@ -2,7 +2,7 @@
 require_once __DIR__ . '/config.php';
 
 /**
- * Send an email using Resend API (via cURL)
+ * Send an email using Brevo API (primary) or Resend API (fallback)
  * 
  * @param string $to Recipient email
  * @param string $subject Email subject
@@ -11,11 +11,81 @@ require_once __DIR__ . '/config.php';
  */
 function sendEmail($to, $subject, $body) {
     if (empty($to)) return "Recipient email is empty";
-    
-    if (empty(RESEND_API_KEY) || strpos(RESEND_API_KEY, 're_') !== 0) {
-        return "Resend API Key is not configured correctly.";
+
+    // 1. Prefer Brevo API if configured
+    if (!empty(BREVO_API_KEY)) {
+        return sendViaBrevo($to, $subject, $body);
     }
 
+    // 2. Fallback to Resend API
+    if (!empty(RESEND_API_KEY) && strpos(RESEND_API_KEY, 're_') === 0) {
+        return sendViaResend($to, $subject, $body);
+    }
+
+    return "No email API configured. Please set BREVO_API_KEY in your environment variables.";
+}
+
+/**
+ * Send email via Brevo REST API (HTTPS port 443 - works on Render)
+ */
+function sendViaBrevo($to, $subject, $body) {
+    $url = 'https://api.brevo.com/v3/smtp/email';
+    $senderEmail = defined('BREVO_SENDER_EMAIL') && BREVO_SENDER_EMAIL ? BREVO_SENDER_EMAIL : (defined('ADMIN_EMAIL') ? ADMIN_EMAIL : 'sharifislam0505@gmail.com');
+    $senderName = defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : 'Amar Recipe';
+
+    $payload = [
+        'sender' => [
+            'name' => $senderName,
+            'email' => $senderEmail,
+        ],
+        'to' => [
+            [
+                'email' => $to,
+            ]
+        ],
+        'subject' => $subject,
+        'htmlContent' => $body,
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'accept: application/json',
+        'api-key: ' . BREVO_API_KEY,
+        'content-type: application/json',
+    ]);
+    
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if ($error) {
+        $errorMsg = "Brevo cURL Error: " . $error;
+        error_log($errorMsg);
+        return $errorMsg;
+    }
+
+    if ($httpCode >= 200 && $httpCode < 300) {
+        error_log("Email sent successfully to $to via Brevo API");
+        return true;
+    } else {
+        $errorMsg = "Brevo API Error (HTTP $httpCode): " . $response;
+        error_log($errorMsg);
+        return $errorMsg;
+    }
+}
+
+/**
+ * Send email via Resend API
+ */
+function sendViaResend($to, $subject, $body) {
     $url = 'https://api.resend.com/emails';
     
     $payload = [

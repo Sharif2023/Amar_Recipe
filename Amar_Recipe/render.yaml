@@ -16,6 +16,10 @@ services:
         fromDatabase:
           name: amar-recipe-db
           property: connectionURI
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        value: "sharifislam0505@gmail.com"
     # Database will be created separately and linked
 
 databases:

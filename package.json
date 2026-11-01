@@ -1,7 +1,7 @@
 {
   "name": "amar-recipe",
   "version": "1.0.0",
-  "description": "Recipe management system for GitHub and Bytehost deployment",
+  "description": "Recipe management system",
   "scripts": {
     "dev": "cd Amar_Recipe && npm run dev",
     "build": "cd Amar_Recipe && npm run build",
@@ -17,9 +17,8 @@
     "management",
     "react",
     "php",
-    "vercel",
-    "bytehost"
+    "vercel"
   ],
-  "author": "Sharif Ahmed",
+  "author": "Shariful Islam",
   "license": "MIT"
 }

@@ -45,8 +45,10 @@ Complete guide for deploying Amar Recipe to production.
      DATABASE_URL = postgresql://postgres.iseehucuytvgtpdqupzp:[YOUR-PASSWORD]@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres
      RENDER = true
      ALLOWED_ORIGIN = https://your-app.vercel.app
+     BREVO_API_KEY = xkeysib-your-brevo-api-key-here
+     BREVO_SENDER_EMAIL = sharifislam0505@gmail.com
      ```
-   - *Note: Replace `[YOUR-PASSWORD]` in the URI with `amar-recipepostgres`.*
+   - *Note: Replace `[YOUR-PASSWORD]` in the URI with your Supabase database password, and `BREVO_API_KEY` with your Brevo key.*
 
 ### Step 3: Deploy Frontend to Vercel
 
