@@ -12,14 +12,9 @@ require_once __DIR__ . '/config.php';
 function sendEmail($to, $subject, $body) {
     if (empty($to)) return "Recipient email is empty";
 
-    // 1. Prefer Brevo API if configured
+    // Only use Brevo for verification emails.
     if (!empty(BREVO_API_KEY)) {
         return sendViaBrevo($to, $subject, $body);
-    }
-
-    // 2. Fallback to Resend API
-    if (!empty(RESEND_API_KEY) && strpos(RESEND_API_KEY, 're_') === 0) {
-        return sendViaResend($to, $subject, $body);
     }
 
     return "No email API configured. Please set BREVO_API_KEY in your environment variables.";
@@ -86,50 +81,8 @@ function sendViaBrevo($to, $subject, $body) {
  * Send email via Resend API
  */
 function sendViaResend($to, $subject, $body) {
-    $url = 'https://api.resend.com/emails';
-    
-    $payload = [
-        'from' => SMTP_FROM_NAME . ' <' . SMTP_FROM_EMAIL . '>',
-        'to' => [$to],
-        'subject' => $subject,
-        'html' => $body,
-    ];
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . RESEND_API_KEY,
-        'Content-Type: application/json',
-    ]);
-    
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $error = curl_error($ch);
-    curl_close($ch);
-
-    if ($error) {
-        $errorMsg = "cURL Error: " . $error;
-        error_log($errorMsg);
-        return $errorMsg;
-    }
-
-    if ($httpCode >= 200 && $httpCode < 300) {
-        error_log("Email sent successfully to $to via Resend API");
-        return true;
-    } else {
-        $errorMsg = "Resend API Error (HTTP $httpCode): " . $response;
-        if ($httpCode == 403 && strpos($response, 'validation_error') !== false) {
-            $errorMsg = "Resend API Error (403): You can only send emails to your own email address because your domain is not verified. To send to other emails, please verify your domain at Resend.com.";
-        }
-        error_log($errorMsg);
-        return $errorMsg;
-    }
+    // Kept for compatibility, but disabled in sendEmail().
+    return "Resend API is disabled for this project. Please use Brevo.";
 }
 
 /**
