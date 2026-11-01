@@ -1,5 +1,78 @@
 @import "tailwindcss";
 
+:root {
+    --font-bangla: "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", "Arial", sans-serif;
+    --font-bangla-alt: "Anek Bangla", "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", sans-serif;
+    --font-emoji-safe: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "EmojiOne Color", sans-serif;
+}
+
+html,
+body,
+#root {
+    font-family: var(--font-bangla);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-bangla);
+}
+
+* {
+    font-family: inherit;
+}
+
+.hind-siliguri-light {
+    font-family: "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.hind-siliguri-regular {
+    font-family: "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.hind-siliguri-medium {
+    font-family: "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.hind-siliguri-semibold {
+    font-family: "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.hind-siliguri-bold {
+    font-family: "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.anek-bangla {
+    font-family: "Anek Bangla", "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
+
+.anek-bangla-thin { font-family: var(--font-bangla-alt); font-weight: 100; }
+.anek-bangla-extralight { font-family: var(--font-bangla-alt); font-weight: 200; }
+.anek-bangla-light { font-family: var(--font-bangla-alt); font-weight: 300; }
+.anek-bangla-regular { font-family: var(--font-bangla-alt); font-weight: 400; }
+.anek-bangla-medium { font-family: var(--font-bangla-alt); font-weight: 500; }
+.anek-bangla-semibold { font-family: var(--font-bangla-alt); font-weight: 600; }
+.anek-bangla-bold { font-family: var(--font-bangla-alt); font-weight: 700; }
+.anek-bangla-extrabold { font-family: var(--font-bangla-alt); font-weight: 800; }
+
+.emoji-safe {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "EmojiOne Color", sans-serif;
+}
+
 @theme {
     --animate-seesaw: seesaw 0.8s ease-in-out infinite;
 
