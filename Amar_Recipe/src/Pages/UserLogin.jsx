@@ -73,7 +73,7 @@ export default function UserLogin() {
                         </div>
 
                         {/* RIGHT: Form container */}
-                        <div className="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto lg:col-span-5">
+                        <div className="w-full max-w-xl mx-auto lg:mx-0 lg:ml-auto lg:col-span-5">
                             <div className="bg-white dark:bg-[#1f1f1f] rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
                                 {/* Top gradient strip */}
                                 <div className="h-1 w-full bg-gradient-to-r from-[#8c0327] via-rose-500 to-orange-500" />

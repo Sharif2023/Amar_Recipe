@@ -3,6 +3,7 @@ import { API_BASE_URL, getUserAuthHeaders } from '../config/api';
 
 const USER_KEY = 'amar_recipe_user';
 const TOKEN_KEY = 'amar_recipe_token';
+const LOGOUT_IN_PROGRESS_KEY = 'amar_recipe_logout_in_progress';
 
 const UserAuthContext = createContext(null);
 
@@ -28,6 +29,7 @@ export function UserAuthProvider({ children }) {
         if (nextUser && nextToken) {
             localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
             localStorage.setItem(TOKEN_KEY, nextToken);
+            localStorage.removeItem(LOGOUT_IN_PROGRESS_KEY);
         } else {
             localStorage.removeItem(USER_KEY);
             localStorage.removeItem(TOKEN_KEY);
@@ -38,7 +40,7 @@ export function UserAuthProvider({ children }) {
 
     useEffect(() => {
         const currentToken = localStorage.getItem(TOKEN_KEY);
-        if (!currentToken) {
+        if (!currentToken || localStorage.getItem(LOGOUT_IN_PROGRESS_KEY) === '1') {
             setLoading(false);
             return;
         }
@@ -62,9 +64,13 @@ export function UserAuthProvider({ children }) {
             .finally(() => setLoading(false));
     }, []);
 
-    const login = (nextUser, nextToken) => persist(nextUser, nextToken);
+    const login = (nextUser, nextToken) => {
+        localStorage.removeItem(LOGOUT_IN_PROGRESS_KEY);
+        persist(nextUser, nextToken);
+    };
 
     const logout = async () => {
+        localStorage.setItem(LOGOUT_IN_PROGRESS_KEY, '1');
         try {
             await fetch(API_BASE_URL + 'user_logout.php', {
                 method: 'POST',
