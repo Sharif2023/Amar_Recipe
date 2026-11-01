@@ -14,6 +14,13 @@ $recipe_id = $_POST['recipe_id'] ?? $_POST['recipeId'] ?? ($data['recipe_id'] ??
 $user_email = $_POST['user_email'] ?? $_POST['email'] ?? ($data['user_email'] ?? ($data['email'] ?? ''));
 $rating = $_POST['rating'] ?? ($data['rating'] ?? '');
 
+$conn = getDbConnection();
+$authUser = getAuthenticatedUser($conn, false);
+$ratingUserId = $authUser['id'] ?? null;
+if ($authUser && empty($user_email)) {
+    $user_email = $authUser['email'];
+}
+
 $image_url = null;
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $fileTmpPath = $_FILES['image']['tmp_name'];
@@ -36,8 +43,6 @@ if (empty($recipe_id) || empty($user_email) || empty($rating)) {
     exit;
 }
 
-$conn = getDbConnection();
-
 try {
     $conn->beginTransaction();
     // Initial check outside transaction (actually better inside now we started it)
@@ -52,13 +57,13 @@ try {
 
     require_once __DIR__ . '/mail_util.php';
 
-    // Check if we should bypass verification (Option B)
-    $shouldVerify = ($user_email === ADMIN_EMAIL);
+    // Guests may need verification; logged-in verified users skip it so ratings show on profile.
+    $shouldVerify = (empty($authUser) || empty($authUser['is_verified'])) && ($user_email === ADMIN_EMAIL);
     $token = $shouldVerify ? bin2hex(random_bytes(16)) : null;
     
     // Perform the save operation (Insert or Update)
     if ($existing) {
-        $query = "UPDATE ratings SET rating = :rating, verification_token = :token, is_verified = :is_verified, created_at = NOW()";
+        $query = "UPDATE ratings SET rating = :rating, verification_token = :token, is_verified = :is_verified, created_at = NOW(), user_id = COALESCE(:user_id, user_id)";
         if ($image_url) {
             $query .= ", image_url = :image_url";
         }
@@ -68,6 +73,7 @@ try {
             ':rating' => $rating, 
             ':token' => $token, 
             ':is_verified' => $shouldVerify ? 0 : 1,
+            ':user_id' => $ratingUserId,
             ':id' => $existing['id']
         ];
         if ($image_url) {
@@ -75,11 +81,11 @@ try {
         }
         $updateStmt->execute($params);
     } else {
-        $query = "INSERT INTO ratings (recipe_id, user_email, email, rating, is_verified, verification_token";
+        $query = "INSERT INTO ratings (recipe_id, user_email, email, rating, is_verified, verification_token, user_id";
         if ($image_url) {
             $query .= ", image_url";
         }
-        $query .= ") VALUES (:recipe_id, :user_email, :email, :rating, :is_verified, :token";
+        $query .= ") VALUES (:recipe_id, :user_email, :email, :rating, :is_verified, :token, :user_id";
         if ($image_url) {
             $query .= ", :image_url";
         }
@@ -91,7 +97,8 @@ try {
             ':email' => $user_email, 
             ':rating' => $rating, 
             ':is_verified' => $shouldVerify ? 0 : 1, 
-            ':token' => $token
+            ':token' => $token,
+            ':user_id' => $ratingUserId
         ];
         if ($image_url) {
             $params[':image_url'] = $image_url;

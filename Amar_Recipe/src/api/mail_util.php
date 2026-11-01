@@ -151,3 +151,21 @@ function sendRecipeDeclineNotification($email, $recipeTitle, $reason) {
     ";
     return sendEmail($email, $subject, $body);
 }
+
+function sendUserSignupVerification($email, $name, $token) {
+    $verifyUrl = FRONTEND_URL . "verify-email?type=user&token=" . urlencode($token);
+    $safeName = htmlspecialchars($name ?: 'there', ENT_QUOTES, 'UTF-8');
+    $subject = "আপনার অ্যাকাউন্ট যাচাই করুন - Amar Recipe";
+    $body = "
+        <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
+            <h2 style='color: #e11d48;'>Amar Recipe</h2>
+            <p>হ্যালো {$safeName},</p>
+            <p>আপনার অ্যাকাউন্ট চালু করতে ইমেইল যাচাই করুন। যাচাইয়ের পর আপনি লগইন করে রেসিপি সাবমিশন, অনুমোদন/রিজেক্ট এবং রেটিং ট্র্যাক করতে পারবেন।</p>
+            <div style='margin: 30px 0;'>
+                <a href='{$verifyUrl}' style='background-color: #e11d48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;'>ইমেইল যাচাই করুন</a>
+            </div>
+            <p style='color: #666; font-size: 12px;'>যদি আপনি এই অ্যাকাউন্ট না খুলে থাকেন, তবে এই ইমেইলটি উপেক্ষা করুন।</p>
+        </div>
+    ";
+    return sendEmail($email, $subject, $body);
+}

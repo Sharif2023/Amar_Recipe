@@ -15,8 +15,13 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable required Apache modules
-RUN a2enmod rewrite headers
+# Enable required Apache modules and pass Authorization to PHP
+RUN a2enmod rewrite headers \
+    && printf '%s\n' \
+        'SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1' \
+        'SetEnvIf X-Auth-Token "(.*)" HTTP_X_AUTH_TOKEN=$1' \
+        > /etc/apache2/conf-available/pass-auth.conf \
+    && a2enconf pass-auth
 
 # Set working directory
 WORKDIR /var/www/html

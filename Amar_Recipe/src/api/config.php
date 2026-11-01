@@ -31,7 +31,7 @@ if ($envOrigin === '*') {
 // Handle OPTIONS preflight request immediately
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin, X-Auth-Token');
     header('Access-Control-Max-Age: 86400');
     http_response_code(200);
     exit();
@@ -39,7 +39,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS
 
 // Set CORS headers for all other requests
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin, X-Auth-Token');
 header('Content-Type: application/json; charset=utf-8');
 
 // Error reporting
@@ -73,7 +73,7 @@ if ($databaseUrl) {
 // ==========================================
 // EMAIL CONFIGURATION (Resend API)
 // ==========================================
-define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: 're_8RwLWFts_BED5BCyFWLDsj5TBTKsnBMCX'); 
+define('RESEND_API_KEY', getenv('RESEND_API_KEY') ?: ''); 
 define('SMTP_FROM_EMAIL', getenv('SMTP_FROM_EMAIL') ?: 'onboarding@resend.dev');
 define('SMTP_FROM_NAME', 'Amar Recipe');
 define('ADMIN_EMAIL', 'sharifislam0505@gmail.com');
@@ -112,6 +112,12 @@ function getDbConnection() {
             PDO::ATTR_EMULATE_PREPARES => false,
             PDO::ATTR_TIMEOUT => 5
         ]);
+        require_once __DIR__ . '/user_auth.php';
+        try {
+            ensureUserSchema($pdo);
+        } catch (Throwable $schemaError) {
+            error_log("User schema ensure failed: " . $schemaError->getMessage());
+        }
         return $pdo;
     } catch (Exception $e) {
         error_log("Database connection failed: " . $e->getMessage());

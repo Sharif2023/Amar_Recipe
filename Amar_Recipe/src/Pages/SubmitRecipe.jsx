@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { API_BASE_URL, ADMIN_API_BASE_URL } from '../config/api';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { API_BASE_URL, getUserAuthHeaders } from '../config/api';
 import Loader from '../Components/Loader';
+import { useUserAuth } from '../context/UserAuthContext';
 
 export default function SubmitRecipe() {
+    const { isLoggedIn, user } = useUserAuth() || {};
     const [formData, setFormData] = useState({
         title: '',
         category: '',
@@ -19,6 +22,16 @@ export default function SubmitRecipe() {
         comment: '',
         source: '',
     });
+
+    useEffect(() => {
+        if (!isLoggedIn || !user) return;
+        setFormData((prev) => ({
+            ...prev,
+            organizerName: prev.organizerName || user.name || '',
+            organizerEmail: prev.organizerEmail || user.email || '',
+            organizerAddress: prev.organizerAddress || user.address || '',
+        }));
+    }, [isLoggedIn, user]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
@@ -134,6 +147,7 @@ export default function SubmitRecipe() {
         try {
             const response = await fetch(API_BASE_URL + 'submit_recipe_request.php', {
                 method: 'POST',
+                headers: getUserAuthHeaders(),
                 body: data,
             });
 
@@ -191,6 +205,20 @@ export default function SubmitRecipe() {
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">সহজেই আপনার রেসিপিটি সকলের মাঝে পৌঁছে দিন।</p>
                     </header>
+
+                    {!isLoggedIn && (
+                        <div className="mb-10 p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 border border-amber-100 dark:border-amber-900/30">
+                            <p className="font-semibold text-lg leading-snug">
+                                You can submit but can't track your recipe without login.
+                            </p>
+                            <p className="mt-2 text-sm">
+                                লগইন ছাড়া রেসিপি জমা দিতে পারবেন, কিন্তু অনুমোদন/রিজেক্ট ও রেটিং ট্র্যাক করতে পারবেন না।{' '}
+                                <Link to="/login" className="font-bold underline">লগইন</Link>
+                                {' '}বা{' '}
+                                <Link to="/signup" className="font-bold underline">সাইনআপ</Link>
+                            </p>
+                        </div>
+                    )}
 
                     {submissionStatus.message && (
                         <div className={`mb-10 p-6 rounded-2xl flex items-start gap-4 animate-in fade-in zoom-in-95 duration-500 ${submissionStatus.type === 'success' ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border border-green-100 dark:border-green-900/30' : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border border-red-100 dark:border-red-900/30'}`}>
@@ -376,6 +404,7 @@ export default function SubmitRecipe() {
                                         type="email"
                                         name="organizerEmail"
                                         required
+                                        readOnly={Boolean(isLoggedIn && user?.email)}
                                         placeholder="example@mail.com"
                                         className="block w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-[#1b1b1b] border-2 border-transparent focus:border-[#8c0327] dark:focus:border-rose-600 outline-none transition-all dark:text-white font-medium"
                                         value={formData.organizerEmail}
