@@ -57,14 +57,25 @@ try {
         }
     }
     elseif ($type === 'user') {
-        $stmt = $conn->prepare("SELECT id FROM users WHERE verification_token = :token");
+        require_once __DIR__ . '/user_auth.php';
+        $stmt = $conn->prepare("SELECT id, name, email, phone, address, is_verified, created_at FROM users WHERE verification_token = :token");
         $stmt->execute([':token' => $token]);
-        $user = $stmt->fetch();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
             $update = $conn->prepare("UPDATE users SET is_verified = TRUE, verification_token = NULL, updated_at = NOW() WHERE id = :id");
             $update->execute([':id' => $user['id']]);
-            echo json_encode(['success' => true, 'message' => 'ধন্যবাদ! আপনার অ্যাকাউন্ট যাচাই হয়েছে। এখন লগইন করতে পারেন।']);
+
+            // Auto-login: create an active session token
+            $sessionToken = createUserSession($conn, (int) $user['id']);
+            $user['is_verified'] = true;
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'ধন্যবাদ! আপনার অ্যাকাউন্ট সফলভাবে যাচাই হয়েছে। আপনি এখন সরাসরি লগইন অবস্থায় আছেন।',
+                'token' => $sessionToken,
+                'user' => publicUserPayload($user),
+            ]);
         } else {
             echo json_encode(['success' => false, 'message' => 'যাচাইকরন টোকেনটি পাওয়া যায়নি বা ইতিমধ্য ব্যবহার করা হয়েছে।']);
         }

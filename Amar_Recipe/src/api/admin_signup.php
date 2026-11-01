@@ -34,7 +34,7 @@ $stmt = $conn->prepare("SELECT id FROM admin_requests WHERE email = :email");
 $stmt->execute([':email' => $email]);
 if ($stmt->fetch()) {
     echo json_encode(['success' => false, 'message' => 'Email already registered']);
-    exit;si
+    exit;
 }
 
 try {

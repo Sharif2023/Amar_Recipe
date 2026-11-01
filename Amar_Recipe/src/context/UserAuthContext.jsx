@@ -50,12 +50,14 @@ export function UserAuthProvider({ children }) {
             .then((data) => {
                 if (data.success && data.user) {
                     persist(data.user, currentToken);
-                } else {
+                } else if (data.success === false) {
+                    // Session invalid or expired on backend
                     persist(null, null);
                 }
             })
-            .catch(() => {
-                persist(null, null);
+            .catch((err) => {
+                // Network hiccup or Render cold start - keep current user session
+                console.warn('Could not refresh user session from backend:', err);
             })
             .finally(() => setLoading(false));
     }, []);

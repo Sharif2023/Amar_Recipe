@@ -38,14 +38,26 @@ function ensureUserSchema(PDO $conn): void
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ");
-        $conn->exec("ALTER TABLE submission_requests ADD COLUMN IF NOT EXISTS user_id INTEGER");
-        $conn->exec("ALTER TABLE recipes ADD COLUMN IF NOT EXISTS user_id INTEGER");
-        $conn->exec("ALTER TABLE ratings ADD COLUMN IF NOT EXISTS user_id INTEGER");
-        $conn->exec("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)");
-        $conn->exec("CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON user_sessions (token_hash)");
-        $conn->exec("CREATE INDEX IF NOT EXISTS idx_submissions_user_id ON submission_requests (user_id)");
-        $conn->exec("CREATE INDEX IF NOT EXISTS idx_recipes_user_id ON recipes (user_id)");
-        $conn->exec("CREATE INDEX IF NOT EXISTS idx_ratings_user_id ON ratings (user_id)");
+        foreach (['submission_requests', 'recipes', 'ratings'] as $tbl) {
+            try {
+                $conn->exec("ALTER TABLE {$tbl} ADD COLUMN IF NOT EXISTS user_id INTEGER");
+            } catch (Throwable $e) {
+                // Table might not exist yet
+            }
+        }
+        foreach ([
+            "CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)",
+            "CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON user_sessions (token_hash)",
+            "CREATE INDEX IF NOT EXISTS idx_submissions_user_id ON submission_requests (user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_recipes_user_id ON recipes (user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_ratings_user_id ON ratings (user_id)"
+        ] as $idxSql) {
+            try {
+                $conn->exec($idxSql);
+            } catch (Throwable $e) {
+                // Ignore index errors if table does not exist
+            }
+        }
         return;
     }
 
