@@ -80,7 +80,7 @@ function Header() {
                     <div className="flex items-center justify-between w-full lg:w-auto">
                         <Link to={'/'} className="group shrink-0 lg:pr-2">
                             <div className="text-white font-bold text-xl sm:text-2xl inline-flex items-center gap-2 group-hover:text-orange-600 hover:cursor-pointer whitespace-nowrap">
-                                <img src={logo} className="w-8 h-8 sm:w-9 sm:h-9 group-hover:animate-seesaw" alt="Amar Recipe Header Logo" />
+                                <img src={logo} className="w-8 h-8 sm:w-9 sm:h-9 group-hover:animate-seesaw -mt-0.5" alt="Amar Recipe Header Logo" />
                                 আমার রেসিপি
                             </div>
                         </Link>
