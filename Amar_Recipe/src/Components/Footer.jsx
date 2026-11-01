@@ -9,7 +9,7 @@ const Footer = () => {
                     <a href="/" className="flex justify-center group">
                         <div className="text-black dark:text-white font-bold text-2xl mb-4 lg:mb-0 group-hover:text-orange-600 hover:cursor-pointer inline-flex items-center gap-2">
                             <img src={logo} className="w-8 h-8 group-hover:animate-seesaw" alt="Amar Recipe Header Logo" />
-                            আমার রেসিপি
+                            <span className="translate-y-[5px]">আমার রেসিপি</span>
                         </div>
                     </a>
                     <ul className="text-sm flex items-center justify-center flex-col gap-7 md:flex-row md:gap-12 transition-all duration-500 py-5 mb-5 border-b border-gray-200 dark:border-gray-800">
@@ -52,7 +52,7 @@ const Footer = () => {
 
                         </a>
                     </div>
-                    <span className="text-lg text-gray-500 dark:text-gray-400 text-center block">©<a href="https://engineer-sharif.infinityfreeapp.com/">Sharif Code Corner</a> 2025, All rights reserved.</span>
+                    <span className="text-lg text-gray-500 dark:text-gray-400 text-center block"><a href="https://si-sharif.vercel.app/">Shariful Islam,</a> &copy; {new Date().getFullYear()} All rights reserved.</span>
                 </div>
             </div>
         </footer>

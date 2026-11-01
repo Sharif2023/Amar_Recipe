@@ -81,7 +81,7 @@ function Header() {
                         <Link to={'/'} className="group shrink-0 lg:pr-2">
                             <div className="text-white font-bold text-xl sm:text-2xl inline-flex items-center gap-2 group-hover:text-orange-600 hover:cursor-pointer whitespace-nowrap">
                                 <img src={logo} className="w-8 h-8 sm:w-9 sm:h-9 group-hover:animate-seesaw -mt-0.5" alt="Amar Recipe Header Logo" />
-                                আমার রেসিপি
+                                <span className="translate-y-[5px]">আমার রেসিপি</span>
                             </div>
                         </Link>
 
@@ -250,7 +250,7 @@ function Header() {
 
                                 {/* Dropdown Menu */}
                                 {userMenuOpen && (
-                                    <div 
+                                    <div
                                         className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1f1f1f] rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-150"
                                         style={{ minWidth: '13rem' }}
                                     >
